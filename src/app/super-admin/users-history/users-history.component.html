@@ -1,0 +1,610 @@
+<main id="main" class="main">
+
+  <div class="uh-page-header">
+    <div>
+      <h1 class="uh-page-title">Users History</h1>
+      <p class="uh-page-subtitle">
+        View and track user session history
+      </p>
+    </div>
+  </div>
+
+
+  <!-- USER DETAILS -->
+
+  <div
+    class="ai-panel uh-user-details-panel data-table-wrapper"
+    *ngIf="
+      showSessionTable &&
+      selectedRole?.shortCode !== 'all' &&
+      selectedSubAdmin?.id !== 'all'
+    ">
+
+    <div
+      class="ai-panel__header"
+      role="button"
+      tabindex="0"
+      (click)="userDetailsPanelOpen = !userDetailsPanelOpen"
+      [class.ai-panel__header--open]="userDetailsPanelOpen">
+
+      <div class="ai-panel__header-left">
+
+        <span class="ai-panel__chevron">
+          <svg
+            [style.transform]="
+              userDetailsPanelOpen
+                ? 'rotate(180deg)'
+                : 'rotate(0deg)'
+            "
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none">
+
+            <path
+              d="M5 7L10 12L15 7"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+          </svg>
+        </span>
+
+        <span class="ai-panel__title">
+          User Details
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="ai-panel__body"
+      *ngIf="userDetailsPanelOpen">
+
+      <div class="ud-field-grid">
+
+        <div class="ud-field-block">
+          <span class="ud-field-label">Name</span>
+
+          <span class="ud-field-value">
+            {{ (selectedSubAdmin || selectedAdmin)?.name || '—' }}
+          </span>
+        </div>
+
+
+        <div class="ud-field-block">
+
+          <span class="ud-field-label">
+            Email
+          </span>
+
+          <span class="ud-field-value">
+            {{ (selectedSubAdmin || selectedAdmin)?.email || '—' }}
+          </span>
+
+        </div>
+
+
+        <div class="ud-field-block">
+
+          <span class="ud-field-label">
+            Phone
+          </span>
+
+          <span class="ud-field-value">
+            {{ (selectedSubAdmin || selectedAdmin)?.phone || '—' }}
+          </span>
+
+        </div>
+
+
+        <div class="ud-field-block">
+
+          <span class="ud-field-label">
+            Role
+          </span>
+
+          <span class="ud-field-value">
+            {{ selectedRole?.roleName || '—' }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- DATA TABLE -->
+
+  <div class="data-table-wrapper">
+
+
+    <!-- TOP TOOLBAR -->
+
+    <div class="page-top-toolbar">
+
+      <div class="toolbar-left">
+
+        <label class="entries-label">
+
+          Show
+
+          <span class="entries-select-wrap">
+
+            <div class="entries-select-box">
+
+              <span class="entries-number">
+                {{ sessionPageSize }}
+              </span>
+
+              <svg
+                class="entries-arrow"
+                width="12"
+                height="12"
+                viewBox="0 0 20 20"
+                fill="none">
+
+                <path
+                  d="M5 7L10 12L15 7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+
+              </svg>
+
+            </div>
+
+
+            <select
+              class="entries-select-native"
+              [value]="sessionPageSize"
+              (change)="onSessionPageSizeChange($event)">
+
+              <option
+                *ngFor="let s of [10,25,50,100]"
+                [value]="s">
+
+                {{ s }}
+
+              </option>
+
+            </select>
+
+          </span>
+
+          entries
+
+        </label>
+
+      </div>
+
+
+
+      <div class="toolbar-right">
+
+        <button
+          type="button"
+          class="uh-filter-btn"
+          [class.uh-filter-btn--active]="filterPanelOpen"
+          (click)="
+            filterPanelOpen = !filterPanelOpen;
+            $event.stopPropagation()
+          ">
+
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 19 19"
+            fill="none">
+
+            <path
+              d="M2 5H17M5 10H14M8 15H11"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"/>
+
+          </svg>
+
+          Filter
+
+          <span
+            class="uh-filter-dot"
+            *ngIf="selectedAdmin">
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- FILTER SUMMARY -->
+
+    <div
+      class="filter-summary"
+      *ngIf="
+        showSessionTable &&
+        (
+          (isSuperAdmin && selectedAdmin) ||
+          selectedRole ||
+          selectedSubAdmin ||
+          selectedRange !== 'all'
+        )
+      ">
+
+      <span class="summary-label">
+        Selected Filters:
+      </span>
+
+
+      <span
+        class="filter-chip"
+        *ngIf="isSuperAdmin && selectedAdmin">
+
+        Admin:
+
+        <strong>
+          {{ selectedAdmin?.name }}
+        </strong>
+
+      </span>
+
+
+      <span
+        class="filter-chip"
+        *ngIf="selectedRole">
+
+        Role:
+
+        <strong>
+          {{
+            selectedRole.shortCode === 'all'
+              ? 'All Roles'
+              : selectedRole.roleName
+          }}
+        </strong>
+
+      </span>
+
+
+      <span
+        class="filter-chip"
+        *ngIf="selectedSubAdmin">
+
+        User:
+
+        <strong>
+
+          {{
+            selectedSubAdmin.id === 'all'
+              ? 'All Users'
+              : (
+                  selectedSubAdmin?.name
+                  || (
+                    (selectedSubAdmin?.first_name || '')
+                    + ' '
+                    + (selectedSubAdmin?.last_name || '')
+                  )
+                  || selectedSubAdmin?.email
+                )
+          }}
+
+        </strong>
+
+      </span>
+
+
+      <span class="filter-chip">
+
+        Date:
+
+        <strong>
+          {{ selectedRangeLabel }}
+        </strong>
+
+      </span>
+
+    </div>
+
+
+
+    <!-- TABLE -->
+
+    <div
+      *ngIf="showSessionTable"
+      class="data-table-scroll">
+
+      <table class="data-table">
+
+        <thead>
+
+          <tr>
+            <th class="col-compact">
+              Login Time
+            </th>
+
+            <th class="col-compact">
+              Logout Time
+            </th>
+
+            <th class="col-compact">
+              Activity
+            </th>
+
+            <th class="col-action">
+              Actions
+            </th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+          <!-- LOADING -->
+
+          <tr
+            *ngIf="loadingSessions"
+            class="empty-row">
+
+            <td
+              [attr.colspan]="showUserColumns ? 6 : 4"
+              class="empty-cell">
+
+              <span class="loading-spinner"></span>
+
+              Loading sessions...
+
+            </td>
+
+          </tr>
+
+
+
+          <!-- DATA -->
+
+          <tr
+            *ngFor="
+              let session of pagedSessions;
+              trackBy: trackBySession
+            ">
+
+            <td class="col-compact">
+
+              {{
+                session.session_created
+                | date:'dd MMM yyyy, hh:mm a'
+              }}
+
+            </td>
+
+
+            <td class="col-compact">
+
+              {{
+                session.session_ended
+                  ? (
+                    session.session_ended
+                    | date:'dd MMM yyyy, hh:mm a'
+                  )
+                  : '—'
+              }}
+
+            </td>
+
+
+
+            <td class="col-compact">
+
+              <span
+                class="status-badge"
+
+                [ngClass]="
+                  session.status === 'ended' ||
+                  session.status === 'expired' ||
+                  session.session_ended
+                    ? 'badge-inactive'
+                    : 'badge-active'
+                ">
+
+                {{
+                  session.status === 'ended' ||
+                  session.status === 'expired' ||
+                  session.session_ended
+                    ? 'Logged Out'
+                    : 'Active'
+                }}
+
+              </span>
+
+            </td>
+
+
+
+            <td
+              class="col-action"
+              (click)="$event.stopPropagation()">
+
+              <app-three-dots-button
+                [active]="activePopupId === session.id"
+                (menuClick)="openActionPopup(session, $event)">
+              </app-three-dots-button>
+
+            </td>
+
+          </tr>
+
+
+
+          <!-- EMPTY -->
+
+          <tr
+            *ngIf="
+              !loadingSessions &&
+              sessions.length === 0
+            "
+            class="empty-row">
+
+            <td
+              [attr.colspan]="showUserColumns ? 6 : 4"
+              class="empty-cell">
+
+              No sessions found.
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+
+    <!-- PROMPT STATE -->
+
+    <div
+      *ngIf="!showSessionTable"
+      class="uh-prompt-state">
+
+      <svg
+        class="uh-prompt-icon"
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.4"
+        stroke-linecap="round">
+
+        <circle cx="11" cy="11" r="8"/>
+
+        <path d="M21 21l-4.35-4.35"/>
+
+      </svg>
+
+
+      <p *ngIf="!isSuperAdmin">
+
+        Select a <strong>Role</strong>
+        and <strong>User</strong>,
+        then click <strong>Apply</strong>
+        to view sessions.
+
+      </p>
+
+
+      <p *ngIf="isSuperAdmin">
+
+        Select filters and click
+        <strong>Apply</strong>
+        to view sessions.
+
+      </p>
+
+    </div>
+
+
+
+    <!-- PAGINATION -->
+
+    <app-pagination-footer
+      *ngIf="
+        showSessionTable &&
+        sessions.length > 0
+      "
+
+      [totalItems]="sessions.length"
+      [pageSize]="sessionPageSize"
+      [currentPage]="sessionPage"
+      itemLabel="sessions"
+
+      (pageChange)="onPageChange($event)">
+    </app-pagination-footer>
+
+
+  </div>
+
+
+
+  <!-- FILTER PANEL -->
+
+  <app-filter-panel
+
+    [isOpen]="filterPanelOpen"
+
+    [isSuperAdmin]="isSuperAdmin"
+
+    [adminDropdownDisabled]="adminDropdownDisabled"
+
+    [admins]="admins"
+
+    [roles]="roles"
+
+    [subAdmins]="subAdmins"
+
+    [loadingSubAdmins]="loadingSubAdmins"
+
+    [selectedAdmin]="selectedAdmin"
+
+    [selectedRole]="selectedRole"
+
+    [selectedSubAdmin]="selectedSubAdmin"
+
+    [selectedRange]="selectedRange"
+
+    [selectedRangeLabel]="selectedRangeLabel"
+
+    [customRangeStart]="customRangeStart"
+
+    [customRangeEnd]="customRangeEnd"
+
+    (closed)="filterPanelOpen = false"
+
+    (applied)="onFilterApplied($event)"
+
+    (cleared)="onFilterCleared()"
+
+    (adminSelected)="onFilterAdminSelected($event)"
+
+    (roleSelected)="onFilterRoleSelected($event)"
+
+    (subAdminSelected)="onFilterSubAdminSelected($event)">
+
+  </app-filter-panel>
+
+
+</main>
+
+
+<!-- POPUP MENU -->
+
+<app-popup-menu
+
+  *ngIf="activePopupId !== null"
+
+  title="ACTIONS"
+
+  [items]="actionMenuItems"
+
+  [position]="popupPosition"
+
+  [width]="180"
+
+  (closeClick)="closeActionPopup()"
+
+  (itemClick)="onPopupItemClick($event)">
+
+</app-popup-menu>

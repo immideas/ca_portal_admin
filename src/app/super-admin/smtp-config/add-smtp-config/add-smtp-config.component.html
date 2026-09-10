@@ -1,0 +1,150 @@
+<main id="main" class="complaint-wrapper">
+  <header class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add">
+        </div>
+        <div class="title-text">
+          <h4>{{ isViewMode ? 'View SMTP Config' : isEditMode ? 'Edit SMTP Config' : 'Add SMTP Config' }}</h4>
+          <p>SMTP Email Server details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" type="button" class="btn-save btn-active" (click)="enableEditMode()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+
+        <span class="uploading-indicator" *ngIf="isUploading">
+          <span class="status-spinner-small"></span> Saving...
+        </span>
+
+        <button type="submit" form="smtpForm" class="btn-save"
+          [ngClass]="{ 'btn-active': smtpForm.valid && !isUploading }"
+          [disabled]="smtpForm.invalid || isUploading || (isEditMode && !canEdit)">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info">
+      </div>
+      <div class="header-content">
+        <span class="header-text">SMTP Configuration</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="smtpForm" id="smtpForm" (ngSubmit)="saveSmtpConfig()" class="form-padding-wrap">
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="host">
+            SMTP Host <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <input id="host" type="text" formControlName="host"
+              class="form-controler" placeholder="e.g. smtp.gmail.com" />
+          </div>
+          <div class="text-danger mt-1 field-error-text"
+            *ngIf="smtpForm.get('host')?.touched && smtpForm.get('host')?.invalid">
+            SMTP Host is required.
+          </div>
+        </div>
+  <div class="col-md-6 form-group">
+    <label for="status">Status</label>
+    <div class="field-wrap icon-category-sub">
+      <select id="status" formControlName="status" class="form-controler">
+        <option [ngValue]="1">Active</option>
+        <option [ngValue]="0">Inactive</option>
+      </select>
+    </div>
+  </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="port">
+            Port <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <input id="port" type="number" formControlName="port"
+              class="form-controler" placeholder="e.g. 587 or 465" />
+          </div>
+          <div class="text-danger mt-1 field-error-text"
+            *ngIf="smtpForm.get('port')?.touched && smtpForm.get('port')?.invalid">
+            Valid port number is required.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group d-flex flex-column justify-content-center">
+          <label for="secure">
+            Secure Connection (SSL/TLS)
+          </label>
+          <div class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" id="secure" formControlName="secure">
+            <label class="form-check-label ms-2" for="secure">
+              {{ smtpForm.get('secure')?.value ? 'Enabled (SSL/TLS)' : 'Disabled (STARTTLS / Plain)' }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="authUser">
+            Auth Email User <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <input id="authUser" type="email" formControlName="authUser"
+              class="form-controler" placeholder="e.g. user@example.com" />
+          </div>
+          <div class="text-danger mt-1 field-error-text"
+            *ngIf="smtpForm.get('authUser')?.touched && smtpForm.get('authUser')?.invalid">
+            Valid Auth User Email is required.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="authPass">
+            Auth Password <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <input id="authPass" type="password" formControlName="authPass"
+              class="form-controler" placeholder="Enter password / App Password" />
+          </div>
+          <div class="text-danger mt-1 field-error-text"
+            *ngIf="smtpForm.get('authPass')?.touched && smtpForm.get('authPass')?.invalid">
+            Auth Password is required.
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </article>
+</main>

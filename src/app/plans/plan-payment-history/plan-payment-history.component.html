@@ -1,0 +1,146 @@
+<app-common-header></app-common-header>
+<app-sidebar></app-sidebar>
+
+<main id="main" class="main">
+  <section class="section">
+    <div class="container-fluid py-4" [class.with-multi-select-header]="selectedCount > 0">
+
+      <app-multi-select-header
+        *ngIf="selectedCount > 0"
+        [selectedCount]="selectedCount"
+        [buttons]="multiSelectButtons"
+        (buttonClick)="onMultiHeaderButtonClick($event)">
+      </app-multi-select-header>
+
+      <app-page-header title="Plan Payment History" subtitle="View and download your payment records">
+        <button class="btn-advance" (click)="goToAdvancePayment()">Advance Payment</button>
+      </app-page-header>
+
+      <div class="data-table-wrapper">
+        <div class="page-top-toolbar">
+          <div class="toolbar-left">
+            <label class="entries-label">Show
+              <span class="entries-select-wrap">
+                <div class="entries-select-box">
+                  <span class="entries-number">{{ pageSize }}</span>
+                  <img class="entries-arrow" src="assets/svgs/show_arrow.svg" alt="arrow" />
+                </div>
+                <select class="entries-select-native" [value]="pageSize" (change)="onPageSizeChange($event)">
+                  <option *ngFor="let s of [10,25,50,100]" [value]="s">{{ s }}</option>
+                </select>
+              </span>
+              entries
+            </label>
+          </div>
+
+          <div class="toolbar-right">
+            <div class="search-input-wrap">
+              <img class="search-icon-img" src="assets/svgs/search_table.svg" alt="search" />
+              <input class="search-input" type="text" placeholder="Search by plan name or payment ID"
+                (input)="onSearch($any($event.target).value)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="data-table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-check">
+                  <div class="checkbox-cell">
+                    <input type="checkbox" class="custom-checkbox" [checked]="selectAll"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleSelectAll($any($event.target).checked)" />
+                  </div>
+                </th>
+                <th class="col-compact sortable" [class.sorted]="sortCol === 'plan_name'" (click)="setSort('plan_name')">
+                  Plan Name<span class="sort-icon"><svg viewBox="0 0 12 12" fill="currentColor">
+                    <path *ngIf="sortCol !== 'plan_name' || sortDir === 'asc'" d="M4 5L6 2L8 5H4z" />
+                    <path *ngIf="sortCol !== 'plan_name' || sortDir === 'desc'" d="M8 7L6 10L4 7H8z" />
+                  </svg></span>
+                </th>
+                <th class="col-compact sortable" [class.sorted]="sortCol === 'amount'" (click)="setSort('amount')">
+                  Amount<span class="sort-icon"><svg viewBox="0 0 12 12" fill="currentColor">
+                    <path *ngIf="sortCol !== 'amount' || sortDir === 'asc'" d="M4 5L6 2L8 5H4z" />
+                    <path *ngIf="sortCol !== 'amount' || sortDir === 'desc'" d="M8 7L6 10L4 7H8z" />
+                  </svg></span>
+                </th>
+                <th class="col-compact sortable" [class.sorted]="sortCol === 'payment_date'" (click)="setSort('payment_date')">
+                  Payment Date<span class="sort-icon"><svg viewBox="0 0 12 12" fill="currentColor">
+                    <path *ngIf="sortCol !== 'payment_date' || sortDir === 'asc'" d="M4 5L6 2L8 5H4z" />
+                    <path *ngIf="sortCol !== 'payment_date' || sortDir === 'desc'" d="M8 7L6 10L4 7H8z" />
+                  </svg></span>
+                </th>
+                <th class="col-compact sortable" [class.sorted]="sortCol === 'expiration_date'" (click)="setSort('expiration_date')">
+                  Expiration Date<span class="sort-icon"><svg viewBox="0 0 12 12" fill="currentColor">
+                    <path *ngIf="sortCol !== 'expiration_date' || sortDir === 'asc'" d="M4 5L6 2L8 5H4z" />
+                    <path *ngIf="sortCol !== 'expiration_date' || sortDir === 'desc'" d="M8 7L6 10L4 7H8z" />
+                  </svg></span>
+                </th>
+                <th class="col-compact">Payment ID</th>
+                <th class="col-action">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="isLoading">
+                <tr class="sk-row" *ngFor="let _ of skeletonRows">
+                  <td><span class="sk-cell sk-cell--xs"></span></td>
+                  <td><span class="sk-cell sk-cell--md"></span></td>
+                  <td><span class="sk-cell sk-cell--sm"></span></td>
+                  <td><span class="sk-cell sk-cell--sm"></span></td>
+                  <td><span class="sk-cell sk-cell--sm"></span></td>
+                  <td><span class="sk-cell sk-cell--md"></span></td>
+                  <td><span class="sk-cell sk-cell--xs"></span></td>
+                </tr>
+              </ng-container>
+              <ng-container *ngIf="!isLoading">
+                <tr *ngIf="!pagedItems || pagedItems.length === 0" class="empty-row">
+                  <td colspan="7" style="text-align:center; color:#9CA3AF; padding:32px 0; font-size:13px;">No payment records found.</td>
+                </tr>
+                <tr *ngFor="let item of pagedItems" class="clickable-row" (click)="viewPayment(item.id || item.payment_id)">
+                  <td class="col-check" (click)="$event.stopPropagation()">
+                    <div class="checkbox-cell">
+                      <input type="checkbox" class="custom-checkbox" [checked]="isSelected(item)"
+                        (click)="$event.stopPropagation()"
+                        (change)="toggleSelect(item, $any($event.target).checked)" />
+                    </div>
+                  </td>
+                  <td class="col-compact">
+                    <span class="item-name">{{ item.Plan?.plan_name || item.plan_name || item.plan_id || 'N/A' }}</span>
+                  </td>
+                  <td class="col-compact">
+                    <span class="vehicle-text">{{ item.amount || 'N/A' }}</span>
+                  </td>
+                  <td class="col-compact">
+                    <span class="vehicle-text">{{ formatDate(item.payment_date || item.purchase_date || item.entry_created || item.paid_at || item.createdAt) }}</span>
+                  </td>
+                  <td class="col-compact">
+                    <span class="vehicle-text">{{ formatDate(item.expiration_date) }}</span>
+                  </td>
+                  <td class="col-compact">
+                    <span class="vehicle-text">{{ item.transaction_id || (item.metadata?.gateway_payment?.id) || 'N/A' }}</span>
+                  </td>
+                  <td class="col-action" (click)="$event.stopPropagation()">
+                    <app-three-dots-button [active]="activePopupItemId === (item.id || item.payment_id)"
+                      (menuClick)="openActionPopup(item, $event)">
+                    </app-three-dots-button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+
+        <app-pagination-footer [totalItems]="filteredItems.length" [pageSize]="pageSize" [currentPage]="currentPage"
+          itemLabel="payments" (pageChange)="onPageChange($event)">
+        </app-pagination-footer>
+      </div>
+
+    </div>
+  </section>
+
+  <app-popup-menu *ngIf="activePopupItemId !== null" title="ACTIONS" [items]="actionMenuItems"
+    [position]="popupPosition" [width]="180" (closeClick)="closeActionPopup()" (itemClick)="onPopupItemClick($event)">
+  </app-popup-menu>
+
+</main>

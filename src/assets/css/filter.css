@@ -1,0 +1,467 @@
+/* =========================================================
+   USER HEADER FILTER PANEL
+   Theme colors are driven by backend ThemeConfiguration
+   ========================================================= */
+
+.uh-fp-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(2px);
+  z-index: 299;
+}
+
+.uh-fp {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 100vw;
+  height: 100vh;
+
+  background: var(--brand-card-bg, #FFFFFF);
+  color: var(--brand-text, #1F2937);
+
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.12);
+
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.uh-fp--open {
+  transform: translateX(0);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.uh-fp__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px;
+
+  border-bottom: 1px solid var(--brand-border, #E5E7EB);
+}
+
+.uh-fp__title {
+  font-size: 15px;
+  font-weight: 700;
+
+  color: var(--brand-heading,
+      var(--brand-text, #111827));
+}
+
+.uh-fp__close {
+  width: 30px;
+  height: 30px;
+
+  border: 1px solid var(--brand-border, #E5E7EB);
+
+  background: var(--brand-section-header,
+      #F1F5FF);
+
+  color: var(--brand-text, #1F2937);
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uh-fp__close:hover {
+  background: var(--brand-input-disabled-bg,
+      #F3F4F6);
+
+  border-color: var(--brand-border, #E5E7EB);
+
+  color: var(--brand-primary,
+      #4F46E5);
+}
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.uh-fp__body {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+}
+
+.uh-fp__body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.uh-fp__body::-webkit-scrollbar-thumb {
+  background: var(--brand-border,
+      #E5E7EB);
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   FILTER SECTION
+   ========================================================= */
+
+.uh-fp-section {
+  border-bottom: 1px solid var(--brand-border,
+      #E5E7EB);
+}
+
+.uh-fp-section--disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.uh-fp-section__label {
+  padding: 16px 18px 8px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  color: var(--brand-label,
+      #6B7280);
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
+.uh-fp-field {
+  position: relative;
+
+  padding: 0 18px 16px;
+
+  overflow: visible;
+}
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.uh-fp-select {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 42px;
+  padding: 0 12px;
+
+  border: 1px solid var(--brand-input-border,
+      #EEF2F7);
+
+  border-radius: 10px;
+
+  background: var(--brand-input-bg,
+      #F9FAFB);
+
+  color: var(--brand-text,
+      #1F2937);
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.uh-fp-select:hover:not(:disabled) {
+  border-color: var(--brand-primary,
+      #4F46E5);
+}
+
+.uh-fp-select:focus {
+  outline: none;
+
+  border-color: var(--brand-primary,
+      #4F46E5);
+
+  background: var(--brand-input-focus-bg,
+      #EEF4FF);
+
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 12%,
+      transparent);
+}
+
+.uh-fp-select:disabled {
+  background: var(--brand-input-disabled-bg,
+      #F3F4F6);
+
+  color: var(--brand-muted-text,
+      #9CA3AF);
+
+  cursor: not-allowed;
+}
+
+.uh-fp-select__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uh-fp-select__value--placeholder {
+  color: var(--brand-muted-text,
+      #9CA3AF);
+}
+
+/* =========================================================
+   DROPDOWN
+   ========================================================= */
+
+.uh-fp-dropdown {
+  position: absolute;
+
+  top: calc(100% - 8px);
+  left: 18px;
+  right: 18px;
+
+  z-index: 999;
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+
+  border: 1px solid var(--brand-card-border,
+      #D6E4FF);
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 8px 24px rgba(16, 24, 40, 0.1),
+    0 2px 6px rgba(16, 24, 40, 0.06);
+
+  padding: 6px;
+  margin: 0;
+
+  list-style: none;
+
+  max-height: 240px;
+  overflow-y: auto;
+
+  animation: fadeIn 0.16s ease;
+}
+
+.uh-fp-dropdown::-webkit-scrollbar {
+  width: 5px;
+}
+
+.uh-fp-dropdown::-webkit-scrollbar-thumb {
+  background: var(--brand-border,
+      #E5E7EB);
+
+  border-radius: 999px;
+}
+
+.uh-fp-dropdown li {
+  padding: 10px 12px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+
+  color: var(--brand-text,
+      #1F2937);
+
+  cursor: pointer;
+
+  transition: background 0.14s ease,
+    color 0.14s ease;
+}
+
+.uh-fp-dropdown li:hover {
+  background: var(--brand-section-header,
+      #F1F5FF);
+
+  color: var(--brand-primary,
+      #4F46E5);
+}
+
+.uh-fp-dropdown__item--selected {
+  background: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      var(--brand-card-bg, #FFFFFF));
+
+  color: var(--brand-primary,
+      #4F46E5);
+
+  font-weight: 600;
+}
+
+.uh-fp-dropdown__empty {
+  color: var(--brand-muted-text,
+      #9CA3AF);
+
+  font-size: 12px;
+
+  cursor: default;
+
+  padding: 10px 12px;
+}
+
+/* =========================================================
+   CUSTOM DATE RANGE
+   ========================================================= */
+
+.uh-fp-custom-range {
+  padding: 0 18px 18px;
+}
+
+.uh-fp-date-row {
+  display: flex;
+  gap: 10px;
+}
+
+.uh-fp-date-field {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.uh-fp-date-label {
+  font-size: 11px;
+  font-weight: 700;
+
+  color: var(--brand-label,
+      #6B7280);
+
+  text-transform: uppercase;
+}
+
+.uh-fp-date-input {
+  height: 40px;
+
+  padding: 0 10px;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--brand-input-border,
+      #EEF2F7);
+
+  background: var(--brand-input-bg,
+      #F9FAFB);
+
+  color: var(--brand-text,
+      #1F2937);
+
+  font-size: 13px;
+
+  transition: all 0.18s ease;
+}
+
+.uh-fp-date-input::placeholder {
+  color: var(--brand-muted-text,
+      #9CA3AF);
+}
+
+.uh-fp-date-input:focus {
+  outline: none;
+
+  border-color: var(--brand-primary,
+      #4F46E5);
+
+  background: var(--brand-input-focus-bg,
+      #EEF4FF);
+
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 12%,
+      transparent);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.uh-fp__footer {
+  display: flex;
+  gap: 10px;
+
+  padding: 16px 18px;
+
+  border-top: 1px solid var(--brand-border,
+      #E5E7EB);
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.uh-fp__btn-clear,
+.uh-fp__btn-apply {
+  flex: 1;
+
+  height: 42px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.uh-fp__btn-clear {
+  border: 1px solid var(--brand-border,
+      #E5E7EB);
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+
+  color: var(--brand-text,
+      #1F2937);
+}
+
+.uh-fp__btn-clear:hover {
+  background: var(--brand-section-header,
+      #F1F5FF);
+
+  border-color: var(--brand-primary,
+      #4F46E5);
+
+  color: var(--brand-primary,
+      #4F46E5);
+}
+
+.uh-fp__btn-apply {
+  border: none;
+
+  background: var(--brand-primary,
+      #4F46E5);
+
+  color: #FFFFFF;
+}
+
+.uh-fp__btn-apply:hover {
+  background: var(--brand-primary-hover,
+      #4338CA);
+}

@@ -1,0 +1,518 @@
+/* =========================================================
+   LOGIN CARD
+   ========================================================= */
+
+.card {
+  border-radius: 15px;
+
+  padding-bottom: 50px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+
+  color: var(--brand-text, #1F2937);
+
+  border: 1px solid var(--brand-card-border, #D6E4FF);
+
+  --bs-card-bg: var(--brand-card-bg, #FFFFFF);
+  --bs-card-color: var(--brand-text, #1F2937);
+  --bs-card-border-color: var(--brand-card-border, #D6E4FF);
+}
+
+
+/* =========================================================
+   LOGIN INPUT
+   ========================================================= */
+
+.input-group {
+  position: relative;
+}
+
+.input-group::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  border-radius: 15px;
+
+  box-shadow: 0 0 0 0 color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 50%,
+      transparent);
+
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.input-group:hover::before {
+  box-shadow: 0 0 10px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 50%,
+      transparent);
+}
+
+.form-control {
+  border-radius: 15px;
+
+  color: var(--brand-text, #1F2937);
+
+  background-color: var(--brand-input-bg, #F9FAFB);
+
+  border: 1px solid var(--brand-input-border, #EEF2F7);
+
+  transition:
+    box-shadow 0.3s ease-in-out,
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.form-control::placeholder {
+  color: var(--brand-muted-text, #9CA3AF);
+}
+
+.form-control:hover {
+  background-color: var(--brand-input-focus-bg, #EEF4FF);
+
+  border-color: var(--brand-primary, #4F46E5);
+
+  box-shadow: 0 0 10px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 50%,
+      transparent);
+}
+
+.form-control:focus {
+  color: var(--brand-text, #1F2937);
+
+  background-color: var(--brand-input-focus-bg, #EEF4FF);
+
+  border-color: var(--brand-primary, #4F46E5);
+
+  box-shadow: 0 0 10px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 25%,
+      transparent);
+
+  outline: none;
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+.btn {
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--brand-primary, #4F46E5);
+
+  border-color: var(--brand-primary, #4F46E5);
+
+  color: var(--brand-sidebar-active-text, #FFFFFF);
+}
+
+.btn-primary:hover {
+  background: var(--brand-primary-hover, #4338CA);
+
+  border-color: var(--brand-primary-hover, #4338CA);
+
+  color: var(--brand-sidebar-active-text, #FFFFFF);
+
+  transform: scale(1.05);
+}
+
+.btn-primary:focus,
+.btn-primary:active {
+  background: var(--brand-primary-hover, #4338CA);
+
+  border-color: var(--brand-primary-hover, #4338CA);
+
+  color: var(--brand-sidebar-active-text, #FFFFFF);
+
+  box-shadow: none;
+}
+
+.btn-primary:disabled {
+  background: var(--brand-input-disabled-bg, #F3F4F6);
+
+  border-color: var(--brand-input-disabled-bg, #F3F4F6);
+
+  color: var(--brand-muted-text, #9CA3AF);
+
+  opacity: 0.7;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =========================================================
+   LOGIN TEXT
+   ========================================================= */
+
+.form-label {
+  color: var(--brand-label, #6B7280);
+
+  font-weight: 500;
+}
+
+.card-title {
+  color: var(--brand-heading, #111827);
+}
+
+.small {
+  color: var(--brand-primary, #4F46E5);
+}
+
+.small:hover {
+  color: var(--brand-primary-hover, #4338CA);
+}
+
+
+/* =========================================================
+   PASSWORD ICON
+   ========================================================= */
+
+.input-group,
+.form-control {
+  position: relative;
+}
+
+span[style*="position: absolute"] {
+  color: var(--brand-input-border, #EEF2F7);
+}
+
+span[style*="position: absolute"] svg {
+  color: var(--brand-navbar-icon, #012970);
+  stroke: currentColor;
+}
+
+span[style*="position: absolute"]:hover svg {
+  color: var(--brand-primary, #4F46E5);
+}
+
+
+/* =========================================================
+   INVALID / VALIDATION
+   ========================================================= */
+
+.invalid-feedback {
+  color: var(--brand-error, #DC2626);
+}
+
+
+/* =========================================================
+   ERROR ALERT
+   ========================================================= */
+
+.alert-danger {
+  color: var(--brand-error, #DC2626);
+
+  background-color: color-mix(in srgb,
+      var(--brand-error, #DC2626) 8%,
+      var(--brand-card-bg, #FFFFFF));
+
+  border-color: color-mix(in srgb,
+      var(--brand-error, #DC2626) 25%,
+      var(--brand-card-bg, #FFFFFF));
+}
+
+
+/* =========================================================
+   SESSION MODAL
+   ========================================================= */
+
+.session-modal-custom {
+  border-radius: 10px;
+
+  box-shadow: 0 4px 24px color-mix(in srgb,
+      var(--brand-text, #1F2937) 10%,
+      transparent);
+
+  background: var(--brand-card-bg, #FFFFFF);
+
+  color: var(--brand-text, #1F2937);
+
+  padding: 0;
+
+  overflow: auto;
+
+  min-width: 1200px;
+  max-width: 99vw;
+
+  min-height: 400px;
+  max-height: 90vh;
+
+  border: 1px solid var(--brand-card-border, #D6E4FF);
+}
+
+@media (max-width: 1300px) {
+  .session-modal-custom {
+    min-width: 100%;
+    max-width: 100vw;
+  }
+}
+
+
+/* =========================================================
+   SESSION MODAL HEADER
+   ========================================================= */
+
+.session-modal-header {
+  background: var(--brand-section-header, #F1F5FF);
+
+  color: var(--brand-heading, #111827);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 20px 10px;
+
+  border-bottom: 1px solid var(--brand-card-border, #D6E4FF);
+}
+
+.session-modal-header .modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: var(--brand-heading, #111827);
+}
+
+.session-modal-header .modal-title i {
+  color: var(--brand-primary, #4F46E5);
+}
+
+.session-modal-header .btn-close {
+  background: none;
+
+  border: none;
+
+  color: var(--brand-muted-text, #9CA3AF);
+
+  font-size: 1.3rem;
+
+  opacity: 0.7;
+
+  transition: opacity 0.2s;
+}
+
+.session-modal-header .btn-close:hover {
+  opacity: 1;
+
+  color: var(--brand-error, #DC2626);
+}
+
+
+/* =========================================================
+   SESSION MODAL BODY
+   ========================================================= */
+
+.session-modal-body {
+  padding: 20px 20px 8px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+
+  color: var(--brand-text, #1F2937);
+}
+
+
+/* =========================================================
+   SESSION MODAL FOOTER
+   ========================================================= */
+
+.session-modal-footer {
+  background: var(--brand-section-header, #F1F5FF);
+
+  padding: 12px 20px;
+
+  border-top: 1px solid var(--brand-card-border, #D6E4FF);
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+/* =========================================================
+   SESSION TABLE
+   ========================================================= */
+
+.session-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  margin-top: 10px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+
+  color: var(--brand-text, #1F2937);
+
+  border-radius: 6px;
+
+  font-size: 0.97rem;
+
+  --bs-table-bg: var(--brand-card-bg, #FFFFFF);
+  --bs-table-color: var(--brand-text, #1F2937);
+  --bs-table-border-color: var(--brand-border, #E5E7EB);
+}
+
+.session-table th,
+.session-table td {
+  padding: 7px 8px;
+
+  text-align: left;
+
+  vertical-align: middle;
+
+  border-color: var(--brand-border, #E5E7EB);
+}
+
+.session-table th {
+  background: var(--brand-section-header, #F1F5FF);
+
+  font-weight: 600;
+
+  color: var(--brand-heading, #111827);
+}
+
+.session-table tbody tr {
+  background: var(--brand-card-bg, #FFFFFF);
+}
+
+.session-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb,
+      var(--brand-section-header, #F1F5FF) 50%,
+      var(--brand-card-bg, #FFFFFF));
+}
+
+.session-table tbody tr:hover {
+  background: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 5%,
+      var(--brand-card-bg, #FFFFFF));
+}
+
+.session-table td {
+  word-break: break-word;
+
+  color: var(--brand-text, #1F2937);
+}
+
+
+/* =========================================================
+   SESSION LOGOUT BUTTON
+   ========================================================= */
+
+.session-logout-btn {
+  background: var(--brand-error, #DC2626);
+
+  color: var(--brand-sidebar-active-text, #FFFFFF);
+
+  border: none;
+
+  border-radius: 3px;
+
+  padding: 4px 12px;
+
+  font-weight: 400;
+
+  font-size: 0.97rem;
+
+  box-shadow: none;
+
+  transition: background 0.2s;
+}
+
+.session-logout-btn:hover:not(:disabled) {
+  background: color-mix(in srgb,
+      var(--brand-error, #DC2626) 85%,
+      var(--brand-text, #1F2937));
+}
+
+.session-logout-btn:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SESSION RETRY BUTTON
+   ========================================================= */
+
+.session-retry-btn {
+  background: var(--brand-primary, #4F46E5);
+
+  color: var(--brand-sidebar-active-text, #FFFFFF);
+
+  border: none;
+
+  border-radius: 4px;
+
+  padding: 6px 18px;
+
+  font-weight: 600;
+
+  font-size: 1rem;
+
+  transition: background 0.2s;
+}
+
+.session-retry-btn:hover:not(:disabled) {
+  background: var(--brand-primary-hover, #4338CA);
+}
+
+.session-retry-btn:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MODAL POSITION
+   ========================================================= */
+
+.modal-dialog {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100vh;
+}
+
+@media (max-width: 1300px) {
+  .modal-dialog {
+    min-height: unset;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .session-modal-body,
+  .session-modal-footer,
+  .session-modal-header {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .session-table th,
+  .session-table td {
+    padding: 5px 4px;
+    font-size: 0.92rem;
+  }
+}

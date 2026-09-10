@@ -1,0 +1,84 @@
+
+$color-bg:              #f5f6fa;
+$color-surface:         #ffffff;
+$color-border:          #e8eaee;
+$color-border-light:    #f0f1f5;
+$color-text-primary:    #1a1d23;
+$color-text-secondary:  #6b7280;
+$color-text-muted:      #9ca3af;
+ $color-link:            #2969FF;
+$color-link-hover:      #2554d4;
+
+$status-estimate-bg:    #F3F4F6;
+$status-estimate-text:  #6B7280;
+$status-estimate-border:#D1D5DB;
+
+$status-delivered-bg:   #F0FDF4;
+$status-delivered-text: #16A34A;
+$status-delivered-border:#86EFAC;
+
+$status-approved-bg:    #F0FDF4;
+$status-approved-text:  #15803D;
+$status-approved-border:#4ADE80;
+
+$status-progress-bg:    #EFF6FF;
+$status-progress-text:  #2563EB;
+$status-progress-border:#93C5FD;
+
+$status-invoiced-bg:    #FFF7ED;
+$status-invoiced-text:  #EA580C;
+$status-invoiced-border:#FED7AA;
+
+$status-completed-bg:   #D1FAE5;
+$status-completed-text: #065F46;
+$status-completed-border:#6EE7B7;
+
+$avatar-jt-bg:  #3b6ff5; $avatar-jt-text: #fff;
+$avatar-mt-bg:  #7c3af5; $avatar-mt-text: #fff;
+$avatar-al-bg:  #f59e0b; $avatar-al-text: #fff;
+$avatar-rk-bg:  #ef4444; $avatar-rk-text: #fff;
+$avatar-zt-bg:  #10b981; $avatar-zt-text: #fff;
+$avatar-pl-bg:  #6366f1; $avatar-pl-text: #fff;
+$avatar-mp-bg:  #0891b2; $avatar-mp-text: #fff;
+
+$card-delivered-color: #1a9e5c;
+$card-ready-color:     #3b6ff5;
+$card-progress-color:  #d97706;
+$card-yetstart-color:  #ef4444;
+$card-estimated-color: #6b7280;
+
+
+$font-family-heading:       var(--font-heading);
+$font-family-base:          var(--font-body);         
+$font-family-table-header:  var(--font-table-header);
+$font-family-table-row:     var(--font-table-row);    
+$font-family-button:        var(--font-button);
+
+$font-size-xs:          11px;
+$font-size-sm:          12.5px;
+$font-size-base:        13.5px;
+$font-size-md:          14px;
+$font-size-lg:          18px;
+$font-size-xl:          24px;
+
+$spacing-xs:   4px;
+$spacing-sm:   8px;
+$spacing-md:   14px;
+$spacing-lg:   20px;
+$spacing-xl:   28px;
+
+$radius-sm:    6px;
+$radius-md:    10px;
+$radius-lg:    14px;
+$radius-full:  999px;
+$border-width: 1px;
+
+$shadow-card:  0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px $color-border;
+$shadow-row-hover: 0 2px 8px rgba(59,111,245,0.08);
+
+$table-row-height:   52px;
+$table-header-bg:    #f8f9fc;
+$table-row-hover-bg: #f7f9ff;
+$table-border:       $color-border;
+
+$transition-base:    all 0.18s cubic-bezier(.4,0,.2,1);

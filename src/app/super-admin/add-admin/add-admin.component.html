@@ -1,0 +1,764 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Admin"
+                : isEditMode
+                  ? "Edit Admin"
+                  : "Add Admin"
+            }}
+          </h4>
+          <p>Admin details and permissions</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button
+          *ngIf="canEdit"
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <span class="uploading-indicator" *ngIf="isUploading">
+          <span class="status-spinner-small"></span>
+          {{ uploadingSlotLabel || "Uploading..." }}
+        </span>
+
+        <button
+          type="submit"
+          form="adminForm"
+          class="btn-save"
+          [ngClass]="{ 'btn-active': adminForm.valid && !isUploading }"
+          [disabled]="
+            adminForm.invalid || (isEditMode && !canEdit) || isUploading
+          "
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+          <span>{{ isEditMode ? "Update" : "Save" }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+      <div class="header-content">
+        <span class="header-text">Admin Details</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">
+      {{ errorMessage }}
+    </div>
+
+    <form
+      [formGroup]="adminForm"
+      id="adminForm"
+      (ngSubmit)="saveAdmin()"
+      class="form-padding-wrap"
+    >
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="adminName">
+            Name
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              id="adminName"
+              type="text"
+              formControlName="name"
+              class="form-controler"
+              (keypress)="allowOnlyAlphabets($event)"
+              placeholder="Enter name"
+              [readonly]="isViewMode"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              adminForm.get('name')?.invalid && adminForm.get('name')?.touched
+            "
+          >
+            <div *ngIf="adminForm.get('name')?.errors?.['required']">
+              Name is required.
+            </div>
+            <div *ngIf="adminForm.get('name')?.errors?.['minlength']">
+              Name must be at least 3 characters long.
+            </div>
+            <div *ngIf="adminForm.get('name')?.errors?.['pattern']">
+              Only alphabets are allowed.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group mt-3 mt-md-0">
+          <label for="adminEmail">
+            Email
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              id="adminEmail"
+              type="email"
+              formControlName="email"
+              class="form-controler"
+              autocomplete="off"
+              placeholder="Enter email"
+              [readonly]="isViewMode"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
+            "
+          >
+            <div *ngIf="adminForm.get('email')?.errors?.['required']">
+              Email is required.
+            </div>
+            <div *ngIf="adminForm.get('email')?.errors?.['email']">
+              Invalid email format.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="adminPhone">
+            Phone
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              id="adminPhone"
+              type="text"
+              formControlName="phone"
+              class="form-controler"
+              maxlength="10"
+              (keypress)="allowOnlyNumbers($event)"
+              placeholder="Enter phone number"
+              [readonly]="isViewMode"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              adminForm.get('phone')?.invalid && adminForm.get('phone')?.touched
+            "
+          >
+            Phone is required.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group mt-3 mt-md-0">
+          <label for="adminRole">
+            Role
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <select
+              id="adminRole"
+              formControlName="role"
+              class="form-controler"
+              [disabled]="isViewMode"
+            >
+              <option value="" disabled selected>Select Role</option>
+              <option *ngFor="let role of plans" [value]="role.id">
+                {{ role.roleName }}
+              </option>
+            </select>
+          </div>
+          <div
+            *ngIf="
+              adminForm.get('role')?.invalid && adminForm.get('role')?.touched
+            "
+            class="text-danger small mt-1"
+            style="font-size: 11px"
+          >
+            Role is required.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group mt-3">
+          <label for="adminTheme"> Theme </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <select
+              id="adminTheme"
+              formControlName="theme_id"
+              class="form-controler"
+              [disabled]="isViewMode"
+            >
+              <option [ngValue]="null" disabled>Select Theme</option>
+              <option *ngFor="let t of themesList" [ngValue]="t.id">
+                {{ t.theme_name }}
+              </option>
+            </select>
+          </div>
+
+          <div
+            class="d-flex align-items-center gap-2 mt-2"
+            *ngIf="selectedTheme"
+            style="gap: 8px"
+          >
+            <span
+              [style.background]="selectedTheme.primary_color"
+              style="
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                border: 1px solid #e5e7eb;
+              "
+            ></span>
+            <span
+              [style.background]="selectedTheme.sidebar_color"
+              style="
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                border: 1px solid #e5e7eb;
+              "
+            ></span>
+            <span
+              [style.background]="selectedTheme.navbar_color"
+              style="
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                border: 1px solid #e5e7eb;
+              "
+            ></span>
+            <span class="text-muted" style="font-size: 11px">{{
+              selectedTheme.description
+            }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="allowTrial"> Allow Trial </label>
+          <div class="form-check form-switch">
+            <input
+              type="checkbox"
+              id="allowTrial"
+              class="form-check-input"
+              [checked]="adminForm.get('allow_trial')?.value"
+              (change)="onTrialToggle()"
+              [disabled]="isViewMode || trialLocked"
+            />
+          </div>
+          <div
+            class="text-muted mt-1"
+            style="font-size: 11px"
+            *ngIf="trialLocked"
+          >
+            <i class="bi bi-lock-fill"></i> {{ trialLockedReason }}
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label>
+            Plan
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+
+          <div class="plan-radio-stack">
+            <div
+              class="plan-radio-card"
+              *ngFor="let p of plansList"
+              [class.plan-radio-card--selected]="
+                adminForm.get('plan')?.value === p.id
+              "
+              (click)="selectPlan(p)"
+            >
+              <div class="plan-radio-card__head">
+                <input
+                  type="radio"
+                  name="planRadio"
+                  [id]="'plan_' + p.id"
+                  [value]="p.id"
+                  [checked]="adminForm.get('plan')?.value === p.id"
+                  [attr.disabled]="isViewMode ? true : null"
+                  (click)="$event.stopPropagation(); selectPlan(p)"
+                />
+
+                <label
+                  [for]="'plan_' + p.id"
+                  class="plan-radio-card__title"
+                  (click)="$event.stopPropagation()"
+                >
+                  <span class="pd-plan-name">{{ p.plan_name }}</span>
+                  <span class="plan-radio-card__price"
+                    >{{ p.currency || "INR" }} {{ p.plan_price }}</span
+                  >
+                  <ng-container *ngIf="p.features?.no_of_users">
+                    &middot;
+                    {{
+                      p.features.no_of_users === -1
+                        ? "Unlimited"
+                        : p.features.no_of_users
+                    }}
+                    users</ng-container
+                  >
+                </label>
+              </div>
+
+              <div
+                class="form-padding-wrap"
+                *ngIf="adminForm.get('plan')?.value === p.id"
+              >
+                <div class="pd-section-header">
+                  <div
+                    style="
+                      margin-left: auto;
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                    "
+                  >
+                    <span class="pd-badge pd-badge--trial" *ngIf="p.trial_days"
+                      >Trial</span
+                    >
+                    <span class="pd-badge pd-badge--paid" *ngIf="!p.trial_days"
+                      >Paid</span
+                    >
+                    <span
+                      class="pd-badge pd-badge--active"
+                      *ngIf="p.status === '1'"
+                      >Active</span
+                    >
+                    <span
+                      class="pd-badge pd-badge--inactive"
+                      *ngIf="p.status !== '1'"
+                      >Inactive</span
+                    >
+                  </div>
+                </div>
+
+                <div class="pd-section">
+                  <div class="pd-section-title">
+                    <i class="bi bi-credit-card"></i> Pricing &amp; Billing
+                  </div>
+                  <div class="pd-grid">
+                    <div class="pd-item">
+                      <span class="pd-label">Price</span>
+                      <span class="pd-value"
+                        >{{ p.currency || "INR" }}
+                        {{ p.plan_price ?? "—" }}</span
+                      >
+                    </div>
+                    <div class="pd-item">
+                      <span class="pd-label">Billing Cycle</span>
+                      <span class="pd-value">{{ p.billing_cycle ?? "—" }}</span>
+                    </div>
+                    <div class="pd-item">
+                      <span class="pd-label">Trial Days</span>
+                      <span class="pd-value">{{ p.trial_days ?? 0 }} days</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pd-section">
+                  <div class="pd-section-title">
+                    <i class="bi bi-bar-chart"></i> Limits &amp; Quotas
+                  </div>
+                  <div class="pd-grid">
+                    <div class="pd-item">
+                      <span class="pd-label">Users (Seats)</span>
+                      <span class="pd-value">{{
+                        p.features?.no_of_users === -1
+                          ? "Unlimited"
+                          : (p.features?.no_of_users ?? "—")
+                      }}</span>
+                    </div>
+                    <div class="pd-item">
+                      <span class="pd-label">Customers</span>
+                      <span class="pd-value">{{
+                        p.features?.no_of_customers === -1
+                          ? "Unlimited"
+                          : (p.features?.no_of_customers ?? "—")
+                      }}</span>
+                    </div>
+                    <div class="pd-item">
+                      <span class="pd-label">Projects</span>
+                      <span class="pd-value">{{
+                        p.features?.no_of_projects === -1
+                          ? "Unlimited"
+                          : (p.features?.no_of_projects ?? "—")
+                      }}</span>
+                    </div>
+                    <div class="pd-item">
+                      <span class="pd-label">Open Tickets</span>
+                      <span class="pd-value">{{
+                        p.features?.open_tickets ?? "—"
+                      }}</span>
+                    </div>
+                    <div class="pd-item">
+                      <span class="pd-label">Tickets / Month</span>
+                      <span class="pd-value">{{
+                        p.features?.tickets_per_month === -1
+                          ? "Unlimited"
+                          : (p.features?.tickets_per_month ?? "—")
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="pd-section"
+                  style="border-bottom: none; margin-bottom: 0"
+                >
+                  <div class="pd-section-title">
+                    <i class="bi bi-toggles"></i> Features &amp; Modules
+                  </div>
+                  <div class="pd-feature-grid">
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.reports_analytics"
+                    >
+                      <i
+                        [class]="
+                          p.features?.reports_analytics
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>Reports &amp; Analytics</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.session_activities"
+                    >
+                      <i
+                        [class]="
+                          p.features?.session_activities
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>Session Tracking</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.customer_portal"
+                    >
+                      <i
+                        [class]="
+                          p.features?.customer_portal
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>Customer Portal</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.email_communication"
+                    >
+                      <i
+                        [class]="
+                          p.features?.email_communication
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>Email</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.sms_communication"
+                    >
+                      <i
+                        [class]="
+                          p.features?.sms_communication
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>SMS</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.whatsapp_communication"
+                    >
+                      <i
+                        [class]="
+                          p.features?.whatsapp_communication
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>WhatsApp</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.backend_encryption"
+                    >
+                      <i
+                        [class]="
+                          p.features?.backend_encryption
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>Backend Encryption</span>
+                    </div>
+
+                    <div
+                      class="pd-feature"
+                      [class.pd-feature--on]="p.features?.e2e_encryption"
+                    >
+                      <i
+                        [class]="
+                          p.features?.e2e_encryption
+                            ? 'bi bi-check-circle-fill'
+                            : 'bi bi-x-circle-fill'
+                        "
+                      ></i>
+                      <span>E2E Encryption</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              adminForm.get('plan')?.invalid && adminForm.get('plan')?.touched
+            "
+            class="text-danger mt-1"
+            style="font-size: 11px"
+          >
+            Plan is required.
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label> Payment Preference </label>
+
+          <div class="plan-radio-stack">
+            <div
+              class="plan-radio-card"
+              [class.plan-radio-card--selected]="
+                adminForm.get('autopay')?.value === false
+              "
+            >
+              <div class="plan-radio-card__head">
+                <input
+                  type="radio"
+                  id="autopayManual"
+                  formControlName="autopay"
+                  [value]="false"
+                  [attr.disabled]="isViewMode ? true : null"
+                />
+                <label for="autopayManual" class="plan-radio-card__title">
+                  <i class="bi bi-cash-coin"></i>
+                  <span class="pd-plan-name">Manual Payment</span>
+                </label>
+              </div>
+            </div>
+
+            <div
+              class="plan-radio-card"
+              [class.plan-radio-card--selected]="
+                adminForm.get('autopay')?.value === true "
+            >
+              <div class="plan-radio-card__head">
+                <input
+                  type="radio"
+                  id="autopayAuto"
+                  formControlName="autopay"
+                  [value]="true"
+                  [attr.disabled]="isViewMode ? true : null"
+                />
+                <label for="autopayAuto" class="plan-radio-card__title">
+                  <i class="bi bi-arrow-repeat"></i>
+                  <span class="pd-plan-name">Auto Pay (Subscription)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="form-padding-wrap-image">
+      <div class="col-md-12 form-group">
+        <label class="upload-main-label">
+          Images <span class="sub-label">(PNG, JPG, WEBP)</span>
+        </label>
+
+        <div *ngIf="isViewMode && imageUrls.length" class="attachment-wrapper">
+          <button
+            type="button"
+            *ngFor="let url of imageUrls"
+            class="attachment-link"
+            (click)="openImagePreview(url)"
+          >
+            <img
+              [src]="url"
+              alt="admin-image"
+              class="attachment-thumbnail-small"
+            />
+          </button>
+        </div>
+
+        <div
+          *ngIf="isViewMode && !imageUrls.length"
+          class="text-muted no-images-text"
+        >
+          No image uploaded.
+        </div>
+
+        <div class="modern-uploader-wrapper" *ngIf="!isViewMode" #uploaderHost>
+          <lib-image-uploader-lib
+            [imageUrls]="imageUrls"
+            [maxImages]="maxImages"
+            [aspectRatio]="1"
+            [layoutMode]="'grid'"
+            [allowDrag]="!isViewMode"
+            [allowEdit]="!isViewMode"
+            [allowDelete]="!isViewMode"
+            [allowReplace]="!isViewMode"
+            (imagesChange)="handleImagesChange($event)"
+            (imageUpload)="onImageUpload($event)"
+            (imageReplace)="onImageReplace($event)"
+            (imageDelete)="onImageDelete($event)"
+            (imageEdit)="onImageEdit($event)"
+          >
+          </lib-image-uploader-lib>
+
+          <div
+            class="upload-slot-overlay"
+            *ngFor="let slot of uploadingSlots | keyvalue"
+            [style.top.px]="slot.value.top"
+            [style.left.px]="slot.value.left"
+            [style.width.px]="slot.value.width"
+            [style.height.px]="slot.value.height"
+          >
+            <span class="status-spinner-small"></span>
+            <span class="upload-slot-percent"
+              >{{ slot.value.progress | number: "1.0-0" }}%</span
+            >
+          </div>
+        </div>
+
+        <div class="text-muted mt-1" style="font-size: 11px" *ngIf="isViewMode">
+          <i class="bi bi-lock-fill"></i> Switch to Edit mode to change the
+          profile image.
+        </div>
+      </div>
+    </div>
+    <div
+      class="image-modal-backdrop"
+      *ngIf="showImageModal"
+      (click)="closeImagePreview()"
+    >
+      <div class="image-modal-content" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="image-modal-close"
+          (click)="closeImagePreview()"
+          aria-label="Close"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <img [src]="modalImageUrl" alt="preview" class="image-modal-img" />
+      </div>
+    </div>
+  </article>
+</main>

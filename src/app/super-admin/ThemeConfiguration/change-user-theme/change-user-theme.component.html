@@ -1,0 +1,530 @@
+<ngx-ui-loader></ngx-ui-loader>
+
+<main id="main" class="complaint-wrapper">
+
+
+
+  <header class="top-header">
+    <div class="header-left">
+      <ng-container *ngIf="showBackButton">
+        <button type="button" class="back-btn" (click)="goBack()" aria-label="Go back">
+          <img src="assets/img/back-icon.svg" alt="back" />
+        </button>
+
+        <div class="divider"></div>
+      </ng-container>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="icon" />
+        </div>
+        <div class="title-text">
+          <h4>
+            {{
+              isCustomizeMode
+                ? (customThemeId ? 'Edit Custom Theme' : 'Create Custom Theme')
+                : (isSuperAdminTargetFlow ? 'Change Admin Theme' : 'Choose Theme')
+            }}
+          </h4>
+
+          <p>
+            {{
+              isCustomizeMode
+                ? (customThemeId
+                    ? 'Update your existing custom theme'
+                    : 'Create your custom theme')
+                : (isSuperAdminTargetFlow
+                    ? 'Choose an existing theme for this admin'
+                    : 'Choose a theme for your account')
+            }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="header-actions">
+      <button type="button" class="btn-cancel" (click)="goBack()">Cancel</button>
+
+      <button
+        *ngIf="!isCustomizeMode"
+        type="button"
+        class="btn-save"
+        [ngClass]="{
+          'btn-active': selectedThemeId && !saving && selectedThemeId !== currentThemeId
+        }"
+        [disabled]="!selectedThemeId || saving || selectedThemeId === currentThemeId || !canChooseTheme"
+        (click)="saveTheme()"
+      >
+        <img *ngIf="!saving" class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+        <i *ngIf="saving" class="bi bi-arrow-repeat spin"></i>
+        <span>{{ saving ? 'Saving...' : 'Save Theme' }}</span>
+      </button>
+
+      <button
+        *ngIf="isCustomizeMode && isAdminChooseThemeFlow"
+        type="button"
+        class="btn-save"
+        [ngClass]="{ 'btn-active': customTheme.theme_name && !saving }"
+        [disabled]="!customTheme.theme_name || !customTheme.theme_name.trim() || saving || !canCustomizeTheme"
+        (click)="saveCustomizedTheme()"
+      >
+        <img *ngIf="!saving" class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+        <i *ngIf="saving" class="bi bi-arrow-repeat spin"></i>
+        <span>
+          {{
+            saving
+              ? 'Saving...'
+              : (customThemeId ? 'Update Custom Theme' : 'Save Custom Theme')
+          }}
+        </span>
+      </button>
+    </div>
+  </header>
+
+
+
+  <article class="card complaint-card mt-3 theme-user-information-card" *ngIf="targetAdmin">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+      <div class="header-content">
+        <span class="header-text">User Information</span>
+      </div>
+    </div>
+
+    <div class="modern-body theme-user-card theme-user-info-body">
+      <div class="theme-user-avatar">
+        {{ getAdminInitials() }}
+      </div>
+
+      <div class="theme-user-details">
+        <h5>{{ getAdminDisplayName() }}</h5>
+
+        <div class="theme-user-email">
+          <span class="email-icon">
+            <i class="bi bi-envelope"></i>
+          </span>
+          <span class="email-text">{{ targetAdmin?.email || '-' }}</span>
+        </div>
+      </div>
+
+      <div class="theme-user-meta">
+        <div class="theme-user-meta-item">
+          <span>
+            <i class="bi bi-person-badge"></i>
+            Role
+          </span>
+          <strong>{{ targetAdmin?.role_name || 'Admin' }}</strong>
+        </div>
+
+        <div class="theme-user-meta-item">
+          <span>
+            <i class="bi bi-palette2"></i>
+            Current Theme
+          </span>
+          <strong class="theme-value">
+            <span
+              class="theme-swatch"
+              [style.background-color]="selectedTheme?.primary_color || '#3b5bdb'"
+            ></span>
+            {{ selectedTheme?.theme_name || 'Default Theme' }}
+          </strong>
+        </div>
+      </div>
+    </div>
+  </article>
+
+
+
+  <div *ngIf="apiError" class="alert alert-danger mx-4 mt-3" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    {{ apiError }}
+  </div>
+
+
+
+  <article class="card complaint-card mt-3" *ngIf="!isCustomizeMode">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+
+      <div class="header-content">
+        <span class="header-text">Choose Theme</span>
+      </div>
+
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img src="assets/img/star.svg" class="required-icon" alt="required-star" />
+        </span>
+      </div>
+    </div>
+
+    <div class="form-padding-wrap">
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label for="theme_select">Select Theme</label>
+
+          <div class="field-wrap" style="--field-icon: url(&quot;assets/img/profile-img.jpg&quot;)">
+            <select
+              id="theme_select"
+              class="form-controler"
+              [value]="selectedThemeId"
+              (change)="selectTheme(+$any($event.target).value)"
+              [disabled]="loading || themes.length === 0 || !canChooseTheme"
+            >
+
+              <optgroup label="Super Admin Themes" *ngIf="defaultThemes.length">
+                <option *ngFor="let theme of defaultThemes" [value]="theme.id">
+                  {{ theme.theme_name }}
+                  {{ isCurrentTheme(theme.id) ? '(Current)' : '' }}
+                </option>
+              </optgroup>
+
+
+              <optgroup label="My Custom Theme" *ngIf="customThemes.length">
+                <option *ngFor="let theme of customThemes" [value]="theme.id">
+                  {{ theme.theme_name }}
+                  {{ isCurrentTheme(theme.id) ? '(Current)' : '' }}
+                </option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-2 text-muted">Loading themes...</p>
+      </div>
+
+      <div *ngIf="!loading && themes.length === 0" class="text-center text-muted py-5">
+        No themes available.
+      </div>
+    </div>
+  </article>
+
+
+
+  <ng-container *ngIf="isCustomizeMode && isAdminChooseThemeFlow">
+
+    <!-- Theme Name + Description -->
+    <article class="card complaint-card mt-3">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+        <div class="header-content">
+          <span class="header-text">Theme Configuration</span>
+        </div>
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+            <img src="assets/img/star.svg" class="required-icon" alt="required-star" />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="custom_theme_name">
+              Theme Name
+              <img src="assets/img/star.svg" class="required-icon" alt="required" />
+            </label>
+            <div class="field-wrap" style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)">
+              <input
+                type="text"
+                id="custom_theme_name"
+                name="theme_name"
+                class="form-controler"
+                [(ngModel)]="customTheme.theme_name"
+                placeholder="Enter theme name"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="custom_description">Description</label>
+            <div class="field-wrap" style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)">
+              <textarea
+                id="custom_description"
+                name="description"
+                class="form-controler"
+                rows="2"
+                [(ngModel)]="customTheme.description"
+                placeholder="Enter theme description (optional)"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Color Configurations — collapsible accordion, one card total -->
+    <article class="card complaint-card mt-3">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+        <div class="header-content">
+          <span class="header-text">Color Configurations</span>
+        </div>
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+            <img src="assets/img/star.svg" class="required-icon" alt="required-star" />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div
+          class="color-group-card"
+          *ngFor="let group of colorGroups; let gi = index; trackBy: trackByGroupName"
+        >
+          <div class="color-group-header" (click)="toggleColorGroup(gi)">
+            <div class="color-group-title">
+              <i class="bi" [ngClass]="group.icon"></i>
+              <span>{{ group.name }}</span>
+              <span class="color-group-count">{{ group.fields.length }}</span>
+            </div>
+            <i
+              class="bi color-group-chevron"
+              [ngClass]="isColorGroupOpen(gi) ? 'bi-chevron-up' : 'bi-chevron-down'"
+            ></i>
+          </div>
+
+          <div class="color-group-body-outer" [class.open]="isColorGroupOpen(gi)">
+            <div class="row color-group-body">
+              <div class="col-md-6 col-lg-4 form-group" *ngFor="let field of group.fields; trackBy: trackByFieldKey">
+                <label [for]="field.key">
+                  {{ field.label }}
+                  <img src="assets/img/star.svg" class="required-icon" alt="required" />
+                </label>
+                <div class="color-field-wrap">
+                  <color-selection-method
+                    [initialColor]="customTheme[field.key]"
+                    (colorPicked)="onColorPick(field.key, $event)"
+                  ></color-selection-method>
+
+                  <input
+                    type="text"
+                    [id]="field.key"
+                    [name]="field.key"
+                    class="form-controler"
+                    [(ngModel)]="customTheme[field.key]"
+                    placeholder="#000000"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </ng-container>
+
+
+
+  <article class="card complaint-card mt-3">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+      <div class="header-content">
+        <span class="header-text">Theme Preview</span>
+      </div>
+      <div class="required-group">
+        <button
+          type="button"
+          class="preview-toggle-btn"
+          [class.expanded]="previewExpanded"
+          (click)="togglePreview()"
+          [attr.aria-expanded]="previewExpanded"
+          aria-label="Toggle theme preview"
+        >
+          <i class="bi bi-chevron-down"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-padding-wrap">
+      <p class="preview-caption">
+        This is how the sidebar, header, form pages and lists will look
+        for this user. Click the arrow to open the preview.
+      </p>
+
+      <div class="preview-frame" *ngIf="previewExpanded">
+        <div class="preview-frame-bar">
+          <span class="frame-dot dot-red"></span>
+          <span class="frame-dot dot-yellow"></span>
+          <span class="frame-dot dot-green"></span>
+          <span class="frame-url">https://resolvenest-admin.imminentideas.in/dashboard</span>
+        </div>
+
+        <div class="theme-preview" *ngIf="previewTheme">
+          <!-- SIDEBAR -->
+          <div class="preview-sidebar" [style.background-color]="previewTheme.sidebar_color">
+            <div class="preview-brand">
+              <span
+                class="preview-brand-icon"
+                [style.background-color]="previewTheme.primary_color"
+              >M</span>
+              <span
+                class="preview-brand-text"
+                [style.color]="previewTheme.sidebar_text_color"
+              >ResolveNest</span>
+            </div>
+
+            <div
+              class="preview-menu active"
+              [style.background-color]="previewTheme.sidebar_active_color"
+              [style.color]="previewTheme.sidebar_active_text_color || previewTheme.sidebar_text_color"
+            >
+              <i class="bi bi-speedometer2"></i>
+              Dashboard
+            </div>
+
+            <div class="preview-menu" [style.color]="previewTheme.sidebar_text_color">
+              <i class="bi bi-people"></i>
+              Users
+            </div>
+
+            <div class="preview-menu" [style.color]="previewTheme.sidebar_text_color">
+              <i class="bi bi-ticket-detailed"></i>
+              Tickets
+            </div>
+
+            <div class="preview-menu" [style.color]="previewTheme.sidebar_text_color">
+              <i class="bi bi-gear"></i>
+              Settings
+            </div>
+
+            <div class="preview-sidebar-footer" [style.color]="previewTheme.sidebar_text_color">
+              <span class="preview-avatar">{{ getAdminInitials() }}</span>
+              {{ getAdminDisplayName() }}
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="preview-right" [style.background-color]="previewTheme.page_background_color">
+
+            <!-- HEADER -->
+            <div
+              class="preview-navbar"
+              [style.background-color]="previewTheme.navbar_color"
+              [style.color]="previewTheme.navbar_text_color"
+            >
+              <span class="preview-navbar-left">
+                <i class="bi bi-list" [style.color]="previewTheme.navbar_icon_color || previewTheme.primary_color"></i>
+              </span>
+
+              <span class="preview-navbar-right">
+                <i class="bi bi-gear" [style.color]="previewTheme.navbar_icon_color || previewTheme.primary_color"></i>
+                <span class="preview-avatar preview-avatar-sm">{{ getAdminInitials() }}</span>
+                <i class="bi bi-chevron-down"></i>
+              </span>
+            </div>
+
+            <div class="preview-content">
+
+              <!-- TOP FORM HEADING -->
+              <div
+                class="preview-topform"
+                [style.background-color]="previewTheme.card_background_color"
+                [style.border-color]="previewTheme.border_color"
+              >
+                <span class="preview-topform-left">
+                  <i class="bi bi-arrow-left" [style.color]="previewTheme.text_color"></i>
+                  <span
+                    class="preview-topform-icon"
+                    [style.background-color]="previewTheme.primary_color"
+                  >
+                    <i class="bi bi-plus-lg"></i>
+                  </span>
+                  <span class="preview-topform-title">
+                    <strong [style.color]="previewTheme.text_color">Add Sub-Admin</strong>
+                    <small [style.color]="previewTheme.muted_text_color">Sub-admin details</small>
+                  </span>
+                </span>
+
+                <span class="preview-topform-actions">
+                  <button
+                    type="button"
+                    class="preview-btn-cancel"
+                    [style.border-color]="previewTheme.border_color"
+                    [style.color]="previewTheme.text_color"
+                  >Cancel</button>
+
+                  <button
+                    type="button"
+                    class="preview-btn-save"
+                    [style.background-color]="previewTheme.primary_color"
+                  >Save User</button>
+                </span>
+              </div>
+
+              <!-- FORM FIELD -->
+              <div class="preview-form">
+                <h6 [style.color]="previewTheme.label_color">Name</h6>
+                <input
+                  type="text"
+                  class="preview-field"
+                  placeholder="Enter name"
+                  readonly
+                  [style.background-color]="previewTheme.input_background_color"
+                  [style.border-color]="previewTheme.input_border_color"
+                  [style.color]="previewTheme.text_color"
+                />
+              </div>
+
+              <!-- LIST / TABLE -->
+              <div
+                class="preview-list"
+                [style.background-color]="previewTheme.card_background_color"
+                [style.border-color]="previewTheme.card_border_color"
+              >
+                <div
+                  class="preview-list-header"
+                  [style.background-color]="previewTheme.section_header_color"
+                  [style.color]="previewTheme.muted_text_color"
+                >
+                  <span>Name</span>
+                  <span>Email</span>
+                  <span>Status</span>
+                </div>
+
+                <div class="preview-list-row" [style.color]="previewTheme.text_color">
+                  <span>Rahul Sharma</span>
+                  <span [style.color]="previewTheme.muted_text_color">rahul&#64;mail.com</span>
+                  <span class="preview-status-dot" [style.background-color]="previewTheme.primary_color"></span>
+                </div>
+
+                <div class="preview-list-row" [style.color]="previewTheme.text_color">
+                  <span>Ayesha Khan</span>
+                  <span [style.color]="previewTheme.muted_text_color">ayesha&#64;mail.com</span>
+                  <span class="preview-status-dot" [style.background-color]="previewTheme.primary_color"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-empty" *ngIf="!previewTheme">
+          <i class="bi bi-palette"></i>
+          <p>Select a theme to see the preview</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+</main>

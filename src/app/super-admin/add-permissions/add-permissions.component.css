@@ -1,0 +1,52 @@
+.ng-select .ng-dropdown-panel {
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text for better contrast */
+}
+
+.ng-select .ng-dropdown-panel .ng-option {
+  color: white; /* Ensure options text is visible on blue background */
+}
+
+.ng-select .ng-dropdown-panel .ng-option:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.permissions-border {
+  border: 1px solid #007bff; /* Blue border */
+  border-radius: 5px;
+  padding: 10px;
+  max-height: 200px;
+  overflow-y: auto; /* Add scroll for long lists */
+}
+
+.form-check {
+  margin-bottom: 5px;
+}
+
+.form-check-input {
+  margin-right: 10px;
+}
+
+.custom-dropdown {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 16px;
+  appearance: none; /* Remove default dropdown arrow */
+  background-image: none; /* Remove dropdown arrow for input field */
+}
+
+.custom-dropdown:focus {
+  outline: none;
+  border-color: #0056b3;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.custom-dropdown option {
+  padding: 10px;
+  background-color: #ffffff;
+  color: #495057;
+}

@@ -1,0 +1,1244 @@
+/* ==========================================================================
+   FONTS
+   ========================================================================== */
+
+/* Theme system ke liye hardcoded external fonts ki zarurat nahi */
+.complaint-wrapper {
+  font-family: inherit;
+}
+
+
+/* ==========================================================================
+   1. CORE WRAPPER & LAYOUT
+   ========================================================================== */
+
+.complaint-wrapper {
+  padding: 0 !important;
+  display: block;
+  min-height: calc(100vh - 65px);
+
+  color: var(--brand-text, #1F2937);
+  background: var(--brand-page-bg, #F8FAFC);
+
+  box-sizing: border-box;
+}
+
+
+/* ==========================================================================
+   2. STICKY HEADER SECTION
+   ========================================================================== */
+
+.top-header {
+  width: 100%;
+    /* width: calc(100% - 260px); */
+  height: 65px;
+  margin-top: -16px;
+  padding: 0 32px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: var(--brand-navbar-bg, #FFFFFF);
+  border-bottom: 1px solid var(--brand-border, #E5E7EB);
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+
+  border-radius: 8px;
+  border: none;
+
+  background: transparent;
+  color: var(--brand-navbar-icon, #012970);
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+  background: var(--brand-section-header, #F1F5FF);
+}
+
+.back-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--brand-border, #E5E7EB);
+}
+
+.title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-icon {
+  width: 32px;
+  height: 32px;
+
+  background: var(--brand-primary, #4F46E5);
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-icon img {
+  width: 16px;
+  height: 16px;
+}
+
+.title-box h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+
+  color: var(--brand-navbar-text, #111827);
+}
+
+.title-box p {
+  font-size: 12px;
+  margin: 0;
+
+  color: var(--brand-muted-text, #9CA3AF);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+/* ==========================================================================
+   HEADER BUTTONS
+   ========================================================================== */
+
+.btn-cancel {
+  padding: 8px 16px;
+
+  border: 1px solid var(--brand-border, #E5E7EB);
+  background: var(--brand-card-bg, #FFFFFF);
+
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  color: var(--brand-text, #374151);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: var(--brand-section-header, #F1F5FF);
+  border-color: var(--brand-primary, #4F46E5);
+  color: var(--brand-primary, #4F46E5);
+}
+
+.btn-save {
+  padding: 8px 16px;
+
+  background: var(--brand-input-disabled-bg, #F3F4F6);
+  border: 1px solid var(--brand-input-disabled-bg, #F3F4F6);
+
+  border-radius: 8px;
+
+  color: var(--brand-muted-text, #9CA3AF);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: not-allowed;
+
+  font-weight: 700;
+  font-size: 12px;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-save.btn-active {
+  background: var(--brand-primary, #4F46E5);
+  border-color: var(--brand-primary, #4F46E5);
+
+  color: var(--brand-sidebar-active-text, #FFFFFF);
+
+  cursor: pointer;
+}
+
+.btn-save.btn-active:hover {
+  background: var(--brand-primary-hover, #4338CA);
+  border-color: var(--brand-primary-hover, #4338CA);
+}
+
+.save-icon {
+  width: 12px;
+  height: 12px;
+}
+
+
+/* ==========================================================================
+   3. COMPLAINT CARD & FORM
+   ========================================================================== */
+
+.complaint-card {
+  width: calc(100% - 32px);
+  max-width: 896px;
+
+  margin: 24px auto;
+
+  border: 1px solid var(--brand-card-border, #D6E4FF);
+  border-radius: 12px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+  color: var(--brand-text, #1F2937);
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 1px 3px color-mix(in srgb,
+      var(--brand-text, #1F2937) 5%,
+      transparent);
+}
+
+
+/* ==========================================================================
+   SECTION HEADER
+   ========================================================================== */
+
+.section-title {
+  width: 100%;
+  height: 56px;
+
+  background: var(--brand-section-header, #F1F5FF);
+
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  box-sizing: border-box;
+}
+
+.item-icon {
+  width: 32px;
+  height: 32px;
+
+  background: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 10%,
+      var(--brand-card-bg, #FFFFFF));
+
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.item-icon img {
+  width: 16px;
+  height: 16px;
+}
+
+.header-content {
+  min-width: 0;
+}
+
+.header-text {
+  font-size: 14px;
+  font-weight: 700;
+
+  color: var(--brand-heading, #111827);
+}
+
+.required-group {
+  margin-left: auto;
+}
+
+.badge-required {
+  background: var(--brand-card-bg, #FFFFFF);
+  color: var(--brand-text, #374151);
+
+  padding: 4px 10px;
+
+  border-radius: 20px;
+  border: 1px solid var(--brand-border, #D1D5DB);
+
+  font-size: 12px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required-icon {
+  width: 8px;
+  height: 8px;
+
+  margin-bottom: 2px;
+}
+
+
+/* ==========================================================================
+   FORM WRAPPER
+   ========================================================================== */
+
+.form-padding-wrap {
+  padding: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+
+  color: var(--brand-label, #374151);
+
+  margin-bottom: 6px;
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.upload-main-label {
+  font-weight: 600 !important;
+}
+
+.sub-label {
+  color: var(--brand-muted-text, #9CA3AF);
+
+  font-weight: 400;
+  font-size: 11px;
+}
+
+
+/* ==========================================================================
+   BOOTSTRAP / ERROR TEXT OVERRIDE
+   ========================================================================== */
+
+.field-error-text {
+  font-size: 11px;
+  color: var(--brand-error, #DC2626) !important;
+}
+
+.text-danger {
+  color: var(--brand-error, #DC2626) !important;
+}
+
+.text-muted {
+  color: var(--brand-muted-text, #9CA3AF) !important;
+}
+
+
+/* ==========================================================================
+   4. FIELD ICON SYSTEM
+   ========================================================================== */
+
+.field-wrap {
+  position: relative;
+
+  width: 100%;
+  display: block;
+
+  /*
+   * isolation intentionally nahi lagaya gaya.
+   * ng-select dropdown appendTo="body" use kar raha hai.
+   */
+}
+
+.field-wrap::before {
+  content: "";
+
+  position: absolute;
+
+  left: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 16px;
+  height: 16px;
+
+  background-image: var(--field-icon);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+
+  pointer-events: none;
+
+  opacity: 0.6;
+
+  z-index: 3;
+}
+
+
+/* ==========================================================================
+   NATIVE INPUT
+   ========================================================================== */
+
+.field-wrap .form-controler {
+  width: 100% !important;
+  height: 42px !important;
+
+  padding: 0 16px 0 40px !important;
+
+  border: 1px solid var(--brand-input-border, #EEF2F7) !important;
+  border-radius: 10px !important;
+
+  background-color: var(--brand-input-bg, #F9FAFB) !important;
+
+  font-size: 13px !important;
+  font-family: inherit !important;
+
+  color: var(--brand-text, #374151) !important;
+
+  outline: none !important;
+
+  box-sizing: border-box !important;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+.field-wrap .form-controler::placeholder {
+  color: var(--brand-muted-text, #9CA3AF) !important;
+  opacity: 1;
+}
+
+.field-wrap .form-controler:focus {
+  border-color: var(--brand-primary, #4F46E5) !important;
+
+  background-color: var(--brand-input-focus-bg,
+      #EEF4FF) !important;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      transparent) !important;
+}
+
+
+/* ==========================================================================
+   TEXTAREA
+   ========================================================================== */
+
+.field-wrap:has(textarea.form-controler)::before {
+  top: 14px !important;
+  transform: none !important;
+}
+
+.field-wrap textarea.form-controler {
+  height: auto !important;
+  min-height: 90px !important;
+
+  padding: 12px 16px 12px 40px !important;
+
+  resize: vertical !important;
+}
+
+
+/* ==========================================================================
+   DISABLED INPUT
+   ========================================================================== */
+
+.field-wrap .form-controler:disabled {
+  background-color: var(--brand-input-disabled-bg,
+      #F3F4F6) !important;
+
+  color: var(--brand-muted-text,
+      #9CA3AF) !important;
+
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+
+/* ==========================================================================
+   READONLY INPUT
+   ========================================================================== */
+
+.form-controler[readonly] {
+  background-color: var(--brand-input-bg,
+      #F9FAFB) !important;
+
+  color: var(--brand-text,
+      #374151) !important;
+
+  cursor: default !important;
+  user-select: text !important;
+}
+
+.field-wrap textarea.form-controler[readonly] {
+  word-break: break-all;
+  resize: none !important;
+}
+
+
+/* ==========================================================================
+   5. NG-SELECT
+   ========================================================================== */
+
+.field-wrap .ng-select {
+  width: 100%;
+}
+
+
+/* Container */
+
+.field-wrap .ng-select .ng-select-container {
+  height: 42px !important;
+  min-height: 42px !important;
+
+  border: 1px solid var(--brand-input-border,
+      #EEF2F7) !important;
+
+  border-radius: 10px !important;
+
+  background-color: var(--brand-input-bg,
+      #F9FAFB) !important;
+
+  font-size: 13px !important;
+  font-family: inherit !important;
+
+  color: var(--brand-text,
+      #374151) !important;
+
+  cursor: pointer !important;
+
+  box-shadow: none !important;
+
+  align-items: center !important;
+
+  position: relative !important;
+  z-index: 1 !important;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+
+/* Left icon space */
+
+.field-wrap .ng-select .ng-select-container .ng-value-container {
+  padding-left: 40px !important;
+
+  align-items: center !important;
+}
+
+
+/* Placeholder */
+
+.field-wrap .ng-select .ng-placeholder {
+  color: var(--brand-muted-text,
+      #9CA3AF) !important;
+
+  font-size: 13px !important;
+  font-family: inherit !important;
+}
+
+
+/* Selected value */
+
+.field-wrap .ng-select .ng-value {
+  color: var(--brand-text,
+      #374151) !important;
+
+  font-size: 13px !important;
+}
+
+
+/* Focus */
+
+.field-wrap .ng-select.ng-select-focused .ng-select-container {
+  border-color: var(--brand-primary,
+      #4F46E5) !important;
+
+  background-color: var(--brand-input-focus-bg,
+      #EEF4FF) !important;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      transparent) !important;
+}
+
+
+/* Arrow */
+
+.field-wrap .ng-select .ng-arrow-wrapper {
+  padding-right: 12px !important;
+  padding-left: 8px !important;
+}
+
+.field-wrap .ng-select .ng-arrow {
+  border-color:
+    var(--brand-muted-text, #9CA3AF) transparent transparent !important;
+}
+
+.field-wrap .ng-select.ng-select-opened .ng-arrow {
+  border-color:
+    transparent transparent var(--brand-primary, #4F46E5) !important;
+}
+
+
+/* ==========================================================================
+   NG-SELECT SEARCH INPUT
+   ========================================================================== */
+
+.field-wrap .ng-select .ng-input>input {
+  padding-left: 30px !important;
+  padding-top: 5px !important;
+
+  font-size: 13px !important;
+  font-family: inherit !important;
+
+  color: var(--brand-text,
+      #374151) !important;
+
+  background: transparent !important;
+
+  border: none !important;
+  outline: none !important;
+
+  width: 100% !important;
+
+  box-sizing: border-box !important;
+}
+
+.field-wrap .ng-select .ng-input>input::placeholder {
+  color: var(--brand-muted-text,
+      #9CA3AF) !important;
+}
+
+
+/* Disabled */
+
+.field-wrap .ng-select.ng-select-disabled .ng-select-container {
+  background-color: var(--brand-input-disabled-bg,
+      #F3F4F6) !important;
+
+  color: var(--brand-muted-text,
+      #9CA3AF) !important;
+
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+
+/* ==========================================================================
+   6. NG-SELECT DROPDOWN PANEL
+   appendTo="body"
+   ========================================================================== */
+
+.field-wrap .ng-select .ng-dropdown-panel,
+.ng-dropdown-panel {
+  border: 1px solid var(--brand-input-border,
+      #EEF2F7) !important;
+
+  border-radius: 10px !important;
+
+  background-color: var(--brand-card-bg,
+      #FFFFFF) !important;
+
+  color: var(--brand-text,
+      #374151) !important;
+
+  box-shadow:
+    0 4px 16px color-mix(in srgb,
+      var(--brand-text, #1F2937) 8%,
+      transparent) !important;
+
+  margin-top: 4px !important;
+
+  overflow: hidden !important;
+
+  z-index: 99999 !important;
+}
+
+
+/* Dropdown items wrapper */
+
+.field-wrap .ng-select .ng-dropdown-panel .ng-dropdown-panel-items,
+.ng-dropdown-panel .ng-dropdown-panel-items {
+  max-height: 220px !important;
+}
+
+
+/* ==========================================================================
+   OPTIONS
+   ========================================================================== */
+
+.field-wrap .ng-select .ng-option,
+.ng-dropdown-panel .ng-option {
+  text-align: left !important;
+
+  padding: 10px 16px !important;
+
+  font-size: 13px !important;
+  font-family: inherit !important;
+
+  color: var(--brand-text,
+      #374151) !important;
+
+  background-color: var(--brand-card-bg,
+      #FFFFFF) !important;
+
+  cursor: pointer !important;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+
+/* Hover / marked */
+
+.field-wrap .ng-select .ng-option:hover,
+
+.field-wrap .ng-select .ng-option.ng-option-marked,
+
+.ng-dropdown-panel .ng-option:hover,
+
+.ng-dropdown-panel .ng-option.ng-option-marked {
+  background-color:
+    color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      var(--brand-card-bg, #FFFFFF)) !important;
+
+  color: var(--brand-primary,
+      #4F46E5) !important;
+}
+
+
+/* Selected */
+
+.field-wrap .ng-select .ng-option.ng-option-selected,
+
+.ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color:
+    color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      var(--brand-card-bg, #FFFFFF)) !important;
+
+  color: var(--brand-primary,
+      #4F46E5) !important;
+
+  font-weight: 600 !important;
+}
+
+
+/* ==========================================================================
+   7. ERROR ALERT
+   ========================================================================== */
+
+.complaint-card .alert-danger {
+  margin-left: 24px;
+  margin-right: 24px;
+
+  background-color:
+    color-mix(in srgb,
+      var(--brand-error, #DC2626) 8%,
+      var(--brand-card-bg, #FFFFFF));
+
+  border: 1px solid color-mix(in srgb,
+      var(--brand-error, #DC2626) 25%,
+      var(--brand-card-bg, #FFFFFF));
+
+  color: var(--brand-error,
+      #DC2626);
+
+  border-radius: 8px;
+}
+
+
+/* ==========================================================================
+   8. LOADING STATE
+   ========================================================================== */
+
+.status-state {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 48px 24px;
+
+  gap: 12px;
+
+  color: var(--brand-muted-text,
+      #9CA3AF);
+
+  font-size: 13px;
+}
+
+.status-spinner {
+  display: inline-block;
+
+  width: 28px;
+  height: 28px;
+
+  border: 3px solid var(--brand-border, #E5E7EB);
+
+  border-top-color:
+    var(--brand-primary, #4F46E5);
+
+  border-radius: 50%;
+
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================================
+   9. ATTACHMENT / VIEW MODE
+   ========================================================================== */
+
+.attachment-wrapper {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  gap: 14px;
+
+  margin-top: 8px;
+
+  width: 100%;
+}
+
+button.attachment-link,
+.attachment-link {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 110px;
+  height: 110px;
+
+  flex: 0 0 110px;
+
+  padding: 4px;
+  margin: 0;
+
+  border: 1px solid var(--brand-card-border, #D6E4FF);
+
+  border-radius: 12px;
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+button.attachment-link:hover,
+.attachment-link:hover {
+  border-color:
+    var(--brand-primary, #4F46E5);
+
+  box-shadow:
+    0 6px 18px color-mix(in srgb,
+      var(--brand-text, #1F2937) 12%,
+      transparent);
+
+  transform: scale(1.03);
+}
+
+.attachment-thumbnail-small {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  display: block;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+}
+
+.no-images-text {
+  font-size: 12px;
+
+  color: var(--brand-label,
+      #6B7280) !important;
+}
+
+
+/* ==========================================================================
+   10. IMAGE MODAL
+   ========================================================================== */
+
+.image-modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    color-mix(in srgb,
+      var(--brand-text, #1F2937) 70%,
+      transparent);
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  padding: 24px;
+
+  z-index: 10000;
+
+  box-sizing: border-box;
+}
+
+.image-modal-content {
+  position: relative;
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+
+  color: var(--brand-text,
+      #1F2937);
+
+  padding: 16px;
+
+  border: 1px solid var(--brand-card-border, #D6E4FF);
+
+  border-radius: 12px;
+
+  max-width: 90vw;
+  max-height: 90vh;
+
+  box-shadow:
+    0 10px 40px color-mix(in srgb,
+      var(--brand-text, #1F2937) 25%,
+      transparent);
+
+  box-sizing: border-box;
+}
+
+.image-preview-large,
+.image-modal-img {
+  display: block;
+
+  max-width: 80vw;
+  max-height: 78vh;
+
+  object-fit: contain;
+
+  border-radius: 8px;
+}
+
+.image-close-btn,
+.image-modal-close {
+  position: absolute;
+
+  top: -14px;
+  right: -14px;
+
+  width: 34px;
+  height: 34px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background:
+    var(--brand-navbar-icon, #012970);
+
+  color:
+    var(--brand-sidebar-active-text, #FFFFFF);
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.image-close-btn:hover,
+.image-modal-close:hover {
+  background:
+    var(--brand-error, #DC2626);
+
+  transform: scale(1.05);
+}
+
+
+/* ==========================================================================
+   11. IMAGE UPLOADER
+   ========================================================================== */
+
+.uploading-indicator {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 12px;
+
+  color:
+    var(--brand-muted-text, #9CA3AF);
+
+  font-weight: 600;
+}
+
+.status-spinner-small {
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid var(--brand-border, #E5E7EB);
+
+  border-top-color:
+    var(--brand-primary, #4F46E5);
+
+  border-radius: 50%;
+
+  animation:
+    spin-small 0.7s linear infinite;
+
+  flex-shrink: 0;
+}
+
+
+/* Wrapper */
+
+.modern-uploader-wrapper {
+  position: relative;
+
+  margin-top: 16px;
+}
+
+
+/* Per-slot upload overlay */
+
+.upload-slot-overlay {
+  position: absolute;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  background:
+    color-mix(in srgb,
+      var(--brand-card-bg, #FFFFFF) 85%,
+      transparent);
+
+  color:
+    var(--brand-text, #1F2937);
+
+  backdrop-filter: blur(3px);
+
+  border: 1px solid var(--brand-card-border, #D6E4FF);
+
+  border-radius: 10px;
+
+  pointer-events: none;
+
+  z-index: 999;
+
+  transition:
+    top 0.15s ease,
+    left 0.15s ease,
+    width 0.15s ease,
+    height 0.15s ease;
+}
+
+.upload-slot-percent {
+  font-size: 11px;
+
+  font-weight: 700;
+
+  color:
+    var(--brand-primary, #4F46E5);
+}
+
+
+/* ==========================================================================
+   12. IMAGE FORM PADDING
+   ========================================================================== */
+
+.form-padding-wrap-image {
+  padding: 0 24px 24px;
+}
+
+.form-padding-wrap:has(+ .form-padding-wrap-image) {
+  padding-bottom: 0;
+}
+
+
+/* ==========================================================================
+   13. SMALL SPINNER
+   ========================================================================== */
+
+@keyframes spin-small {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================================
+   14. FIELD ICON
+   ========================================================================== */
+
+.field-wrap {
+  --field-icon: url('/assets/img/category-sub.svg');
+}
+
+
+/* ==========================================================================
+   15. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 920px) {
+
+  .complaint-card {
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  .top-header {
+    height: auto;
+
+    padding: 16px;
+
+    flex-wrap: wrap;
+
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+
+    justify-content: space-between;
+  }
+
+  .header-actions button {
+    flex: 1;
+
+    justify-content: center;
+  }
+
+  .form-padding-wrap {
+    padding: 16px;
+  }
+
+  .form-padding-wrap-image {
+    padding: 0 16px 16px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .divider {
+    display: none;
+  }
+
+  .title-box p {
+    display: none;
+  }
+
+  .badge-required {
+    padding: 2px 8px;
+  }
+
+  .section-title {
+    padding: 0 16px;
+  }
+
+  .complaint-card {
+    margin: 12px;
+    width: calc(100% - 24px);
+  }
+
+}
+
+
+/* ==========================================================================
+   END
+   ========================================================================== */

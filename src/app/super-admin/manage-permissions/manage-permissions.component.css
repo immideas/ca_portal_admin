@@ -1,0 +1,13 @@
+.odd{
+    display: none;
+}
+.dataTables_empty{
+    display: none;
+}
+table tr .odd{
+    display: none;
+}
+.action_btns{
+    float: right;
+    margin-bottom: 10px;
+}

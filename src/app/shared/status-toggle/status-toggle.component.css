@@ -1,0 +1,96 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Angular Material Slide Toggle */
+:host ::ng-deep .mat-mdc-slide-toggle {
+  --mdc-switch-selected-track-color:
+    var(--brand-primary, #4F46E5);
+
+  --mdc-switch-selected-hover-track-color:
+    var(--brand-primary-hover, #4338CA);
+
+  --mdc-switch-selected-pressed-track-color:
+    var(--brand-primary-hover, #4338CA);
+
+  --mdc-switch-selected-focus-track-color:
+    var(--brand-primary, #4F46E5);
+
+  --mdc-switch-unselected-track-color:
+    var(--brand-muted-text, #9CA3AF);
+
+  --mdc-switch-unselected-hover-track-color:
+    var(--brand-label, #6B7280);
+
+  --mdc-switch-unselected-pressed-track-color:
+    var(--brand-label, #6B7280);
+
+  --mdc-switch-unselected-focus-track-color:
+    var(--brand-muted-text, #9CA3AF);
+
+  --mdc-switch-selected-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-selected-hover-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-selected-pressed-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-selected-focus-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-unselected-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-unselected-hover-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-unselected-pressed-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-unselected-focus-handle-color:
+    var(--brand-card-bg, #FFFFFF);
+
+  --mdc-switch-selected-icon-color: transparent;
+  --mdc-switch-selected-icon-size: 0px;
+
+  --mdc-switch-unselected-icon-color: transparent;
+  --mdc-switch-unselected-icon-size: 0px;
+
+  --mat-switch-selected-handle-size: 18px;
+  --mat-switch-unselected-handle-size: 14px;
+  --mat-switch-pressed-handle-size: 22px;
+
+  --mdc-switch-track-width: 40px;
+  --mdc-switch-track-height: 22px;
+  --mdc-switch-track-shape: 9999px;
+
+  transform: scale(0.9);
+}
+
+/* Hide Material icons */
+:host ::ng-deep .mdc-switch__icon,
+:host ::ng-deep .mdc-switch__icon--on,
+:host ::ng-deep .mdc-switch__icon--off {
+  display: none !important;
+}
+
+/* Hide ripple / focus visual */
+:host ::ng-deep .mdc-switch__ripple,
+:host ::ng-deep .mat-mdc-focus-indicator {
+  display: none !important;
+}
+
+/*
+  👇 REMOVED — this used to hardcode the handle-track's width/left
+  (`calc(100% - 24px)` / `left: 3px`). Those numbers were tuned for a
+  different track-width / handle-size combination than what's set
+  above (--mdc-switch-track-width: 40px, selected handle 18px vs
+  unselected handle 14px). Material's own stylesheet already computes
+  the handle-track sizing FROM those same CSS custom properties, so
+  this manual override was fighting that internal math — that's what
+  was pushing the thumb out of its correct inset position.
+  Removing it lets Material position the thumb correctly on its own.
+*/

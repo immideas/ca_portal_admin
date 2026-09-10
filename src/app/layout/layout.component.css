@@ -1,0 +1,122 @@
+/* =========================================================
+   MAIN LAYOUT
+   ========================================================= */
+
+#layoutSidenav {
+  display: flex;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  background: var(--brand-page-bg, #F8FAFC);
+}
+
+
+/* =========================================================
+   SIDEBAR WRAPPER
+   (width must match common-sidebar.component.scss:
+    220px expanded / 70px collapsed)
+   ========================================================= */
+
+#layoutSidenav_nav {
+  position: fixed;
+
+  top: 56px;
+  left: 0;
+
+  width: 220px;
+  height: calc(100vh - 56px);
+
+  flex-shrink: 0;
+
+  z-index: 1000;
+
+  transition: width 0.3s ease;
+}
+
+#layoutSidenav_nav.nav-collapsed {
+  width: 70px;
+}
+
+
+/* =========================================================
+   CONTENT
+   flex: 1 alone (no explicit width) lets flexbox size this
+   correctly against the real available space — avoids the
+   width/margin math drifting from the viewport edge.
+   ========================================================= */
+
+#layoutSidenav_content {
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  margin-left: 220px;
+
+  box-sizing: border-box;
+
+  min-height: calc(100vh - 56px);
+
+  background: var(--brand-page-bg, #F8FAFC);
+
+  transition: margin-left 0.3s ease;
+}
+
+#layoutSidenav_content.sidebar-collapsed {
+  margin-left: 70px;
+}
+
+
+/* =========================================================
+   PAGE CONTENT
+   ========================================================= */
+
+.complaint-wrapper,
+.list-container {
+  width: 100% !important;
+
+  max-width: 100% !important;
+
+  box-sizing: border-box;
+
+  overflow-x: hidden;
+}
+
+.filter-layout {
+  width: 100% !important;
+
+  max-width: 100% !important;
+
+  gap: 20px;
+}
+
+#main.list-container,
+main#main {
+  width: 100% !important;
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+  #layoutSidenav_nav {
+    width: 220px;
+
+    transition: transform 0.3s ease;
+  }
+
+  #layoutSidenav_nav.nav-collapsed {
+    width: 220px;
+  }
+
+  #layoutSidenav_content,
+  #layoutSidenav_content.sidebar-collapsed {
+    width: 100%;
+
+    margin-left: 0;
+  }
+}

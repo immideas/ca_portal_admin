@@ -1,0 +1,1181 @@
+// .common-header {
+//   /* =========================
+//      Dynamic Theme Variables
+//      ========================= */
+
+//   --ch-bg: var(--brand-navbar-bg, #ECF4FF);
+
+//   --ch-heading: var(--brand-navbar-text, #333333);
+
+//   --ch-primary: var(--brand-primary, #4154f1);
+//   --ch-primary-hover: var(--brand-primary-hover, #3045d8);
+
+//   --ch-navbar-text: var(--brand-navbar-text, #012970);
+
+//   /* Derived dynamic colors */
+//   --ch-border: color-mix(in srgb,
+//       var(--brand-navbar-text, #012970) 12%,
+//       transparent);
+
+//   --ch-hover-bg: color-mix(in srgb,
+//       var(--brand-primary, #4154f1) 8%,
+//       transparent);
+
+//   --ch-avatar-bg: color-mix(in srgb,
+//       var(--brand-primary, #4154f1) 12%,
+//       var(--brand-navbar-bg, #ECF4FF));
+
+//   --ch-muted-text: color-mix(in srgb,
+//       var(--brand-navbar-text, #012970) 60%,
+//       transparent);
+
+//   --ch-shadow: 0px 4px 33px 0px color-mix(in srgb,
+//       var(--brand-navbar-text, #012970) 8%,
+//       transparent);
+
+//   /* =========================
+//      Header Layout
+//      ========================= */
+
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   z-index: 997;
+
+//   height: 48px;
+
+//   display: flex;
+//   align-items: stretch;
+
+//   padding: 0;
+//   padding-left: 220px;
+
+//   gap: 0;
+
+//   background: var(--ch-bg);
+
+//   box-shadow: var(--ch-shadow);
+
+//   transition: padding-left 0.3s ease;
+
+//   &.sidebar-collapsed {
+//     padding-left: 64px;
+//   }
+// }
+
+
+// /* =========================
+//    Header Left
+//    ========================= */
+
+// .header-left {
+//   display: flex;
+//   align-items: center;
+
+//   gap: 4px;
+
+//   flex: 1;
+//   min-width: 0;
+
+//   padding: 0 8px;
+
+//   background: var(--ch-bg);
+// }
+
+
+// /* =========================
+//    Header Right
+//    ========================= */
+
+// .header-right {
+//   display: flex;
+//   align-items: center;
+
+//   gap: 4px;
+
+//   flex-shrink: 0;
+
+//   padding: 0 12px;
+
+//   background: var(--ch-bg);
+// }
+
+
+// /* =========================
+//    Common Icon Button
+//    ========================= */
+
+// .icon-btn {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   width: 32px;
+//   height: 32px;
+
+//   border: none;
+
+//   background: transparent;
+
+//   border-radius: 50%;
+
+//   color: var(--ch-primary);
+
+//   font-size: 18px;
+
+//   cursor: pointer;
+
+//   flex-shrink: 0;
+
+//   padding: 0;
+
+//   line-height: 1;
+
+//   transition:
+//     background 0.15s ease,
+//     color 0.15s ease;
+
+//   &:hover {
+//     background: var(--ch-hover-bg);
+//     color: var(--ch-primary-hover);
+//   }
+
+//   &:focus-visible {
+//     outline: 2px solid var(--ch-primary);
+//     outline-offset: 2px;
+//   }
+
+//   svg {
+//     display: block;
+
+//     path {
+//       fill: currentColor;
+//     }
+//   }
+// }
+
+
+// /* =========================
+//    Dropdowns
+//    ========================= */
+
+// .notification-dropdown,
+// .settings-dropdown,
+// .profile-dropdown {
+//   min-width: 240px;
+
+//   border: 1px solid var(--ch-border);
+
+//   border-radius: 4px;
+
+//   background: var(--ch-bg);
+
+//   box-shadow: var(--ch-shadow);
+
+//   padding: 0 0 8px 0;
+
+//   margin-top: 8px;
+// }
+
+
+// /* =========================
+//    Dropdown Item
+//    ========================= */
+
+// .dropdown-item {
+//   display: flex;
+//   align-items: center;
+
+//   gap: 10px;
+
+//   padding: 10px 16px;
+
+//   font-size: 14px;
+
+//   color: var(--ch-navbar-text);
+
+//   background: transparent;
+
+//   transition:
+//     background 0.12s ease,
+//     color 0.12s ease;
+
+//   i {
+//     font-size: 16px;
+
+//     color: var(--ch-primary);
+//   }
+
+//   &:hover {
+//     background: var(--ch-hover-bg);
+
+//     color: var(--ch-primary-hover);
+
+//     i {
+//       color: var(--ch-primary-hover);
+//     }
+//   }
+// }
+
+
+// /* =========================
+//    Dropdown Divider
+//    ========================= */
+
+// .dropdown-divider {
+//   margin: 4px 0;
+
+//   border-color: var(--ch-border);
+// }
+
+
+// /* =========================
+//    Dropdown Header
+//    ========================= */
+
+// .dropdown-header-item {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+
+//   padding: 14px 16px 8px;
+
+//   border-bottom: 1px solid var(--ch-border);
+// }
+
+
+// /* =========================
+//    Dropdown Title
+//    ========================= */
+
+// .dropdown-title {
+//   font-size: 14px;
+
+//   font-weight: 600;
+
+//   color: var(--ch-heading);
+// }
+
+
+// /* =========================
+//    View All Link
+//    ========================= */
+
+// .view-all-link {
+//   font-size: 12px;
+
+//   color: var(--ch-primary);
+
+//   text-decoration: none;
+
+//   &:hover {
+//     color: var(--ch-primary-hover);
+
+//     text-decoration: underline;
+//   }
+// }
+
+
+// /* =========================
+//    Empty State
+//    ========================= */
+
+// .empty-state {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+
+//   gap: 8px;
+
+//   padding: 24px 16px;
+
+//   color: var(--ch-muted-text);
+
+//   font-size: 13px;
+
+//   i {
+//     font-size: 24px;
+//   }
+// }
+
+
+// /* =========================
+//    Profile Button
+//    ========================= */
+
+// .profile-btn {
+//   display: flex;
+//   align-items: center;
+
+//   gap: 6px;
+
+//   padding: 4px 8px 4px 4px;
+
+//   border: none;
+
+//   background: transparent;
+
+//   border-radius: 50px;
+
+//   cursor: pointer;
+
+//   transition:
+//     background 0.15s ease,
+//     color 0.15s ease;
+
+//   &:hover {
+//     background: var(--ch-hover-bg);
+//   }
+
+//   &:focus-visible {
+//     outline: 2px solid var(--ch-primary);
+
+//     outline-offset: 2px;
+//   }
+// }
+
+
+// /* =========================
+//    User Avatar
+//    ========================= */
+
+// .user-avatar {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+
+//   width: 30px;
+//   height: 30px;
+
+//   border-radius: 50%;
+
+//   background: var(--ch-avatar-bg);
+
+//   color: var(--ch-primary);
+
+//   font-size: 13px;
+
+//   font-weight: 700;
+
+//   flex-shrink: 0;
+
+//   &--lg {
+//     width: 42px;
+//     height: 42px;
+
+//     font-size: 17px;
+//   }
+// }
+
+
+// /* =========================
+//    Chevron
+//    ========================= */
+
+// .chevron-icon {
+//   font-size: 12px;
+
+//   color: var(--ch-navbar-text);
+
+//   font-weight: 700;
+// }
+
+
+// /* =========================
+//    Profile Header
+//    ========================= */
+
+// .profile-header {
+//   display: flex;
+//   align-items: center;
+
+//   gap: 12px;
+
+//   padding: 14px 16px 10px;
+
+//   border-bottom: 1px solid var(--ch-border);
+
+//   background: var(--ch-bg);
+// }
+
+
+// /* =========================
+//    Profile Info
+//    ========================= */
+
+// .profile-info {
+//   display: flex;
+//   flex-direction: column;
+
+//   gap: 2px;
+// }
+
+
+// /* =========================
+//    Profile Name / Heading
+//    ========================= */
+
+// .profile-name {
+//   font-size: 14px;
+
+//   font-weight: 600;
+
+//   color: var(--ch-heading);
+
+//   line-height: 1.3;
+// }
+
+
+// /* =========================
+//    Profile Role
+//    ========================= */
+
+// .profile-role {
+//   font-size: 12px;
+
+//   color: var(--ch-muted-text);
+
+//   line-height: 1.3;
+// }
+
+
+// /* =========================
+//    Sign Out
+//    ========================= */
+
+// .sign-out {
+//   color: var(--ch-primary) !important;
+
+//   i {
+//     color: var(--ch-primary) !important;
+//   }
+
+//   &:hover {
+//     background: var(--ch-hover-bg) !important;
+
+//     color: var(--ch-primary-hover) !important;
+
+//     i {
+//       color: var(--ch-primary-hover) !important;
+//     }
+//   }
+// }
+
+
+// /* =========================
+//    Right Sidebar
+//    ========================= */
+
+// .right-sidebar {
+//   position: fixed;
+
+//   top: 48px;
+//   right: 0;
+
+//   width: 19%;
+
+//   height: calc(100vh - 48px);
+
+//   background: var(--ch-bg);
+
+//   border-left: 1px solid var(--ch-border);
+
+//   z-index: 996;
+
+//   overflow-y: auto;
+
+//   transform: translateX(100%);
+
+//   transition: transform 0.3s ease;
+
+//   overflow: hidden;
+
+//   display: flex;
+//   flex-direction: column;
+// }
+
+
+// .right-sidebar.open {
+//   transform: translateX(0);
+// }
+
+
+// /* =========================
+//    Chat
+//    ========================= */
+
+// .right-sidebar app-chat {
+//   height: 100%;
+
+//   display: flex;
+// }
+
+
+// /* =========================
+//    Main Content
+//    ========================= */
+
+// .main-content {
+//   transition: margin-right 0.3s ease;
+// }
+
+
+// .main-content.shifted {
+//   margin-right: 232px;
+// }
+
+
+// /* =========================
+//    Mobile
+//    ========================= */
+
+// @media (max-width: 767px) {
+
+//   .common-header {
+//     padding-left: 0;
+
+//     &.sidebar-collapsed {
+//       padding-left: 0;
+//     }
+//   }
+
+//   .header-right {
+//     padding: 0 6px;
+//   }
+
+//   .right-sidebar {
+//     width: 100%;
+//   }
+// }
+/* =========================================================
+   COMMON HEADER
+   Theme colors come from ThemeConfigService
+   Layout preserved
+   ========================================================= */
+
+.common-header {
+  /* =========================
+     Dynamic Theme Variables
+     ========================= */
+
+  --ch-bg: var(--brand-navbar-bg,
+      #FFFFFF);
+
+  --ch-heading: var(--brand-heading,
+      var(--brand-navbar-text, #111827));
+
+  --ch-primary: var(--brand-primary,
+      #4F46E5);
+
+  --ch-primary-hover: var(--brand-primary-hover,
+      #4338CA);
+
+  --ch-navbar-text: var(--brand-navbar-text,
+      #111827);
+
+  --ch-navbar-icon: var(--brand-navbar-icon,
+      #012970);
+
+  --ch-navbar-hover: var(--brand-navbar-hover,
+      #4154F1);
+
+  --ch-border: var(--brand-border,
+      #E5E7EB);
+
+  --ch-card-border: var(--brand-card-border,
+      #D6E4FF);
+
+  --ch-hover-bg: color-mix(in srgb,
+      var(--ch-navbar-hover) 8%,
+      var(--ch-bg));
+
+  --ch-avatar-bg: color-mix(in srgb,
+      var(--ch-primary) 12%,
+      var(--ch-bg));
+
+  --ch-muted-text: var(--brand-muted-text,
+      #9CA3AF);
+
+  --ch-input-bg: var(--brand-input-bg,
+      #F9FAFB);
+
+  --ch-section-bg: var(--brand-section-header,
+      #F1F5FF);
+
+  --ch-error: var(--brand-error,
+      #DC2626);
+
+  --ch-shadow:
+    0px 4px 33px 0px color-mix(in srgb,
+      var(--ch-navbar-text) 8%,
+      transparent);
+
+
+  /* =========================
+     Header Layout
+     ========================= */
+
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 997;
+
+  height: 48px;
+
+  display: flex;
+
+  align-items: stretch;
+
+  padding: 0;
+
+  padding-left: 220px;
+
+  gap: 0;
+
+  background: var(--ch-bg);
+
+  color: var(--ch-navbar-text);
+
+  box-shadow: var(--ch-shadow);
+
+  transition: padding-left 0.3s ease;
+
+
+  &.sidebar-collapsed {
+    padding-left: 64px;
+  }
+}
+
+
+/* =========================
+   Header Left
+   ========================= */
+
+.header-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 0 8px;
+
+  background: var(--ch-bg);
+}
+
+
+/* =========================
+   Header Right
+   ========================= */
+
+.header-right {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  flex-shrink: 0;
+
+  padding: 0 12px;
+
+  background: var(--ch-bg);
+}
+
+
+/* =========================
+   Common Icon Button
+   ========================= */
+
+.icon-btn {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 32px;
+
+  height: 32px;
+
+  border: none;
+
+  background: transparent;
+
+  border-radius: 50%;
+
+  color: var(--ch-navbar-icon);
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  line-height: 1;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+
+  &:hover {
+    background: var(--ch-hover-bg);
+
+    color: var(--ch-navbar-hover);
+  }
+
+
+  &:focus-visible {
+    outline: 2px solid var(--ch-primary);
+
+    outline-offset: 2px;
+  }
+
+
+  svg {
+    display: block;
+
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+
+/* =========================
+   Dropdowns
+   ========================= */
+
+.notification-dropdown,
+.settings-dropdown,
+.profile-dropdown {
+  min-width: 240px;
+
+  border: 1px solid var(--ch-card-border);
+
+  border-radius: 4px;
+
+  background: var(--ch-bg);
+
+  color: var(--ch-navbar-text);
+
+  box-shadow: var(--ch-shadow);
+
+  padding: 0 0 8px 0;
+
+  margin-top: 8px;
+}
+
+
+/* =========================
+   Dropdown Item
+   ========================= */
+
+.dropdown-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 16px;
+
+  font-size: 14px;
+
+  color: var(--ch-navbar-text);
+
+  background: transparent;
+
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+
+
+  i {
+    font-size: 16px;
+
+    color: var(--ch-primary);
+  }
+
+
+  &:hover {
+    background: var(--ch-hover-bg);
+
+    color: var(--ch-primary-hover);
+
+
+    i {
+      color: var(--ch-primary-hover);
+    }
+  }
+}
+
+
+/* =========================
+   Dropdown Divider
+   ========================= */
+
+.dropdown-divider {
+  margin: 4px 0;
+
+  border-color: var(--ch-border);
+}
+
+
+/* =========================
+   Dropdown Header
+   ========================= */
+
+.dropdown-header-item {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 14px 16px 8px;
+
+  border-bottom: 1px solid var(--ch-border);
+}
+
+
+/* =========================
+   Dropdown Title
+   ========================= */
+
+.dropdown-title {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: var(--ch-heading);
+}
+
+
+/* =========================
+   View All Link
+   ========================= */
+
+.view-all-link {
+  font-size: 12px;
+
+  color: var(--ch-primary);
+
+  text-decoration: none;
+
+
+  &:hover {
+    color: var(--ch-primary-hover);
+
+    text-decoration: underline;
+  }
+}
+
+
+/* =========================
+   Empty State
+   ========================= */
+
+.empty-state {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 24px 16px;
+
+  color: var(--ch-muted-text);
+
+  font-size: 13px;
+
+
+  i {
+    font-size: 24px;
+  }
+}
+
+
+/* =========================
+   Profile Button
+   ========================= */
+
+.profile-btn {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 4px 8px 4px 4px;
+
+  border: none;
+
+  background: transparent;
+
+  border-radius: 50px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+
+  &:hover {
+    background: var(--ch-hover-bg);
+  }
+
+
+  &:focus-visible {
+    outline: 2px solid var(--ch-primary);
+
+    outline-offset: 2px;
+  }
+}
+
+
+/* =========================
+   User Avatar
+   ========================= */
+
+.user-avatar {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 30px;
+
+  height: 30px;
+
+  border-radius: 50%;
+
+  background: var(--ch-avatar-bg);
+
+  color: var(--ch-primary);
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  flex-shrink: 0;
+
+
+  &--lg {
+    width: 42px;
+
+    height: 42px;
+
+    font-size: 17px;
+  }
+}
+
+
+/* =========================
+   Chevron
+   ========================= */
+
+.chevron-icon {
+  font-size: 12px;
+
+  color: var(--ch-navbar-icon);
+
+  font-weight: 700;
+}
+
+
+/* =========================
+   Profile Header
+   ========================= */
+
+.profile-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 14px 16px 10px;
+
+  border-bottom: 1px solid var(--ch-border);
+
+  background: var(--ch-bg);
+}
+
+
+/* =========================
+   Profile Info
+   ========================= */
+
+.profile-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+/* =========================
+   Profile Name / Heading
+   ========================= */
+
+.profile-name {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: var(--ch-heading);
+
+  line-height: 1.3;
+}
+
+
+/* =========================
+   Profile Role
+   ========================= */
+
+.profile-role {
+  font-size: 12px;
+
+  color: var(--ch-muted-text);
+
+  line-height: 1.3;
+}
+
+
+/* =========================
+   Sign Out
+   ========================= */
+
+.sign-out {
+  color: var(--ch-error) !important;
+
+
+  i {
+    color: var(--ch-error) !important;
+  }
+
+
+  &:hover {
+    background: color-mix(in srgb,
+        var(--ch-error) 7%,
+        var(--ch-bg)) !important;
+
+    color: var(--ch-error) !important;
+
+
+    i {
+      color: var(--ch-error) !important;
+    }
+  }
+}
+
+
+/* =========================
+   Right Sidebar
+   ========================= */
+
+.right-sidebar {
+  position: fixed;
+
+  top: 48px;
+
+  right: 0;
+
+  width: 19%;
+
+  height: calc(100vh - 48px);
+
+  background: var(--ch-bg);
+
+  color: var(--ch-navbar-text);
+
+  border-left: 1px solid var(--ch-border);
+
+  z-index: 996;
+
+  overflow-y: auto;
+
+  transform: translateX(100%);
+
+  transition: transform 0.3s ease;
+
+  overflow: hidden;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+.right-sidebar.open {
+  transform: translateX(0);
+}
+
+
+/* =========================
+   Chat
+   ========================= */
+
+.right-sidebar app-chat {
+  height: 100%;
+
+  display: flex;
+}
+
+
+/* =========================
+   Main Content
+   ========================= */
+
+.main-content {
+  transition: margin-right 0.3s ease;
+}
+
+
+.main-content.shifted {
+  margin-right: 232px;
+}
+
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 767px) {
+
+  .common-header {
+    padding-left: 0;
+
+
+    &.sidebar-collapsed {
+      padding-left: 0;
+    }
+  }
+
+
+  .header-right {
+    padding: 0 6px;
+  }
+
+
+  .right-sidebar {
+    width: 100%;
+  }
+}

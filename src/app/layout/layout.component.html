@@ -1,0 +1,12 @@
+<div class="sb-nav-fixed">
+  <app-common-header></app-common-header>
+
+  <div id="layoutSidenav">
+    <div id="layoutSidenav_nav" [class.nav-collapsed]="isCollapsed">
+      <app-sidebar></app-sidebar>
+    </div>
+    <div id="layoutSidenav_content" [class.sidebar-collapsed]="isCollapsed">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

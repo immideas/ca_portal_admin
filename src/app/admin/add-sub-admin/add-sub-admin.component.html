@@ -1,0 +1,352 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Sub-Admin"
+                : isEditMode
+                  ? "Edit Sub-Admin"
+                  : "Add Sub-Admin"
+            }}
+          </h4>
+          <p>Sub-admin details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else saveMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #saveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <span class="uploading-indicator" *ngIf="isUploading">
+          <span class="status-spinner-small"></span>
+          {{ uploadingSlotLabel || "Uploading..." }}
+        </span>
+
+        <button
+          type="submit"
+          form="subAdminForm"
+          class="btn-save"
+          [ngClass]="{ 'btn-active': addSubAdminForm.valid && !isUploading }"
+          [disabled]="addSubAdminForm.invalid || isUploading"
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" />
+
+          <span>
+            {{ isEditMode ? "Update" : "Save User" }}
+          </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+ <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+      <div class="header-content">
+        <span class="header-text">Sub-Admin Information</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+        </span>
+      </div>
+    </div>
+
+    <form
+      [formGroup]="addSubAdminForm"
+      id="subAdminForm"
+      (ngSubmit)="saveSubAdmin()"
+      class="form-padding-wrap"
+    >
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="name">
+            Name
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="form-controler"
+              placeholder="Enter name"
+              (keypress)="allowOnlyAlphabets($event)"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              addSubAdminForm.get('name')?.invalid &&
+              addSubAdminForm.get('name')?.touched
+            "
+          >
+            <div *ngIf="addSubAdminForm.get('name')?.errors?.['required']">
+              Name is required.
+            </div>
+
+            <div *ngIf="addSubAdminForm.get('name')?.errors?.['minlength']">
+              Name must be at least 3 characters long.
+            </div>
+
+            <div *ngIf="addSubAdminForm.get('name')?.errors?.['pattern']">
+              Only alphabets are allowed.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="email">
+            Email
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-controler"
+              placeholder="Enter email"
+            />
+          </div>
+          <div
+            *ngIf="
+              addSubAdminForm.get('email')?.invalid &&
+              addSubAdminForm.get('email')?.touched
+            "
+            class="text-danger small mt-1"
+          >
+            <div *ngIf="addSubAdminForm.get('email')?.errors?.['required']">
+              Email is required.
+            </div>
+            <div *ngIf="addSubAdminForm.get('email')?.errors?.['email']">
+              Invalid email format.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="phone">
+            Phone
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/sub-category.svg&quot;)"
+          >
+            <input
+              type="text"
+              id="phone"
+              formControlName="phone"
+              class="form-controler"
+              maxlength="10"
+              placeholder="Enter phone number"
+              (keypress)="allowOnlyNumbers($event)"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              addSubAdminForm.get('phone')?.invalid &&
+              addSubAdminForm.get('phone')?.touched
+            "
+          >
+            <div *ngIf="addSubAdminForm.get('phone')?.errors?.['required']">
+              Phone is required.
+            </div>
+
+            <div *ngIf="addSubAdminForm.get('phone')?.errors?.['pattern']">
+              Enter valid 10 digit phone number.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="role">
+            Role
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <select id="role" formControlName="role" class="form-controler">
+              <option value="" disabled selected>Select role</option>
+              <option *ngFor="let role of roles" [value]="role.id">
+                {{ role.roleName }}
+              </option>
+            </select>
+          </div>
+          <div
+            *ngIf="
+              addSubAdminForm.get('role')?.invalid &&
+              addSubAdminForm.get('role')?.touched
+            "
+            class="text-danger small mt-1"
+          >
+            Role is required.
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="form-padding-wrap-image">
+      <div class="col-md-12 form-group">
+        <label class="upload-main-label">
+          Images <span class="sub-label">(PNG, JPG, WEBP)</span>
+        </label>
+
+        <div *ngIf="isViewMode && imageUrls.length" class="attachment-wrapper">
+          <button
+            type="button"
+            *ngFor="let url of imageUrls"
+            class="attachment-link"
+            (click)="openImagePreview(url)"
+          >
+            <img
+              [src]="url"
+              alt="sub-admin-image"
+              class="attachment-thumbnail-small"
+            />
+          </button>
+        </div>
+
+        <div
+          *ngIf="isViewMode && !imageUrls.length"
+          class="text-muted no-images-text"
+        >
+          No image uploaded.
+        </div>
+
+        <div class="modern-uploader-wrapper" *ngIf="!isViewMode" #uploaderHost>
+          <lib-image-uploader-lib
+            [imageUrls]="imageUrls"
+            [maxImages]="maxImages"
+            [aspectRatio]="1"
+            [layoutMode]="'grid'"
+            [allowDrag]="!isViewMode"
+            [allowEdit]="!isViewMode"
+            [allowDelete]="!isViewMode"
+            [allowReplace]="!isViewMode"
+            (imagesChange)="handleImagesChange($event)"
+            (imageUpload)="onImageUpload($event)"
+            (imageReplace)="onImageReplace($event)"
+            (imageDelete)="onImageDelete($event)"
+            (imageEdit)="onImageEdit($event)"
+          >
+          </lib-image-uploader-lib>
+
+          <div
+            class="upload-slot-overlay"
+            *ngFor="let slot of uploadingSlots | keyvalue"
+            [style.top.px]="slot.value.top"
+            [style.left.px]="slot.value.left"
+            [style.width.px]="slot.value.width"
+            [style.height.px]="slot.value.height"
+          >
+            <span class="status-spinner-small"></span>
+            <span class="upload-slot-percent"
+              >{{ slot.value.progress | number: "1.0-0" }}%</span
+            >
+          </div>
+        </div>
+
+        <div class="text-muted mt-1" style="font-size: 11px" *ngIf="isViewMode">
+          <i class="bi bi-lock-fill"></i> Switch to Edit mode to change the
+          profile image.
+        </div>
+      </div>
+    </div>
+    <div
+      class="image-modal-backdrop"
+      *ngIf="showImageModal"
+      (click)="closeImagePreview()"
+    >
+      <div class="image-modal-content" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="image-modal-close"
+          (click)="closeImagePreview()"
+          aria-label="Close"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <img [src]="modalImageUrl" alt="preview" class="image-modal-img" />
+      </div>
+    </div>
+  </article>
+</main>
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

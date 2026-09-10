@@ -1,0 +1,372 @@
+<div *ngIf="selectedUser" class="ai-panel mt-4">
+  <div
+    class="ai-panel__header"
+    role="button"
+    tabindex="0"
+    (click)="userDetailsPanelOpen = !userDetailsPanelOpen"
+    (keydown.enter)="userDetailsPanelOpen = !userDetailsPanelOpen"
+    [class.ai-panel__header--open]="userDetailsPanelOpen"
+  >
+    <div class="ai-panel__header-left">
+      <span class="ai-panel__chevron">
+        <svg
+          *ngIf="userDetailsPanelOpen"
+          width="20"
+          height="24"
+          viewBox="0 0 20 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g clip-path="url(#pt-cg1)">
+            <path
+              d="M13.6723 10.7931L10.5107 14.0864L9.60188 13.1531L13.6723 8.91309L17.7427 13.1531L16.8339 14.0864L13.6723 10.7931Z"
+              fill="black"
+            />
+          </g>
+          <defs>
+            <clipPath id="pt-cg1">
+              <rect
+                width="16"
+                height="16"
+                fill="white"
+                transform="translate(1.67188 4)"
+              />
+            </clipPath>
+          </defs>
+        </svg>
+        <svg
+          *ngIf="!userDetailsPanelOpen"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M8.00009 8.70691L11.1617 5.41358L12.0705 6.34691L8.00009 10.5869L3.92969 6.34691L4.83849 5.41358L8.00009 8.70691Z"
+            fill="black"
+          />
+        </svg>
+      </span>
+      <span class="ai-panel__title">User Details</span>
+    </div>
+  </div>
+
+  <div class="ai-panel__body" *ngIf="userDetailsPanelOpen">
+    <div class="ud-field-grid">
+      <div class="ud-field-block">
+        <span class="ud-field-label">Name</span>
+        <span class="ud-field-value">{{ selectedUser.name }}</span>
+      </div>
+      <div class="ud-field-block">
+        <span class="ud-field-label">Email</span>
+        <span class="ud-field-value">{{ selectedUser.email }}</span>
+      </div>
+      <div class="ud-field-block">
+        <span class="ud-field-label">Contact No</span>
+        <span class="ud-field-value">{{ selectedUser.phone || "—" }}</span>
+      </div>
+      <div class="ud-field-block">
+        <span class="ud-field-label">Designation</span>
+        <span class="ud-field-value">{{
+          selectedUser.designation ||
+            selectedUser.roleName ||
+            selectedUser.roleCode ||
+            "—"
+        }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngFor="let section of tableSections">
+  <div class="perm-section-card mt-4">
+    <div class="perm-section-header">
+      {{
+        section.sectionName !== "General" ? section.sectionName : "Permissions"
+      }}
+    </div>
+
+    <div class="perm-table-wrapper">
+      <table class="perm-table">
+        <thead>
+          <tr>
+            <th class="col-particulars">Particulars</th>
+            <th *ngIf="showFull" class="col-check">Full</th>
+            <th class="col-check">View</th>
+            <th class="col-check">Create</th>
+            <th class="col-check">Edit</th>
+            <th class="col-check">Delete</th>
+            <th class="col-check">Side Panel</th>
+            <th class="col-others">Others</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let row of section.rows"
+            [class.disabled-row]="isRowDisabled(row)"
+          >
+            <td class="col-particulars">{{ row.rowName }}</td>
+
+            <td *ngIf="showFull" class="col-check">
+              <ng-container *ngIf="mode === 'edit'">
+                <ng-container *ngIf="row.full; else virtualFull">
+                  <mat-checkbox
+                    [(ngModel)]="row.full.isChecked"
+                    [disabled]="row.full.disabled"
+                    [matTooltip]="
+                      row.full.disabled ? 'Not available in current plan' : ''
+                    "
+                    matTooltipPosition="above"
+                    (change)="onFullChange(row)"
+                    class="perm-checkbox"
+                  >
+                  </mat-checkbox>
+                </ng-container>
+                <ng-template #virtualFull>
+                  <mat-checkbox
+                    [ngModel]="isRowFullyChecked(row)"
+                    [disabled]="!hasEnabledPermissions(row)"
+                    (change)="onVirtualFullChange(row, $event)"
+                    class="perm-checkbox"
+                  >
+                  </mat-checkbox>
+                </ng-template>
+              </ng-container>
+              <ng-container *ngIf="mode === 'view'">
+                <button
+                  *ngIf="row.full"
+                  type="button"
+                  class="eye-btn"
+                  [matTooltip]="row.full.description || row.full.name"
+                  matTooltipPosition="above"
+                  title="{{ row.full.description || row.full.name }}"
+                  (click)="viewPermClick.emit(row.full)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </ng-container>
+            </td>
+
+            <td class="col-check">
+              <ng-container *ngIf="mode === 'edit'">
+                <mat-checkbox
+                  *ngIf="row.view"
+                  [(ngModel)]="row.view.isChecked"
+                  [disabled]="row.view.disabled"
+                  [matTooltip]="
+                    row.view.disabled ? 'Not available in current plan' : ''
+                  "
+                  matTooltipPosition="above"
+                  (change)="onColumnChange(row)"
+                  class="perm-checkbox"
+                >
+                </mat-checkbox>
+              </ng-container>
+              <ng-container *ngIf="mode === 'view'">
+                <button
+                  *ngIf="row.view"
+                  type="button"
+                  class="eye-btn"
+                  [matTooltip]="row.view.description || row.view.name"
+                  matTooltipPosition="above"
+                  title="{{ row.view.description || row.view.name }}"
+                  (click)="viewPermClick.emit(row.view)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </ng-container>
+            </td>
+
+            <td class="col-check">
+              <ng-container *ngIf="mode === 'edit'">
+                <mat-checkbox
+                  *ngIf="row.create"
+                  [(ngModel)]="row.create.isChecked"
+                  [disabled]="row.create.disabled"
+                  [matTooltip]="
+                    row.create.disabled ? 'Not available in current plan' : ''
+                  "
+                  matTooltipPosition="above"
+                  (change)="onColumnChange(row)"
+                  class="perm-checkbox"
+                >
+                </mat-checkbox>
+              </ng-container>
+              <ng-container *ngIf="mode === 'view'">
+                <button
+                  *ngIf="row.create"
+                  type="button"
+                  class="eye-btn"
+                  [matTooltip]="row.create.description || row.create.name"
+                  matTooltipPosition="above"
+                  title="{{ row.create.description || row.create.name }}"
+                  (click)="viewPermClick.emit(row.create)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </ng-container>
+            </td>
+
+            <td class="col-check">
+              <ng-container *ngIf="mode === 'edit'">
+                <mat-checkbox
+                  *ngIf="row.edit"
+                  [(ngModel)]="row.edit.isChecked"
+                  [disabled]="row.edit.disabled"
+                  [matTooltip]="
+                    row.edit.disabled ? 'Not available in current plan' : ''
+                  "
+                  matTooltipPosition="above"
+                  (change)="onColumnChange(row)"
+                  class="perm-checkbox"
+                >
+                </mat-checkbox>
+              </ng-container>
+              <ng-container *ngIf="mode === 'view'">
+                <button
+                  *ngIf="row.edit"
+                  type="button"
+                  class="eye-btn"
+                  [matTooltip]="row.edit.description || row.edit.name"
+                  matTooltipPosition="above"
+                  title="{{ row.edit.description || row.edit.name }}"
+                  (click)="viewPermClick.emit(row.edit)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </ng-container>
+            </td>
+
+            <td class="col-check">
+              <ng-container *ngIf="mode === 'edit'">
+                <mat-checkbox
+                  *ngIf="row.delete"
+                  [(ngModel)]="row.delete.isChecked"
+                  [disabled]="row.delete.disabled"
+                  [matTooltip]="
+                    row.delete.disabled ? 'Not available in current plan' : ''
+                  "
+                  matTooltipPosition="above"
+                  (change)="onColumnChange(row)"
+                  class="perm-checkbox"
+                >
+                </mat-checkbox>
+              </ng-container>
+              <ng-container *ngIf="mode === 'view'">
+                <button
+                  *ngIf="row.delete"
+                  type="button"
+                  class="eye-btn"
+                  [matTooltip]="row.delete.description || row.delete.name"
+                  matTooltipPosition="above"
+                  title="{{ row.delete.description || row.delete.name }}"
+                  (click)="viewPermClick.emit(row.delete)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </ng-container>
+            </td>
+
+            <td class="col-check">
+              <ng-container *ngIf="mode === 'edit'">
+                <mat-checkbox
+                  *ngIf="row.sidePanel"
+                  [(ngModel)]="row.sidePanel.isChecked"
+                  [disabled]="row.sidePanel.disabled"
+                  [matTooltip]="
+                    row.sidePanel.disabled
+                      ? 'Not available in current plan'
+                      : ''
+                  "
+                  matTooltipPosition="above"
+                  (change)="onColumnChange(row)"
+                  class="perm-checkbox"
+                >
+                </mat-checkbox>
+              </ng-container>
+              <ng-container *ngIf="mode === 'view'">
+                <button
+                  *ngIf="row.sidePanel"
+                  type="button"
+                  class="eye-btn"
+                  [matTooltip]="row.sidePanel.description || row.sidePanel.name"
+                  matTooltipPosition="above"
+                  title="{{ row.sidePanel.description || row.sidePanel.name }}"
+                  (click)="viewPermClick.emit(row.sidePanel)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </ng-container>
+            </td>
+
+            <td class="col-others">
+              <div *ngIf="row.others.length" class="others-popup-container">
+                <a
+                  href="javascript:void(0)"
+                  class="more-perms-link"
+                  (click)="toggleOthersPopup(row, section, $event)"
+                >
+                  More Permissions
+                </a>
+
+                <div
+                  class="others-popup"
+                  *ngIf="row.showOthersPopup"
+                  [ngStyle]="$any(row).popupStyle"
+                  (click)="$event.stopPropagation()"
+                >
+                  <button
+                    type="button"
+                    class="popup-close"
+                    title="Close"
+                    aria-label="Close"
+                    (click)="row.showOthersPopup = false"
+                  >
+                    ×
+                  </button>
+                  <div class="popup-item" *ngFor="let perm of row.others">
+                    <ng-container *ngIf="mode === 'edit'">
+                      <mat-checkbox
+                        [(ngModel)]="perm.isChecked"
+                        [disabled]="perm.disabled"
+                        [matTooltip]="
+                          perm.disabled ? 'Not available in current plan' : ''
+                        "
+                        matTooltipPosition="above"
+                        class="perm-checkbox"
+                      >
+                        <span class="popup-perm-name">{{ perm.name }}</span>
+                      </mat-checkbox>
+                    </ng-container>
+
+                    <ng-container *ngIf="mode === 'view'">
+                      <span class="popup-perm-name">{{ perm.name }}</span>
+                      <button
+                        type="button"
+                        class="eye-btn eye-btn--sm"
+                        title="{{ perm.description || perm.name }}"
+                        (click)="viewPermClick.emit(perm)"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="section.rows.length === 0">
+            <td [attr.colspan]="showFull ? 8 : 7" class="no-data">
+              No permissions available.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-container>
+
+<div *ngIf="tableSections.length === 0" class="text-center mt-4 text-muted">
+  No permissions available.
+</div>

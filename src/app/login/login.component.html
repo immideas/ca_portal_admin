@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Login - Resolvenest</title>
+        <link href="/assets/img/favicon.png" rel="icon">
+        <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+        <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+        <link href="/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+        <link href="/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+        <link href="/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+        <link href="/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+        <link href="/assets/css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <main>
+            <div class="container">
+                <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 col-md-8 d-flex flex-column align-items-center justify-content-center">
+                                <div class="d-flex justify-content-center py-4">
+                                    <div class="logo d-flex flex-column align-items-center w-auto">
+                                        <img src="/assets/img/immi_icon.png" alt="Logo" style="transform: scale(2);" onerror="this.onerror=null;this.src='/assets/img/default-logo.png';">
+                                        <span class="d-none d-lg-block mt-4" style="text-decoration: none; margin-top: 30px;">Resolvenest</span>
+                                        <small class="d-none d-lg-block" style="margin-top: 20px;">by Imminent Ideas Pvt Ltd</small>
+                                    </div>
+                                </div>
+                                <div class="card mb-3" style="padding-bottom: 50px;">
+                                    <div class="card-body">
+                                        <div class="pt-4 pb-2">
+                                            <h5 class="card-title text-center pb-0 fs-4">Login</h5>
+                                        </div>
+                                        <form [formGroup]="loginForm" (ngSubmit)="submitForm()" class="row g-3 needs-validation" novalidate>
+                                            <div class="col-12">
+                                                <label for="inputEmail" class="form-label">Email or Phone Number</label>
+                                                <div class="input-group has-validation">
+                                                    <input
+                                                        type="text"
+                                                        formControlName="identifier"
+                                                        class="form-control"
+                                                        id="inputEmail"
+                                                        placeholder="Enter your email or phone number"
+                                                        required>
+                                                    <div class="invalid-feedback">Please enter your email or phone number.</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="inputPassword" class="form-label">Password</label>
+                                                <div style="position: relative;">
+                                                    <input
+                                                        [type]="showPassword ? 'text' : 'password'"
+                                                        formControlName="password"
+                                                        class="form-control"
+                                                        id="inputPassword"
+                                                        placeholder="Enter your password"
+                                                        required
+                                                        style="padding-right: 40px;">
+                                                    <span
+                                                        (click)="showPassword = !showPassword"
+                                                        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                                        <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4-7.5 10.5-7.5S22.5 12 22.5 12s-4 7.5-10.5 7.5S1.5 12 1.5 12z"/>
+                                                          <circle cx="12" cy="12" r="3.5"/>
+                                                        </svg>
+                                                        <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4-7.5 10.5-7.5S22.5 12 22.5 12s-4 7.5-10.5 7.5S1.5 12 1.5 12z"/>
+                                                          <circle cx="12" cy="12" r="3.5"/>
+                                                          <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="2"/>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div class="invalid-feedback">Please enter your password!</div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <button class="btn btn-primary w-100" type="submit" [disabled]="loginForm.invalid">Login</button>
+                                            </div>
+                                            <div class="col-12">
+                                              <div class="invalid-feedback">Please enter your password!</div>
+    <div class="text-end mt-1">
+        <a routerLink="/password-reset" class="small">Forgot Password?</a>   <!-- 👈 naya -->
+    </div>
+
+                                            </div>
+                                        </form>
+                                        <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
+                                        <div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);" *ngIf="showSessionModal">
+                                          <div class="modal-dialog modal-lg">
+                                            <div class="modal-content session-modal-custom">
+                                              <div class="session-modal-header">
+                                                <span class="modal-title">
+                                                  <i class="bi bi-exclamation-triangle-fill"></i>
+                                                  Session Limit Reached
+                                                </span>
+                                                <button type="button" class="btn-close" aria-label="Close" (click)="showSessionModal = false">&times;</button>
+                                              </div>
+                                              <div class="session-modal-body">
+                                                <p class="mb-3">You have reached the maximum number of allowed active sessions. Please log out from one or more sessions to continue.</p>
+                                                <div class="table-responsive">
+                                                  <table class="table session-table table-bordered align-middle">
+                                                    <thead>
+                                                      <tr>
+
+                                                        <th>Device (OS)</th>
+                                                        <th>Platform</th>
+
+                                                        <th>Location</th>
+                                                        <th>User Agent</th>
+                                                        <th>Active From</th>
+                                                        <th>Action</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      <tr *ngFor="let session of activeSessions">
+
+                                                        <td>{{ session.os }}</td>
+                                                        <td>{{ session.platform }}</td>
+
+                                                        <td style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                          {{ locationMap[session.location] || session.location }}
+                                                        </td>
+                                                        <td style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ session.user_agent }}</td>
+                                                        <td>{{ session.session_created | date:'medium' }}</td>
+                                                        <td>
+                                                          <button class="session-logout-btn" [disabled]="sessionLogoutLoading" (click)="logoutFromSession(session.id)">
+                                                            <i class="bi bi-box-arrow-right"></i> Logout
+                                                          </button>
+                                                        </td>
+                                                      </tr>
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                                <div *ngIf="activeSessions.length === 0" class="text-center mt-3">
+                                                  <p class="text-success fw-bold">All sessions logged out. You can now retry login.</p>
+                                                </div>
+                                              </div>
+                                              <div class="session-modal-footer">
+                                                <button type="button" class="session-retry-btn" [disabled]="activeSessions.length >= initialSessionCount" (click)="retryLoginAfterSessionLogout()">
+                                                  <i class="bi bi-arrow-repeat"></i> Continue To Login
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+        <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/assets/vendor/simple-datatables/simple-datatables.js"></script>
+        <script src="/assets/js/main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,43 @@
+.tdb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+
+  color: var(--brand-muted-text, #6B7280);
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  flex-shrink: 0;
+}
+
+.tdb:hover {
+  background: var(--brand-sidebar-hover-bg, #F3F6FF);
+  color: var(--brand-navbar-icon, var(--brand-text, #111827));
+}
+
+.tdb--active {
+  background: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      var(--brand-card-bg, #FFFFFF));
+
+  color: var(--brand-primary, #4F46E5);
+}
+
+.tdb--active:hover {
+  background: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 14%,
+      var(--brand-card-bg, #FFFFFF));
+
+  color: var(--brand-primary-hover, #4338CA);
+}

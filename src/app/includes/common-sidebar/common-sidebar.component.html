@@ -1,0 +1,160 @@
+<div
+  class="cs-backdrop"
+  [class.active]="mobileOpen"
+  (click)="closeMobile()"
+></div>
+
+<aside
+  id="common-sidebar"
+  class="common-sidebar"
+  [ngClass]="themeClass"
+  [class.collapsed]="isCollapsed"
+  [class.mobile-open]="mobileOpen"
+  [ngStyle]="sidebarStyles"
+>
+
+<div class="cs-brand">
+  <a class="cs-brand-link" [routerLink]="logoRoute">
+    <span class="cs-brand-icon">
+      <img src="assets/img/fav1.png">
+    </span>
+
+    <span class="cs-brand-text">
+      ResolveNest
+    </span>
+  </a>
+</div>
+  <ul class="cs-nav" id="common-sidebar-nav">
+    <ng-container *ngFor="let section of navSections">
+      <li *ngIf="section.label" class="cs-nav-item">
+        <div
+          class="cs-section-label"
+          [title]="isCollapsed ? section.label : ''"
+        >
+          {{ section.label }}
+        </div>
+      </li>
+
+      <ng-container *ngFor="let item of section.items">
+
+        <li
+          *ngIf="hasChildren(item) && isVisible(item) && item.id === 'more'"
+          class="cs-nav-item"
+        >
+          <a
+            class="cs-nav-link"
+            [class.child-active]="isChildRouteActive(item)"
+            (click)="openMoreDrawer()"
+            role="button"
+            [title]="isCollapsed ? item.label : ''"
+          >
+            <i [class]="'bi ' + item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+
+
+        <li
+  *ngIf="hasChildren(item) && isVisible(item) && item.id !== 'more'"
+  class="cs-nav-item cs-parent"
+  (mouseenter)="isCollapsed && setPopupPosition($event, item.id)"
+  (mouseleave)="isCollapsed && hidePopup()"
+>
+          <div class="cs-hover-wrapper">
+            <a
+              class="cs-nav-link cs-parent-link"
+              [class.expanded]="isExpanded(item.id)"
+              [class.child-active]="isChildRouteActive(item)"
+(click)="onParentClick(item.id)"
+              [attr.aria-expanded]="isExpanded(item.id)"
+              [title]="isCollapsed ? item.label : ''"
+            >
+              <i [class]="'bi ' + item.icon"></i>
+              <span>{{ item.label }}</span>
+              <i class="bi bi-chevron-down cs-chevron"></i>
+            </a>
+
+            <div
+              class="cs-subnav"
+                *ngIf="!isCollapsed"
+              [class.open]="isExpanded(item.id)"
+            >
+              <ul class="cs-subnav-list">
+                <ng-container *ngFor="let child of item.children">
+                  <li *ngIf="isChildVisible(child)" class="cs-subnav-item">
+                    <a
+                      class="cs-subnav-link"
+                      [routerLink]="child.route"
+                      [class.active]="isChildExactActive(child)"
+                    >
+                                          <i [class]="'bi ' + child.icon"></i>
+
+                      <span>{{ child.label }}</span>
+                    </a>
+                  </li>
+                </ng-container>
+              </ul>
+            </div>
+
+            <div
+              class="cs-popup"
+              *ngIf="isCollapsed && activePopup === item.id"
+              [style.top.px]="popupTop"
+              (mouseenter)="keepPopupOpen(item.id)"
+              (mouseleave)="hidePopup()"
+            >
+              <div class="cs-popup-title">{{ item.label }}</div>
+
+
+            <ng-container *ngFor="let child of item.children">
+  <div *ngIf="isChildVisible(child)" class="cs-popup-item">
+    <a
+      [routerLink]="child.route"
+      [class.active]="isChildExactActive(child)"
+    >
+      {{ child.label }}
+    </a>
+  </div>
+</ng-container>
+            </div>
+          </div>
+        </li>
+
+        <li *ngIf="item.isLogout" class="cs-nav-item">
+          <a
+            class="cs-nav-link cs-logout-link"
+            (click)="logout()"
+            role="button"
+            [title]="isCollapsed ? item.label : ''"
+          >
+            <i [class]="'bi ' + item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+
+        <li
+          *ngIf="!hasChildren(item) && !item.isLogout && isVisible(item)"
+          class="cs-nav-item"
+        >
+          <a
+            class="cs-nav-link"
+            [routerLink]="item.route"
+            [class.active]="isItemActive(item)"
+          >
+            <i [class]="'bi ' + item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      </ng-container>
+    </ng-container>
+  </ul>
+
+
+
+  <div
+    class="cs-more-backdrop"
+    [class.active]="moreDrawerOpen"
+    (click)="closeMoreDrawer()"
+  ></div>
+
+</aside>

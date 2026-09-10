@@ -1,0 +1,159 @@
+<main id="main" class="main">
+  <section class="section">
+    <div class="container-fluid py-4">
+
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1>Admins</h1>
+          <p>Manage admin users</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn-primary tour-add-admin" (click)="addAdmin()">+ Add Admin</button>
+        </div>
+      </div>
+
+      <div class="data-table-wrapper">
+
+
+        <div class="page-top-toolbar">
+          <div class="toolbar-left">
+            <label class="entries-label">
+              Show
+              <span class="entries-select-wrap">
+                <div class="entries-select-box">
+                  <span class="entries-number">{{ pageSize }}</span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <select class="entries-select-native" [value]="pageSize"
+                  (change)="onPageSizeChange($event)">
+                  <option *ngFor="let s of [10, 25, 50, 100]" [value]="s">{{ s }}</option>
+                </select>
+              </span>
+              entries
+            </label>
+          </div>
+
+          <div class="toolbar-right">
+            <div class="search-input-wrap">
+              <span class="search-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5" />
+                  <path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+              </span>
+              <input class="search-input tour-search" type="text" placeholder="Search admins"
+                [(ngModel)]="search" (input)="onSearchChange()"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-table-scroll tour-table">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th class="col-action">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+
+
+              <ng-container *ngIf="loading">
+                <tr *ngFor="let r of [1,2,3,4,5]" class="sk-list-row">
+                  <td><div class="sk sk-cell sk-cell--lg"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td><div class="sk sk-cell sk-cell--lg"></div></td>
+                    <td><div class="sk sk-cell sk-cell--md"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td class="col-action"><div class="sk sk-cell sk-cell--xs" style="margin:0 auto"></div></td>
+                </tr>
+              </ng-container>
+
+              <tr *ngIf="!loading && adminUsers.length === 0">
+                <td colspan="6" class="text-center py-5">
+                  <div class="text-muted">No admin users found.</div>
+                </td>
+              </tr>
+
+              <!-- <tr *ngFor="let admin of paginatedUsers"
+                [ngClass]="{'disabled-row': admin.status === 0}"
+                (click)="viewAdmin(admin.id)"
+                style="cursor:pointer">
+
+                <td>{{ admin.name }}</td>
+                <td>{{ admin.phone }}</td>
+                <td>{{ admin.email }}</td>
+<td>{{ admin.Plan?.plan_name || '—' }}</td>
+
+
+<td (click)="$event.stopPropagation()">
+  <app-status-toggle
+    [checked]="admin.status === 1"
+    (toggled)="onStatusToggle(admin, $event)">
+  </app-status-toggle>
+</td>
+
+                <td class="col-action" (click)="$event.stopPropagation()">
+                  <app-three-dots-button
+                    [active]="activeMenuId === admin.id"
+                    (menuClick)="openMenu(admin, $event)">
+                  </app-three-dots-button>
+                </td>
+              </tr> -->
+<tr *ngFor="let admin of paginatedUsers; let i = index"
+  [ngClass]="{'disabled-row': admin.status === 0}"
+  (click)="viewAdmin(admin.id)"
+  style="cursor:pointer">
+
+  <td>{{ admin.name }}</td>
+  <td>{{ admin.phone }}</td>
+  <td>{{ admin.email }}</td>
+  <td>{{ admin.Plan?.plan_name || '—' }}</td>
+
+  <td (click)="$event.stopPropagation()">
+    <app-status-toggle
+      [checked]="admin.status === 1"
+      (toggled)="onStatusToggle(admin, $event)">
+    </app-status-toggle>
+  </td>
+
+  <td class="col-action" (click)="$event.stopPropagation()">
+    <app-three-dots-button
+      [class.tour-actions]="i === 0"
+      [active]="activeMenuId === admin.id"
+      (menuClick)="openMenu(admin, $event)">
+    </app-three-dots-button>
+  </td>
+</tr>
+            </tbody>
+          </table>
+        </div>
+
+        <app-pagination-footer
+          [totalItems]="totalItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          itemLabel="admins"
+          (pageChange)="onPageChange($event)">
+        </app-pagination-footer>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-popup-menu
+  *ngIf="menuPopupPosition"
+  title="Actions"
+  [items]="actionItems"
+  [position]="menuPopupPosition"
+  (itemClick)="onMenuItemClick($event)"
+  (closeClick)="closeMenu()">
+</app-popup-menu>

@@ -1,0 +1,422 @@
+<main id="main" class="main-main">
+<div class="report-page">
+
+  <header class="rpt-header">
+    <div class="rpt-header__left">
+      <div>
+        <h2 class="rpt-title">Reports &amp; Analytics</h2>
+        <p class="rpt-subtitle">
+          System-wide executive overview across all projects and admins
+          <span class="filtered-tag" *ngIf="selectedRange !== 'all'">
+            <i class="bi bi-funnel-fill"></i> Filtered
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="rpt-header__right">
+      <button class="btn-refresh-manual" (click)="loadReport()" [disabled]="loading">
+        <i class="bi bi-arrow-clockwise" [class.spin]="loading"></i>
+        <span>Refresh</span>
+      </button>
+
+      <button class="btn-download btn-excel" (click)="openExport('excel')" [disabled]="exportingExcel || loading">
+        <i class="bi bi-file-earmark-excel-fill"></i>
+        {{ exportingExcel ? 'Exporting…' : 'Excel' }}
+      </button>
+      <button class="btn-download btn-pdf" (click)="openExport('pdf')" [disabled]="exportingPDF || loading">
+        <i class="bi bi-file-earmark-pdf-fill"></i>
+        {{ exportingPDF ? 'Generating…' : 'PDF' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+
+    <div class="filter-bar__icon-wrap">
+      <i class="bi bi-calendar3"></i>
+    </div>
+
+    <div class="filter-bar__divider"></div>
+
+    <select class="filter-select" [(ngModel)]="selectedRange" (change)="onRangeChange()">
+      <option *ngFor="let opt of rangeOptions" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+
+    <ng-container *ngIf="selectedRange === 'custom'">
+      <input type="date" class="filter-date-inp" [(ngModel)]="customStart" />
+      <span class="filter-bar__arrow"><i class="bi bi-arrow-right"></i></span>
+      <input type="date" class="filter-date-inp" [(ngModel)]="customEnd" />
+    </ng-container>
+
+    <div class="filter-bar__divider"></div>
+
+    <button class="btn-apply" (click)="applyFilters()" [disabled]="loading">
+      <i class="bi bi-funnel-fill"></i> Apply
+    </button>
+
+    <button class="btn-clr"
+      *ngIf="selectedRange !== 'all' || customStart || customEnd"
+      (click)="clearFilters()" [disabled]="loading">
+      <i class="bi bi-x-lg"></i> Clear
+    </button>
+
+  </div>
+
+  <div class="loading-bar" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <span>Generating report…</span>
+  </div>
+
+  <ng-container *ngIf="!loading && data">
+
+    <div class="tabs">
+      <button [class.active]="activeTab === 'overview'" (click)="switchTab('overview')">
+        <i class="bi bi-grid-1x2-fill"></i> Overview
+      </button>
+      <button [class.active]="activeTab === 'tickets'" (click)="switchTab('tickets')">
+        <i class="bi bi-ticket-perforated-fill"></i> Ticket Analytics
+      </button>
+      <button [class.active]="activeTab === 'admins'" (click)="switchTab('admins')">
+        <i class="bi bi-person-lines-fill"></i> Admin Performance
+      </button>
+      <button [class.active]="activeTab === 'sessions'" (click)="switchTab('sessions')">
+        <i class="bi bi-clock-history"></i> Sessions
+      </button>
+      <button [class.active]="activeTab === 'activity'" (click)="switchTab('activity')">
+        <i class="bi bi-activity"></i> Activity Log
+      </button>
+    </div>
+
+    <div *ngIf="activeTab === 'overview'">
+
+      <div class="kpi-row">
+        <div class="kpi-card kpi-violet">
+          <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+          <span class="kpi-num">{{ data.summary.totalAdmins }}</span>
+          <span class="kpi-lbl">Total Admins</span>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-icon"><i class="bi bi-briefcase-fill"></i></div>
+          <span class="kpi-num">{{ data.summary.totalProjects }}</span>
+          <span class="kpi-lbl">Total Projects</span>
+        </div>
+        <div class="kpi-card kpi-amber">
+          <div class="kpi-icon"><i class="bi bi-ticket-perforated-fill"></i></div>
+          <span class="kpi-num">{{ data.summary.totalTickets | number }}</span>
+          <span class="kpi-lbl">Total Tickets</span>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-icon"><i class="bi bi-star-fill"></i></div>
+          <span class="kpi-num">{{ data.summary.avgCustomerRating }}</span>
+          <span class="kpi-lbl">Avg Customer Rating</span>
+        </div>
+        <div class="kpi-card" [ngClass]="'kpi-' + slaColor">
+          <div class="kpi-icon"><i class="bi bi-stopwatch-fill"></i></div>
+          <span class="kpi-num">{{ data.summary.avgResolutionHours }}<span class="kpi-unit">hrs</span></span>
+          <span class="kpi-lbl">Avg Resolution Time</span>
+        </div>
+      </div>
+
+      <div class="card" *ngIf="isChartSelected('trend') && data">
+        <h3>Monthly Ticket Volume</h3>
+        <div class="chart-wrap chart-wrap--tall">
+          <canvas #trendCanvas></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="activeTab === 'tickets'">
+
+      <div class="chart-grid">
+
+        <div class="chart-card" *ngIf="isChartSelected('priority') && data">
+          <div class="chart-card__header">
+            <div class="chart-card__title">By Priority</div>
+            <button class="chart-download-btn" (click)="downloadChart('priority')">
+              <i class="bi bi-download"></i> Download
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <canvas #priorityCanvas></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card" *ngIf="isChartSelected('status') && data">
+          <div class="chart-card__header">
+            <div class="chart-card__title">By Status</div>
+            <button class="chart-download-btn" (click)="downloadChart('status')">
+              <i class="bi bi-download"></i> Download
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <canvas #statusCanvas></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card" *ngIf="isChartSelected('mode') && data">
+          <div class="chart-card__header">
+            <div class="chart-card__title">Mode of Complaint</div>
+            <button class="chart-download-btn" (click)="downloadChart('mode')">
+              <i class="bi bi-download"></i> Download
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <canvas #modeCanvas></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card" *ngIf="isChartSelected('escalation') && data">
+          <div class="chart-card__header">
+            <div class="chart-card__title">Escalation Level</div>
+            <button class="chart-download-btn" (click)="downloadChart('escalation')">
+              <i class="bi bi-download"></i> Download
+            </button>
+          </div>
+          <div class="chart-wrap">
+            <canvas #escalationCanvas></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card" *ngIf="isChartSelected('aging') && data">
+        <div class="chart-card__header">
+          <h3 style="margin:0;">Unresolved Ticket Aging</h3>
+          <button class="chart-download-btn" (click)="downloadChart('aging')">
+            <i class="bi bi-download"></i> Download
+          </button>
+        </div>
+        <p class="section-desc">How long open tickets have been waiting for resolution</p>
+        <div class="chart-wrap chart-wrap--tall">
+          <canvas #agingCanvas></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="activeTab === 'admins'">
+
+      <div class="card">
+        <h3>Admin-wise Performance</h3>
+
+        <div *ngIf="!data.adminPerformance.length" class="rp-empty">
+          No admins found under your account.
+        </div>
+
+        <div class="sa-chart-card" *ngIf="data.adminPerformance.length">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Admin</th>
+                <th>Total tickets</th>
+                <th>Completed</th>
+                <th>Resolution rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of data.adminPerformance; trackBy: trackById">
+                <td>
+                  <div class="sa-user-cell">
+                    <div class="sa-avatar">{{ getInitials(a.adminName) }}</div>
+                    <div>
+                      <div class="sa-user-name">{{ a.adminName }}</div>
+                      <div class="sa-user-email">{{ a.adminEmail }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ a.totalTickets }}</td>
+                <td>{{ a.resolvedTickets }}</td>
+                <td>
+                  <div class="rate-wrap">
+                    <div class="rate-bar">
+                      <div class="rate-bar__fill"
+                        [style.width.%]="a.resolutionRate"
+                        [style.background]="resolutionColor(a.resolutionRate)">
+                      </div>
+                    </div>
+                    <span class="rate-label">{{ a.resolutionRate }}%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="activeTab === 'sessions'">
+      <div *ngIf="sessionsLoading" class="rp-loader">
+        <div class="loading-spinner"></div><span>Loading sessions…</span>
+      </div>
+
+      <div *ngIf="!sessionsLoading && sessions.length" class="sa-chart-card">
+        <table class="sa-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Started</th>
+              <th>Ended</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of sessions; trackBy: trackById">
+              <td>
+                <div class="sa-user-cell">
+                  <div class="sa-avatar" [class.sa-avatar--active]="isSessionActive(s)">
+                    {{ getInitials(s.User.name || '?') }}
+                  </div>
+                  <div>
+                    <div class="sa-user-name">{{ s.User.name }}</div>
+                    <div class="sa-user-email">{{ s.User.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ s.User.Role.name || '—' }}</td>
+              <td>{{ s.session_created | date:'dd MMM, HH:mm' }}</td>
+              <td>{{ s.session_ended ? (s.session_ended | date:'dd MMM, HH:mm') : '—' }}</td>
+              <td>
+                <span class="sa-badge" [class.sa-badge--success]="isSessionActive(s)"
+                  [class.sa-badge--muted]="!isSessionActive(s)">
+                  {{ isSessionActive(s) ? 'Active' : 'Ended' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!sessionsLoading && sessions.length === 0" class="sa-empty">No sessions found.</div>
+    </div>
+
+    <div *ngIf="activeTab === 'activity'">
+
+      <div *ngIf="activityLoading" class="rp-loader">
+        <div class="loading-spinner"></div><span>Loading activity…</span>
+      </div>
+
+      <div *ngIf="!activityLoading && activities.length" class="sa-chart-card">
+        <table class="sa-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Action</th>
+              <th>Details</th>
+              <th>When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let act of activities; trackBy: trackById">
+              <td>
+                <div class="sa-user-cell">
+                  <div class="sa-avatar">{{ getInitials(act.user.name || '?') }}</div>
+                  <div>
+                    <div class="sa-user-name">{{ act.user.name }}</div>
+                    <div class="sa-user-email">{{ act.user.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="sa-badge sa-badge--info">{{ act.user.role || '—' }}</span>
+              </td>
+              <td>
+                <span class="sa-badge sa-badge--muted sa-mono">{{ act.activityType }}</span>
+              </td>
+              <td>
+                <span class="sa-mono sa-activity-detail">{{ act.pageVisited || '—' }}</span>
+              </td>
+              <td>
+                <span class="sa-muted">{{ timeAgo(act.createdAt) }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!activityLoading && activities.length === 0" class="sa-empty">
+        No activity found.
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>
+</main>
+
+<div class="exp-backdrop" *ngIf="showExportModal" (click)="closeExportModal()"></div>
+
+<div class="exp-modal" *ngIf="showExportModal" role="dialog" aria-modal="true">
+
+  <div class="exp-modal__header">
+    <div class="exp-modal__title-wrap">
+      <div class="exp-modal__icon"
+           [class.exp-modal__icon--excel]="exportType === 'excel'"
+           [class.exp-modal__icon--pdf]="exportType === 'pdf'">
+        <i class="bi" [class.bi-file-earmark-excel-fill]="exportType === 'excel'"
+                      [class.bi-file-earmark-pdf-fill]="exportType === 'pdf'"></i>
+      </div>
+      <div>
+        <h3 class="exp-modal__title">
+          Export as {{ exportType === 'excel' ? 'Excel' : 'PDF' }}
+        </h3>
+        <p class="exp-modal__sub">Select the charts to include in your report</p>
+      </div>
+    </div>
+    <button class="exp-modal__close" (click)="closeExportModal()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="exp-modal__select-all">
+    <label class="exp-check-item exp-check-item--all">
+      <input type="checkbox" [checked]="selectedChartKeys.length === totalChartKeysCount"
+             (change)="selectedChartKeys.length === totalChartKeysCount ? deselectAllCharts() : selectAllCharts()" />
+      <span class="exp-check-box"></span>
+      <span class="exp-check-label">Select All Charts</span>
+    </label>
+  </div>
+
+  <div class="exp-modal__sections">
+    <ng-container *ngFor="let chart of chartOptions">
+
+      <label *ngIf="!chart.children" class="exp-check-item">
+        <input type="checkbox" [(ngModel)]="chart.selected" />
+        <span class="exp-check-box"></span>
+        <span class="exp-check-label">{{ chart.label }}</span>
+      </label>
+
+      <div *ngIf="chart.children">
+        <div class="exp-modal__group-title">{{ chart.group }}</div>
+        <label class="exp-check-item exp-check-item--sub" *ngFor="let child of chart.children">
+          <input type="checkbox" [(ngModel)]="child.selected" />
+          <span class="exp-check-box"></span>
+          <span class="exp-check-label">{{ child.label }}</span>
+        </label>
+      </div>
+
+    </ng-container>
+  </div>
+
+  <div class="exp-modal__footer">
+    <span class="exp-modal__count">
+      {{ selectedChartKeys.length }} / {{ totalChartKeysCount }} charts selected
+    </span>
+    <div class="exp-modal__actions">
+      <button class="exp-btn exp-btn--cancel" (click)="closeExportModal()">Cancel</button>
+      <button class="exp-btn exp-btn--apply" (click)="applyViewFilter()">
+        <i class="bi bi-eye"></i> Apply View
+      </button>
+      <button class="exp-btn exp-btn--download"
+              [disabled]="selectedChartKeys.length === 0"
+              (click)="confirmExport()">
+        <i class="bi bi-download"></i>
+        Download {{ exportType === 'excel' ? 'Excel' : 'PDF' }}
+      </button>
+    </div>
+  </div>
+
+</div>

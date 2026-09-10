@@ -1,0 +1,70 @@
+.sub-expired-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  padding: 24px;
+}
+
+.sub-expired-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 40px 32px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.sub-expired-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.sub-expired-card h2 {
+  margin: 0 0 12px;
+  color: #111827;
+}
+
+.sub-expired-message {
+  color: #6b7280;
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.sub-expired-plan {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 0 0 24px;
+}
+
+.sub-expired-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.sub-expired-actions .btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.sub-expired-actions .btn-primary {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.sub-expired-actions .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sub-expired-actions .btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}

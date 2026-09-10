@@ -1,0 +1,83 @@
+/* ── Table: Project Thumbnail ── */
+.project-thumb {
+  height: 30px;
+  width: auto;
+  border-radius: 4px;
+}
+
+/* ── Status Toggle (editable, canDelete = true) ── */
+.status-toggle {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-toggle-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.status-toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Status Badge (read-only, canDelete = false) ── */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* ── QR Code Modal ── */
+.qr-modal-backdrop {
+  background: rgba(17, 24, 39, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.qr-modal-content {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.qr-modal-header {
+  border-bottom: 1px solid #f0f1f3;
+  padding: 18px 24px;
+}
+
+.qr-modal-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.qr-modal-body {
+  padding: 30px;
+}
+
+.qr-code-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.qr-ticket-url {
+  word-break: break-all;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 15px;
+}
+
+.qr-no-link-text {
+  color: #9ca3af;
+}
+
+.qr-modal-footer {
+  border-top: 1px solid #f0f1f3;
+  padding: 14px 24px;
+}
+
+.qr-btn-radius {
+  border-radius: 6px;
+}

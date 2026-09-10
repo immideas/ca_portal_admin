@@ -1,0 +1,34 @@
+<main id="main" class="main premium-ui">
+ 
+ <app-page-top-bar
+  class="ptb-bleed"
+  title="Permissions"
+  subtitle="Manage system permissions"
+  [showBack]="false"
+  [buttons]="[{ action: 'add', label: 'Add Permissions', type: 'primary', icon: 'save' }]"
+  (buttonClick)="onTopBarButton($event)">
+</app-page-top-bar>
+<section class="section profile">
+
+    <div *ngIf="!dataLoaded" class="text-center mt-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="text-center mt-4 text-danger">
+      {{ errorMessage }}
+    </div>
+
+    <ng-container *ngIf="dataLoaded">
+      <app-permissions-table
+        [tableSections]="tableSections"
+        [selectedUser]="null"
+        mode="view"
+        [showFull]="false"
+        (viewPermClick)="onViewPermClick($event)">
+      </app-permissions-table>
+    </ng-container>
+
+  </section>
+</main>

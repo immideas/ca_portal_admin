@@ -1,0 +1,189 @@
+<main id="main" class="main-main">
+
+  <div class="filter-layout">
+
+    <div class="table-section">
+      <div class="workflow-container">
+        <div class="pagetitle">
+          <h1>Manage Projects</h1>
+          <p class="subtitle">View and manage all system projects</p>
+        </div>
+
+        <div class="plan-limit-banner" *ngIf="projectLimit !== null" [class.limit-reached]="limitReached">
+          <i class="bi" [ngClass]="limitReached ? 'bi-exclamation-triangle-fill' : 'bi-info-circle'"></i>
+          <span>Projects used: <strong>{{ limitLabel }}</strong></span>
+          <span *ngIf="limitReached" class="limit-warning-text">
+            — limit reached. Upgrade your plan to add more projects.
+          </span>
+        </div>
+
+        <div class="toolbar-list-desgin">
+          <div class="toolbar-list-desgin-left">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search projects..." [(ngModel)]="searchQuery"
+                (input)="onSearchChange()" />
+            </div>
+
+
+
+            <button class="btn-reset" (click)="resetFilter()" title="Reset Filters">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+
+          <div class="toolbar-list-desgin-right">
+            <button *ngIf="canAdd" class="btn-add" [disabled]="limitReached"
+              [title]="limitReached ? 'Plan limit reached — upgrade to add more projects' : ''" (click)="add()">
+              <i class="bi bi-plus-lg"></i> Add New
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table id="projectsTable" class="modern-table">
+          <thead>
+            <tr>
+              <th>
+                <div class="th-inner">Image</div>
+              </th>
+              <th>
+                <div class="th-inner">Project Name</div>
+              </th>
+              <th>
+                <div class="th-inner">Project Initials</div>
+              </th>
+              <th>
+                <div class="th-inner">Access Type</div>
+              </th>
+              <th>
+                <div class="th-inner">Status</div>
+              </th>
+              <th class="action-col-header">
+                <div>Actions</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of projects; let i = index" (click)="view(p.id)" class="clickable-row">
+              <td>
+                <img *ngIf="p.image" [src]="baseUrl + p.image" alt="Project" class="project-thumb">
+                <span *ngIf="!p.image" class="td-secondary">-</span>
+              </td>
+              <td>
+                <div class="td-primary">{{ p.name }}</div>
+              </td>
+              <td>
+                <div class="td-secondary">{{ p.initials }}</div>
+              </td>
+              <td>
+                <div class="td-secondary text-capitalize">{{ (p.accessType) }}</div>
+              </td>
+
+              <td (click)="$event.stopPropagation()">
+                <div *ngIf="canDelete; else staticStatus" (click)="toggleStatus(p, $event)"
+                  class="status-toggle">
+                  <i class="bi status-toggle-icon"
+                    [ngClass]="p.status === 1 ? 'bi-toggle-on text-success' : 'bi-toggle-off text-secondary'"></i>
+                  <span class="status-toggle-label"
+                    [ngClass]="p.status === 1 ? 'text-success' : 'text-secondary'">
+                    {{ p.status === 1 ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+
+                <ng-template #staticStatus>
+                  <span class="badge status-badge" [ngClass]="p.status === 1 ? 'bg-success' : 'bg-danger'">
+                    {{ p.status === 1 ? 'Active' : 'Inactive' }}
+                  </span>
+                </ng-template>
+              </td>
+
+              <td class="action-col-data" (click)="$event.stopPropagation()">
+                <app-three-dots-button [active]="activePopup?.index === i"
+                  (menuClick)="openActionMenu(i, p, $any($event))">
+                </app-three-dots-button>
+              </td>
+            </tr>
+
+            <tr *ngIf="projects.length === 0">
+              <td colspan="4">
+                <div class="empty-state">
+                  <i class="bi bi-folder2-open"></i>
+                  <p>No projects found. Try adjusting your search.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-footer" *ngIf="totalItems > 0">
+        <div class="pagination-info">
+          Showing {{ Math.min(pageSize, projects.length) }} of {{ totalItems }} projects
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(1)" title="First">
+                <i class="bi bi-chevron-bar-left"></i>
+              </a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)" title="Previous">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+            <li class="page-item mx-1" *ngFor="let p of [].constructor(Math.ceil(totalItems / pageSize)); let i = index"
+              [class.active]="currentPage === (i + 1)">
+              <a class="page-link" (click)="onPageChange(i + 1)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)" title="Next">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(Math.ceil(totalItems / pageSize))" title="Last">
+                <i class="bi bi-chevron-bar-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+  <div *ngIf="showQrModal" class="modal-backdrop d-block qr-modal-backdrop">
+    <div class="modal d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content qr-modal-content">
+          <div class="modal-header qr-modal-header">
+            <h5 class="modal-title qr-modal-title">{{ selectedProject?.name }} - QR</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeQrModal()"></button>
+          </div>
+          <div class="modal-body text-center qr-modal-body">
+            <img *ngIf="selectedProject?.qrCode" [src]="selectedProject.qrCode" alt="QR Code"
+              class="qr-code-img">
+            <div *ngIf="!selectedProject?.qrCode">
+              <p *ngIf="selectedProject?.openTicketUrl"
+                class="qr-ticket-url">{{
+                selectedProject.openTicketUrl }}</p>
+              <a *ngIf="selectedProject?.openTicketUrl" [href]="selectedProject.openTicketUrl" target="_blank"
+                class="btn btn-sm btn-primary qr-btn-radius">Open Link</a>
+              <p *ngIf="!selectedProject?.openTicketUrl" class="qr-no-link-text">No QR or link available.</p>
+            </div>
+          </div>
+          <div class="modal-footer qr-modal-footer" *ngIf="selectedProject?.openTicketsEnabled">
+            <button *ngIf="selectedProject?.openTicketUrl" class="btn btn-secondary btn-sm qr-btn-radius"  (click)="copyLink()">Copy Link</button>
+            <button class="btn btn-primary btn-sm qr-btn-radius" (click)="closeQrModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-popup-menu *ngIf="activePopup" [title]="activePopup.config.title" [items]="activePopup.config.items"
+    [width]="activePopup.config.width ?? 180" [position]="activePopup.config.position" (closeClick)="closePopup()"
+    (itemClick)="onMenuItemClick($any($event))">
+  </app-popup-menu>
+</main>

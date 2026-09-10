@@ -1,0 +1,289 @@
+<main id="main" class="complaint-wrapper">
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Sub Category"
+                : isEditMode
+                  ? "Edit Sub Category"
+                  : "Add Sub Category"
+            }}
+          </h4>
+          <p>Sub Category details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button
+          *ngIf="canEdit"
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <span class="uploading-indicator" *ngIf="isUploading">
+          <span class="status-spinner-small"></span>
+          {{ uploadingSlotLabel || "Uploading..." }}
+        </span>
+
+        <button
+          type="submit"
+          form="subCategoryForm"
+          class="btn-save"
+          [ngClass]="{ 'btn-active': subCategoryForm.valid && !isUploading }"
+          [disabled]="
+            subCategoryForm.invalid || isUploading || (isEditMode && !canEdit)
+          "
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+          <span>{{ isEditMode ? "Update" : "Save" }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+      <div class="header-content">
+        <span class="header-text">Sub Category Details</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">
+      {{ errorMessage }}
+    </div>
+
+    <form
+      [formGroup]="subCategoryForm"
+      id="subCategoryForm"
+      (ngSubmit)="saveSubCategory()"
+      class="form-padding-wrap"
+    >
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="projectId">
+            Project
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <ng-select
+              inputId="projectId"
+              formControlName="projectId"
+              [items]="projects"
+              bindLabel="name"
+              bindValue="id"
+              placeholder="Select Project"
+              [clearable]="false"
+              [searchable]="true"
+              appendTo="body"
+            >
+            </ng-select>
+          </div>
+          <div
+            class="text-danger mt-1 field-error-text"
+            *ngIf="
+              subCategoryForm.get('projectId')?.touched &&
+              subCategoryForm.get('projectId')?.invalid
+            "
+          >
+            Project is required.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="categoryId">
+            Category
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <ng-select
+              inputId="categoryId"
+              formControlName="categoryId"
+              [items]="categories"
+              bindLabel="name"
+              bindValue="id"
+              [placeholder]="
+                categories.length ? 'Select Category' : 'Choose Project First'
+              "
+              [clearable]="false"
+              [searchable]="true"
+              appendTo="body"
+            >
+            </ng-select>
+          </div>
+          <div
+            class="text-danger mt-1 field-error-text"
+            *ngIf="
+              subCategoryForm.get('categoryId')?.touched &&
+              subCategoryForm.get('categoryId')?.invalid
+            "
+          >
+            Category is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="subCategoryName">
+            Sub Category Name
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div class="field-wrap icon-category-sub">
+            <input
+              id="subCategoryName"
+              type="text"
+              formControlName="name"
+              class="form-controler"
+              placeholder="Enter name"
+            />
+          </div>
+          <div
+            class="text-danger mt-1 field-error-text"
+            *ngIf="
+              subCategoryForm.get('name')?.touched &&
+              subCategoryForm.get('name')?.invalid
+            "
+          >
+            Sub Category name is required.
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="form-padding-wrap-image">
+      <div class="col-md-12 form-group">
+        <label class="upload-main-label">
+          Images
+          <span class="sub-label"
+            >(up to {{ maxImages }} · PNG, JPG, WEBP)</span
+          >
+        </label>
+        <div *ngIf="isViewMode && imageUrls.length" class="attachment-wrapper">
+          <button
+            type="button"
+            *ngFor="let url of imageUrls"
+            class="attachment-link"
+            (click)="openImageModal(url)"
+          >
+            <img
+              [src]="url"
+              alt="sub-category-image"
+              class="attachment-thumbnail-small"
+            />
+          </button>
+        </div>
+
+        <div
+          *ngIf="isViewMode && !imageUrls.length"
+          class="text-muted no-images-text"
+        >
+          No images uploaded.
+        </div>
+
+        <div class="modern-uploader-wrapper" *ngIf="!isViewMode" #uploaderHost>
+          <lib-image-uploader-lib
+            [imageUrls]="imageUrls"
+            [maxImages]="maxImages"
+            [aspectRatio]="1"
+            [layoutMode]="'grid'"
+            [allowDrag]="true"
+            [allowEdit]="true"
+            [allowDelete]="true"
+            [allowReplace]="true"
+            (imagesChange)="handleImagesChange($event)"
+            (imageUpload)="onImageUpload($event)"
+            (imageReplace)="onImageReplace($event)"
+            (imageDelete)="onImageDelete($event)"
+            (imageEdit)="onImageEdit($event)"
+          >
+          </lib-image-uploader-lib>
+
+        
+          <div
+            class="upload-slot-overlay"
+            *ngFor="let slot of uploadingSlots | keyvalue"
+            [style.top.px]="slot.value.top"
+            [style.left.px]="slot.value.left"
+            [style.width.px]="slot.value.width"
+            [style.height.px]="slot.value.height"
+          >
+            <span class="status-spinner-small"></span>
+            <span class="upload-slot-percent"
+              >{{ slot.value.progress | number: "1.0-0" }}%</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <div
+    class="image-modal-backdrop"
+    *ngIf="showImageModal"
+    (click)="closeImageModal()"
+  >
+    <div class="image-modal-content" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        class="image-modal-close"
+        (click)="closeImageModal()"
+        aria-label="Close"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <img [src]="selectedImage" class="image-modal-img" alt="Preview" />
+    </div>
+  </div>
+</main>

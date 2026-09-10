@@ -1,0 +1,210 @@
+<div class="uh-fp-backdrop" *ngIf="isOpen" (click)="onClose()"></div>
+
+<div class="uh-fp" [class.uh-fp--open]="isOpen" (click)="$event.stopPropagation()">
+
+  <div class="uh-fp__header">
+    <span class="uh-fp__title">Filters</span>
+    <button class="uh-fp__close" (click)="onClose()">
+      <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+        <path d="M1 1l12 12M13 1L1 13" stroke="#6B7280" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="uh-fp__body">
+
+    <div class="uh-fp-section" *ngIf="isSuperAdmin">
+      <div class="uh-fp-section__label">Admin</div>
+      <div class="uh-fp-field">
+        <button type="button" class="uh-fp-select"
+          [disabled]="adminDropdownDisabled"
+          (click)="toggleDropdown('admin'); $event.stopPropagation()">
+          <span class="uh-fp-select__value"
+            [class.uh-fp-select__value--placeholder]="!localAdmin">
+            {{ localAdmin?.name || 'Select Admin' }}
+          </span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'admin'"
+          (click)="$event.stopPropagation()">
+          <li *ngFor="let admin of admins"
+            (click)="onSelectAdmin(admin)"
+            [class.uh-fp-dropdown__item--selected]="localAdmin?.id === admin.id">
+            {{ admin.name }}
+          </li>
+          <li *ngIf="admins.length === 0" class="uh-fp-dropdown__empty">
+            No admins found
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="uh-fp-section"
+      [class.uh-fp-section--disabled]="!localAdmin">
+      <div class="uh-fp-section__label">Role</div>
+      <div class="uh-fp-field">
+        <button type="button" class="uh-fp-select"
+          [disabled]="!localAdmin"
+          (click)="toggleDropdown('role'); $event.stopPropagation()">
+          <span class="uh-fp-select__value"
+            [class.uh-fp-select__value--placeholder]="!localRole">
+            {{ localRole?.roleName || 'Select Role' }}
+          </span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'role'"
+          (click)="$event.stopPropagation()">
+          <li *ngFor="let role of roles"
+            (click)="onSelectRole(role)"
+            [class.uh-fp-dropdown__item--selected]="localRole?.shortCode === role.shortCode">
+            {{ role.roleName }}
+          </li>
+          <li *ngIf="roles.length === 0" class="uh-fp-dropdown__empty">
+            No roles found
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="uh-fp-section"
+      [class.uh-fp-section--disabled]="!localAdmin  || !localRole">
+      <div class="uh-fp-section__label">User</div>
+      <div class="uh-fp-field">
+        <button type="button" class="uh-fp-select"
+[disabled]="!localAdmin || !localRole"
+          (click)="toggleDropdown('user'); $event.stopPropagation()">
+          <span class="uh-fp-select__value"
+            [class.uh-fp-select__value--placeholder]="!localSubAdmin">
+            {{ localSubAdmin?.name || 'Select User' }}
+          </span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'user'"
+          (click)="$event.stopPropagation()">
+          <li *ngIf="loadingSubAdmins" class="uh-fp-dropdown__empty">Loading...</li>
+          <ng-container *ngIf="!loadingSubAdmins">
+            <li *ngFor="let subAdmin of subAdmins"
+              (click)="onSelectSubAdmin(subAdmin)"
+              [class.uh-fp-dropdown__item--selected]="localSubAdmin?.id === subAdmin.id">
+              {{ subAdmin.name }}
+            </li>
+            <li *ngIf="subAdmins.length === 0" class="uh-fp-dropdown__empty">
+              No users found
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+
+    <div class="uh-fp-section" *ngIf="uniqueModels.length > 0">
+      <div class="uh-fp-section__label">Model</div>
+      <div class="uh-fp-field">
+        <button type="button" class="uh-fp-select"
+          (click)="toggleDropdown('model'); $event.stopPropagation()">
+          <span class="uh-fp-select__value"
+            [class.uh-fp-select__value--placeholder]="!localModel">
+            {{ localModel || 'All Models' }}
+          </span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'model'"
+          (click)="$event.stopPropagation()">
+          <li (click)="onModelChange('')"
+            [class.uh-fp-dropdown__item--selected]="!localModel">
+            All Models
+          </li>
+          <li *ngFor="let model of uniqueModels"
+            (click)="onModelChange(model)"
+            [class.uh-fp-dropdown__item--selected]="localModel === model">
+            {{ model }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="uh-fp-section" *ngIf="uniqueActivityTypes.length > 0">
+      <div class="uh-fp-section__label">Activity Type</div>
+      <div class="uh-fp-field">
+        <button type="button" class="uh-fp-select"
+          (click)="toggleDropdown('activityType'); $event.stopPropagation()">
+          <span class="uh-fp-select__value"
+            [class.uh-fp-select__value--placeholder]="!localActivityType">
+            {{ localActivityType ? formatActivityType(localActivityType) : 'All Types' }}
+          </span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'activityType'"
+          (click)="$event.stopPropagation()">
+          <li (click)="onActivityTypeChange('')"
+            [class.uh-fp-dropdown__item--selected]="!localActivityType">
+            All Types
+          </li>
+          <li *ngFor="let type of uniqueActivityTypes"
+            (click)="onActivityTypeChange(type)"
+            [class.uh-fp-dropdown__item--selected]="localActivityType === type">
+            {{ formatActivityType(type) }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="uh-fp-section">
+      <div class="uh-fp-section__label">Date Range</div>
+      <div class="uh-fp-field">
+        <button type="button" class="uh-fp-select"
+          (click)="toggleDropdown('range'); $event.stopPropagation()">
+          <span class="uh-fp-select__value">{{ localRangeLabel }}</span>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'range'"
+          (click)="$event.stopPropagation()">
+          <li *ngFor="let opt of rangeOptions"
+            (click)="onSelectRange(opt)"
+            [class.uh-fp-dropdown__item--selected]="localRange === opt.value">
+            {{ opt.label }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="uh-fp-custom-range" *ngIf="localRange === 'custom'">
+        <div class="uh-fp-date-row">
+          <div class="uh-fp-date-field">
+            <label class="uh-fp-date-label">From</label>
+            <input type="date" class="uh-fp-date-input"
+              [(ngModel)]="localCustomStart">
+          </div>
+          <div class="uh-fp-date-field">
+            <label class="uh-fp-date-label">To</label>
+            <input type="date" class="uh-fp-date-input"
+              [(ngModel)]="localCustomEnd">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="uh-fp__footer">
+    <button type="button" class="uh-fp__btn-clear" (click)="onClear()">Clear</button>
+    <button type="button" class="uh-fp__btn-apply" (click)="onApply()">Apply</button>
+  </div>
+
+</div>

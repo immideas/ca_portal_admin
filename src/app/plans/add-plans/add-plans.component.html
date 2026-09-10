@@ -1,0 +1,393 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <div class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add">
+        </div>
+        <div>
+          <h4>{{ isViewMode ? 'View Plan' : isEditMode ? 'Edit Plan' : 'Add Plan' }}</h4>
+          <p>Plan details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" type="button" class="btn-save btn-active" (click)="enableEdit()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+        <button type="submit" form="planForm" class="btn-save" [ngClass]="{ 'btn-active': planForm.valid }"
+          [disabled]="planForm.invalid || (isEditMode && !canEdit)">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">{{ errorMessage }}</div>
+
+  <form [formGroup]="planForm" id="planForm" (ngSubmit)="save()">
+    <section class="section">
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Plan Details</span></div>
+            <div class="required-group">
+              <span class="badge-required">
+                Required <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+              </span>
+            </div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="planName">Plan Name <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="planName" type="text" class="form-controler" formControlName="plan_name"
+                    placeholder="Enter plan name" [readonly]="isViewMode" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="planForm.get('plan_name')?.touched && planForm.get('plan_name')?.invalid">
+                  Plan Name is required.
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="planStatus">Status</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="planStatus" class="form-controler" formControlName="status"
+                    [class.is-readonly]="isViewMode"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="currency">Currency</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="currency" type="text" class="form-controler" formControlName="currency"
+                    placeholder="e.g. INR, USD" [readonly]="isViewMode" maxlength="10" />
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="billingCycle">Billing Cycle</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="billingCycle" class="form-controler" formControlName="billing_cycle"
+                    [class.is-readonly]="isViewMode"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option [ngValue]="null">Select billing cycle</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="half_yearly">Half Yearly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="isTrial">Trial Plan</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="isTrial" class="form-controler" formControlName="is_trial"
+                    [class.is-readonly]="isViewMode"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option [ngValue]="false">No</option>
+                    <option [ngValue]="true">Yes</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="trialDays">Trial Days</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="trialDays" type="number" class="form-controler" formControlName="trial_days"
+                    placeholder="e.g. 14" [readonly]="isViewMode" min="0" />
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+  <label for="planGroup">Plan Group <span class="text-muted" style="font-size:11px">(same code for monthly & yearly variant of same plan)</span></label>
+  <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+    <input list="planGroupOptions" id="planGroup" formControlName="plan_group" class="form-controler"
+      placeholder="Enter or select plan group" [readonly]="isViewMode" />
+    <datalist id="planGroupOptions">
+      <option *ngFor="let group of planGroups" [value]="group"></option>
+    </datalist>
+  </div>
+</div>
+  <div class="col-md-6 form-group">
+    <label for="isDefault">Default Plan</label>
+    <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+      <select id="isDefault" class="form-controler" formControlName="is_default"
+        [class.is-readonly]="isViewMode"
+        [attr.disabled]="isViewMode ? true : null">
+        <option [ngValue]="false">No</option>
+        <option [ngValue]="true">Yes</option>
+      </select>
+    </div>
+  </div>
+</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Pricing &amp; GST</span></div>
+            <div class="required-group">
+              <span class="badge-required">
+                Required <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+              </span>
+            </div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="planPrice">Plan Price (Incl. GST) <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="planPrice" type="number" class="form-controler" formControlName="plan_price"
+                    placeholder="Enter final price with GST" [readonly]="isViewMode" min="0" step="0.01" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="planForm.get('plan_price')?.touched && planForm.get('plan_price')?.invalid">
+                  Valid plan price is required.
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="gstPercentage">GST Percentage (%)</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="gstPercentage" type="number" class="form-controler" formControlName="gst_percentage"
+                    placeholder="e.g. 18" [readonly]="isViewMode" min="0" max="100" step="0.01" />
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="setupCost">Setup Cost (Incl. GST)</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="setupCost" type="number" class="form-controler" formControlName="setup_cost"
+                    placeholder="Enter setup cost" [readonly]="isViewMode" min="0" step="0.01" />
+                </div>
+              </div>
+            </div>
+
+            <!-- UI FIX: only show the auto-calculated breakdown once a price has actually been entered,
+                 instead of showing empty/zero readonly fields before that. -->
+            <div class="row mb-2" *ngIf="planForm.get('plan_price')?.value > 0">
+              <div class="col-12">
+                <p class="section-hint mb-2">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Fields below are auto-calculated from the price and GST percentage.
+                </p>
+              </div>
+
+              <div class="col-md-4 form-group">
+                <label for="subtotal">Base Amount (Excl. GST)</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="subtotal" type="number" class="form-controler gst-readonly"
+                    formControlName="plan_price_subtotal" readonly tabindex="-1" />
+                </div>
+              </div>
+
+              <div class="col-md-4 form-group">
+                <label for="cgst">CGST Amount</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="cgst" type="number" class="form-controler gst-readonly"
+                    formControlName="plan_price_cgst" readonly tabindex="-1" />
+                </div>
+              </div>
+
+              <div class="col-md-4 form-group">
+                <label for="sgst">SGST Amount</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="sgst" type="number" class="form-controler gst-readonly"
+                    formControlName="plan_price_sgst" readonly tabindex="-1" />
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-2" *ngIf="planForm.get('setup_cost')?.value > 0">
+              <div class="col-md-4 form-group">
+                <label for="setupSubtotal">Setup Base Amount</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="setupSubtotal" type="number" class="form-controler gst-readonly"
+                    formControlName="setup_cost_subtotal" readonly tabindex="-1" />
+                </div>
+              </div>
+
+              <div class="col-md-4 form-group">
+                <label for="setupCgst">Setup CGST</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="setupCgst" type="number" class="form-controler gst-readonly"
+                    formControlName="setup_cost_cgst" readonly tabindex="-1" />
+                </div>
+              </div>
+
+              <div class="col-md-4 form-group">
+                <label for="setupSgst">Setup SGST</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="setupSgst" type="number" class="form-controler gst-readonly"
+                    formControlName="setup_cost_sgst" readonly tabindex="-1" />
+                </div>
+              </div>
+            </div>
+
+            <div class="gst-summary-box"
+              *ngIf="planForm.getRawValue().plan_price_subtotal">
+              <div class="gst-summary-row">
+                <span>Base Amount</span>
+                <strong>₹ {{ planForm.getRawValue().plan_price_subtotal | number:'1.2-2' }}</strong>
+              </div>
+              <div class="gst-summary-row">
+                <span>CGST ({{ (planForm.get('gst_percentage')?.value || 0) / 2 }}%)</span>
+                <strong>₹ {{ planForm.getRawValue().plan_price_cgst | number:'1.2-2' }}</strong>
+              </div>
+              <div class="gst-summary-row">
+                <span>SGST ({{ (planForm.get('gst_percentage')?.value || 0) / 2 }}%)</span>
+                <strong>₹ {{ planForm.getRawValue().plan_price_sgst | number:'1.2-2' }}</strong>
+              </div>
+              <div class="gst-summary-row gst-total">
+                <span>Total (Incl. GST)</span>
+                <strong>₹ {{ planForm.get('plan_price')?.value | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Data Retention</span></div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <p class="section-hint">Configure grace periods before data is archived or permanently deleted.</p>
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="bufferDays">Buffer Days
+                  <span class="text-muted" style="font-size:11px">(grace period after expiry)</span>
+                </label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="bufferDays" type="number" class="form-controler" formControlName="buffer_days"
+                    placeholder="e.g. 7" [readonly]="isViewMode" min="0" />
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="purgeDays">Purge Days
+                  <span class="text-muted" style="font-size:11px">(days until permanent deletion)</span>
+                </label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="purgeDays" type="number" class="form-controler" formControlName="purge_days"
+                    placeholder="e.g. 30" [readonly]="isViewMode" min="0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= PLAN FEATURES (DYNAMIC) =================
+           Ye card pehle 4 alag cards (Limits & Quotas, Communication Channels,
+           Security & Encryption, Advanced Features) ki jagah leta hai.
+           Features table se jitne bhi active features hain, wo yahan
+           apne type (boolean / limit / quota / number / days / text) ke
+           hisaab se automatically render ho jaate hain — koi hardcoding nahi. -->
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Plan Features</span></div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <p class="section-hint">Enable and configure the features available on this plan.</p>
+
+            <div *ngIf="featuresLoading" class="text-muted" style="font-size:13px">Loading features...</div>
+
+            <div formArrayName="features" *ngIf="!featuresLoading">
+              <div *ngFor="let feature of featuresArray.controls; let i = index" [formGroupName]="i">
+
+                <!-- boolean type feature -> toggle switch -->
+                <!-- UI FIX: whole row is now a clickable <label> wrapping the checkbox,
+                     so clicking the feature name also toggles it, not just the small switch. -->
+                <div class="form-group form-group-full" *ngIf="feature.get('type')?.value === 'boolean'">
+                  <label class="toggle-row" [class.disabled]="isViewMode">
+                    <div class="toggle-info">
+                      <span class="toggle-label">{{ feature.get('name')?.value }}</span>
+                    </div>
+                    <span class="toggle-switch">
+                      <input type="checkbox" formControlName="enabled"
+                        [attr.disabled]="isViewMode ? true : null">
+                      <span class="toggle-slider"></span>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- limit / quota / number / days type feature -> numeric input -->
+                <div class="row mb-3" *ngIf="numericTypes.includes(feature.get('type')?.value)">
+                  <div class="col-md-6 form-group">
+                    <label>{{ feature.get('name')?.value }}</label>
+                    <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                      <input type="number" class="form-controler" formControlName="value"
+                        [readonly]="isViewMode" placeholder="e.g. 10" />
+                    </div>
+                    <!-- UI FIX: static hint so the "-1 = unlimited" convention stays visible
+                         even after the field has a value typed in (placeholders disappear then). -->
+                    <span class="text-muted" style="font-size:11px">Use -1 for unlimited</span>
+                  </div>
+                </div>
+
+                <!-- text type feature -> text input -->
+                <div class="row mb-3" *ngIf="feature.get('type')?.value === 'text'">
+                  <div class="col-md-6 form-group">
+                    <label>{{ feature.get('name')?.value }}</label>
+                    <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                      <input type="text" class="form-controler" formControlName="value" [readonly]="isViewMode" />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div *ngIf="featuresArray.length === 0" class="text-muted" style="font-size:13px">
+                No active features found. Add features from the Manage Features screen first.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </form>
+</main>

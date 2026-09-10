@@ -1,0 +1,186 @@
+<div class="confirmation-container">
+  <div class="bg-decoration">
+    <div class="floating-circle circle-1"></div>
+    <div class="floating-circle circle-2"></div>
+    <div class="floating-circle circle-3"></div>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center" *ngIf="loadingDetails">
+      <div class="col-12 col-md-8 col-lg-6 text-center py-5">
+        <p class="text-muted">Loading payment details…</p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center" *ngIf="!loadingDetails && detailsError">
+      <div class="col-12 col-md-8 col-lg-6 text-center py-5">
+        <p class="text-danger">{{ detailsError }}</p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center" *ngIf="!loadingDetails">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="confirmation-card">
+
+          <div class="status text-center">
+            <div class="check-container mx-auto mb-4">
+              <div class="check-circle d-flex align-items-center justify-content-center">
+                <div class="check-mark">✓</div>
+              </div>
+            </div>
+            <h1 class="title mb-2">Payment Confirmed</h1>
+            <p class="subtitle text-muted">Thank you — your payment was successful</p>
+          </div>
+
+          <div class="details mt-4">
+
+            <div class="section mb-4">
+              <h2 class="section-title">Plan Details</h2>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="planName">
+                <span class="detail-label">Plan</span>
+                <span class="detail-value">{{ planName }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.billing_cycle">
+                <span class="detail-label">Billing Cycle</span>
+                <span class="detail-value">{{ plan.billing_cycle }}</span>
+              </div>
+
+ <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.starting_date">
+                <span class="detail-label">Start Date</span>
+                <span class="detail-value">{{ plan.starting_date | date }}</span>
+              </div>
+<div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.expiration_date">
+                <span class="detail-label">End Date</span>
+                <span class="detail-value">{{ plan.expiration_date | date }}</span>
+              </div>
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.no_of_users !== undefined && plan?.no_of_users !== null">
+                <span class="detail-label">Users</span>
+                <span class="detail-value">{{ plan.no_of_users }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.no_of_customers !== undefined && plan?.no_of_customers !== null">
+                <span class="detail-label">Customers</span>
+                <span class="detail-value">{{ plan.no_of_customers }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.no_of_projects !== undefined && plan?.no_of_projects !== null">
+                <span class="detail-label">Projects</span>
+                <span class="detail-value">{{ plan.no_of_projects }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.tickets_per_month !== undefined && plan?.tickets_per_month !== null">
+                <span class="detail-label">Tickets / Month</span>
+                <span class="detail-value">{{ plan.tickets_per_month }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="plan?.is_trial">
+                <span class="detail-label">Trial</span>
+                <span class="detail-value">{{ plan.trial_days }} days</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2">
+                <span class="detail-label">Renewal Type</span>
+                <span class="detail-value">{{ autopay ? 'Auto Renewal' : 'Manual' }}</span>
+              </div>
+            </div>
+
+            <div class="section mb-4" *ngIf="grandTotal !== null">
+              <h2 class="section-title">Amount Breakdown</h2>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="planSubtotal !== null">
+                <span class="detail-label">Plan Subtotal</span>
+                <span class="detail-value currency">₹ {{ planSubtotal | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="hasSetupCost">
+                <span class="detail-label">Setup Cost</span>
+                <span class="detail-value currency">₹ {{ setupSubtotal | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="totalCGST !== null">
+                <span class="detail-label">CGST</span>
+                <span class="detail-value currency">₹ {{ totalCGST | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="totalSGST !== null">
+                <span class="detail-label">SGST</span>
+                <span class="detail-value currency">₹ {{ totalSGST | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2">
+                <span class="detail-label"><strong>Total Paid</strong></span>
+                <span class="detail-value currency"><strong>₹ {{ grandTotal | number:'1.2-2' }} {{ currency }}</strong></span>
+              </div>
+            </div>
+
+            <div class="section mb-4">
+              <h2 class="section-title">Payment Details</h2>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">{{ paymentStatusLabel }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="payment?.payment_method">
+                <span class="detail-label">Payment Method</span>
+                <span class="detail-value text-capitalize">{{ payment.payment_method }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="paidAtFormatted">
+                <span class="detail-label">Paid On</span>
+                <span class="detail-value">{{ paidAtFormatted }}</span>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="razorpayPaymentId">
+                <span class="detail-label">Payment ID</span>
+                <div class="payment-id d-flex align-items-center gap-2">
+                  <span class="payment-id-text">{{ razorpayPaymentId }}</span>
+                  <button class="btn copy-btn btn-sm" (click)="copyToClipboard('payment', razorpayPaymentId)">Copy</button>
+                  <span *ngIf="copiedField === 'payment'" class="badge copied-badge">Copied!</span>
+                </div>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="orderOrSubscriptionId">
+                <span class="detail-label">{{ orderOrSubscriptionLabel }}</span>
+                <div class="payment-id d-flex align-items-center gap-2">
+                  <span class="payment-id-text">{{ orderOrSubscriptionId }}</span>
+                  <button class="btn copy-btn btn-sm" (click)="copyToClipboard('order', orderOrSubscriptionId)">Copy</button>
+                  <span *ngIf="copiedField === 'order'" class="badge copied-badge">Copied!</span>
+                </div>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="payment?.receipt">
+                <span class="detail-label">Receipt No.</span>
+                <span class="detail-value">{{ payment.receipt }}</span>
+              </div>
+
+
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="payment?.invoice_url">
+                <span class="detail-label">Invoice</span>
+                <a class="detail-value" [href]="payment.invoice_url" target="_blank" rel="noopener">View Invoice</a>
+              </div>
+
+              <div class="detail-row d-flex justify-content-between align-items-center py-2" *ngIf="payment?.tax_invoice_url">
+                <span class="detail-label">Tax Invoice (GST)</span>
+                <a class="detail-value" [href]="payment.tax_invoice_url" target="_blank" rel="noopener">View Tax Invoice</a>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="actions text-center mt-4">
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+              <button class="btn btn-success custom-btn-invoice" (click)="downloadInvoice()">Download Invoice</button>
+
+               <button class="btn btn-primary custom-btn-primary" (click)="goToDashboard()">Go To Dashboard</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

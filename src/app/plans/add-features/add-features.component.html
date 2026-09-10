@@ -1,0 +1,308 @@
+<!-- <main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <div class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add">
+        </div>
+        <div>
+          <h4>{{ isViewMode ? 'View Feature' : isEditMode ? 'Edit Feature' : 'Add Feature' }}</h4>
+          <p>Feature details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" type="button" class="btn-save btn-active" (click)="enableEdit()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+        <button type="submit" form="featureForm" class="btn-save" [ngClass]="{ 'btn-active': featureForm.valid }"
+          [disabled]="featureForm.invalid || (isEditMode && !canEdit)">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">{{ errorMessage }}</div>
+
+  <form [formGroup]="featureForm" id="featureForm" (ngSubmit)="save()">
+    <section class="section">
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Feature Details</span></div>
+            <div class="required-group">
+              <span class="badge-required">
+                Required <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+              </span>
+            </div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="featureName">Feature Name <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="featureName" type="text" class="form-controler" formControlName="name"
+                    placeholder="e.g. Users Per Garage" [readonly]="isViewMode" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="featureForm.get('name')?.touched && featureForm.get('name')?.invalid">
+                  Feature name is required (min 2 characters).
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="featureCode">Feature Code <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="featureCode" type="text" class="form-controler" formControlName="feature_code"
+                    placeholder="e.g. users_per_garage" [readonly]="isViewMode || isEditMode" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="featureForm.get('feature_code')?.touched && featureForm.get('feature_code')?.invalid">
+                  Use lowercase letters, numbers and underscores only (e.g. users_per_garage).
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="featureType">Type <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="featureType" class="form-controler" formControlName="type"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option [ngValue]="null">Select type</option>
+                    <option *ngFor="let t of featureTypes" [value]="t">{{ t }}</option>
+                  </select>
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="featureForm.get('type')?.touched && featureForm.get('type')?.invalid">
+                  Type is required.
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="featureStatus">Status</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="featureStatus" class="form-controler" formControlName="status"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option [ngValue]="1">Active</option>
+                    <option [ngValue]="0">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12 form-group">
+                <label for="description">Description</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <textarea id="description" class="form-controler" formControlName="description"
+                    rows="3" placeholder="What does this feature control?"
+                    [readonly]="isViewMode"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Permission Groups</span></div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <p class="section-hint">Select the permission groups this feature should unlock when enabled on a plan.</p>
+
+            <div class="permission-group-grid">
+              <div class="permission-chip"
+                *ngFor="let group of availableGroups"
+                [class.selected]="isGroupSelected(group)"
+                [class.disabled]="isViewMode"
+                (click)="toggleGroup(group)">
+                <i class="bi" [ngClass]="isGroupSelected(group) ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+                <span>{{ group }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </form>
+</main> -->
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <div class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add">
+        </div>
+        <div>
+          <h4>{{ isViewMode ? 'View Feature' : isEditMode ? 'Edit Feature' : 'Add Feature' }}</h4>
+          <p>Feature details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" type="button" class="btn-save btn-active" (click)="enableEdit()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+        <button type="submit" form="featureForm" class="btn-save" [ngClass]="{ 'btn-active': featureForm.valid }"
+          [disabled]="featureForm.invalid || (isEditMode && !canEdit)">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">{{ errorMessage }}</div>
+
+  <form [formGroup]="featureForm" id="featureForm" (ngSubmit)="save()">
+    <section class="section">
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Feature Details</span></div>
+            <div class="required-group">
+              <span class="badge-required">
+                Required <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+              </span>
+            </div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="featureName">Feature Name <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="featureName" type="text" class="form-controler" formControlName="name"
+                    placeholder="e.g. Users Per Garage" [readonly]="isViewMode" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="featureForm.get('name')?.touched && featureForm.get('name')?.invalid">
+                  Feature name is required (min 2 characters).
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="featureCode">Feature Code <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input id="featureCode" type="text" class="form-controler" formControlName="feature_code"
+                    placeholder="e.g. users_per_garage" [readonly]="isViewMode || isEditMode" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="featureForm.get('feature_code')?.touched && featureForm.get('feature_code')?.invalid">
+                  Use lowercase letters, numbers and underscores only (e.g. users_per_garage).
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label for="featureType">Type <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="featureType" class="form-controler" formControlName="type"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option [ngValue]="null">Select type</option>
+                    <option *ngFor="let t of featureTypes" [value]="t">{{ t }}</option>
+                  </select>
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px"
+                  *ngIf="featureForm.get('type')?.touched && featureForm.get('type')?.invalid">
+                  Type is required.
+                </div>
+              </div>
+
+              <div class="col-md-6 form-group">
+                <label for="featureStatus">Status</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <select id="featureStatus" class="form-controler" formControlName="status"
+                    [attr.disabled]="isViewMode ? true : null">
+                    <option [ngValue]="1">Active</option>
+                    <option [ngValue]="0">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12 form-group">
+                <label for="description">Description</label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <textarea id="description" class="form-controler" formControlName="description"
+                    rows="3" placeholder="What does this feature control?"
+                    [readonly]="isViewMode"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="item-icon"><img src="assets/img/Information.svg" alt="info"></div>
+            <div class="header-content"><span class="header-text">Permission Groups</span></div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <p class="section-hint">Select the permission groups this feature should unlock when enabled on a plan.</p>
+
+            <div *ngIf="groupsLoading" class="text-muted" style="font-size:13px">Loading permission groups...</div>
+
+            <div class="permission-group-grid" *ngIf="!groupsLoading">
+              <div class="permission-chip"
+                *ngFor="let group of availableGroups"
+                [class.selected]="isGroupSelected(group)"
+                [class.disabled]="isViewMode"
+                (click)="toggleGroup(group)">
+                <i class="bi" [ngClass]="isGroupSelected(group) ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+                <span>{{ group.groupName }}</span>
+              </div>
+
+              <div *ngIf="availableGroups.length === 0" class="text-muted" style="font-size:13px">
+                No permission groups found. Create permissions with a group code first.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </form>
+</main>

@@ -1,0 +1,258 @@
+<main id="main" class="main">
+
+  <div class="uh-page-header">
+    <div>
+      <h1 class="uh-page-title">Activity Details</h1>
+      <p class="uh-page-subtitle">Track and manage all user activities</p>
+    </div>
+  </div>
+
+  <div *ngIf="sessionId" class="data-table-wrapper mb-3 session-card">
+    <div>
+      <span class="session-card-label">Session ID</span>
+      <div class="session-card-value">{{ sessionId }}</div>
+    </div>
+    <div class="session-card-right">
+      <span class="status-badge"
+        [ngClass]="
+          selectedSession?.status === 'ended' ||
+          selectedSession?.status === 'expired' ||
+          selectedSession?.session_ended
+            ? 'badge-inactive' : 'badge-active'
+        ">
+        {{
+          selectedSession?.status === 'ended' ||
+          selectedSession?.status === 'expired' ||
+          selectedSession?.session_ended
+            ? 'Logged Out' : 'Active'
+        }}
+      </span>
+       <span
+    *ngIf="isSessionActive()"
+    class="live-refresh-indicator">
+
+    <i class="bi bi-arrow-repeat"></i>
+    Auto Refresh (10s)
+
+  </span>
+      <button type="button" class="session-close-btn"
+        (click)="closeSessionMode()" title="Close session view" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="data-table-wrapper" style="padding:16px;">
+    Loading activities...
+  </div>
+  <div *ngIf="error" class="data-table-wrapper" style="padding:16px; color:#d32f2f;">
+    {{ error }}
+  </div>
+
+  <div class="data-table-wrapper">
+
+    <div class="page-top-toolbar">
+      <div class="toolbar-left">
+        <label class="entries-label">Show
+          <span class="entries-select-wrap">
+            <div class="entries-select-box">
+              <span class="entries-number">{{ activityPageSize }}</span>
+              <svg class="entries-arrow" width="12" height="12" viewBox="0 0 20 20" fill="none">
+                <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <select class="entries-select-native" [value]="activityPageSize"
+              (change)="onPageSizeChange($event)">
+              <option *ngFor="let s of [10,25,50,100]" [value]="s">{{ s }}</option>
+            </select>
+          </span>
+          entries
+        </label>
+      </div>
+
+      <div class="toolbar-right">
+        <button
+          type="button"
+          class="uh-filter-btn"
+          [class.uh-filter-btn--active]="filterPanelOpen"
+          (click)="filterPanelOpen = !filterPanelOpen; $event.stopPropagation()">
+          <svg width="17" height="17" viewBox="0 0 19 19" fill="none">
+            <path d="M2 5H17M5 10H14M8 15H11" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round"/>
+          </svg>
+          Filter
+          <span class="uh-filter-dot" *ngIf="hasActiveFilters()"></span>
+        </button>
+      </div>
+    </div>
+<div class="filter-summary px-3 py-2"
+     *ngIf="showActivityTable && (
+       (isSuperAdmin && selectedAdmin) ||
+       selectedRole ||
+       selectedSubAdmin ||
+       selectedModel ||
+       selectedActivityType ||
+       selectedRange !== 'all'
+     )">
+  <span class="summary-label">
+    Showing results for:
+  </span>
+
+  <span class="filter-chip"
+        *ngIf="isSuperAdmin && selectedAdmin">
+    Admin:
+    <strong>
+      {{ selectedAdmin?.name ||
+         ((selectedAdmin?.first_name || '') + ' ' + (selectedAdmin?.last_name || '')) }}
+    </strong>
+  </span>
+
+  <span class="filter-chip" *ngIf="selectedRole">
+    Role:
+ <strong>
+  {{ selectedRole.shortCode === 'all'
+      ? 'All Roles'
+      : selectedRole.roleName }}
+</strong>
+  </span>
+
+  <span class="filter-chip"
+        *ngIf="selectedSubAdmin">
+    User:
+   
+    <strong>
+  {{
+    selectedSubAdmin.id === 'all'
+      ? 'All Users'
+      : (
+          selectedSubAdmin?.name
+          || ((selectedSubAdmin?.first_name || '') + ' ' + (selectedSubAdmin?.last_name || ''))
+          || selectedSubAdmin?.email
+        )
+  }}
+</strong>
+  </span>
+
+  <span class="filter-chip">
+    Date:
+    <strong>{{ selectedRangeLabel || 'All Dates' }}</strong>
+  </span>
+
+  <span class="filter-chip"
+        *ngIf="selectedModel">
+    Model:
+    <strong>{{ selectedModel }}</strong>
+  </span>
+
+  <span class="filter-chip"
+        *ngIf="selectedActivityType">
+    Type:
+    <strong>{{ formatActivityType(selectedActivityType) }}</strong>
+  </span>
+
+</div>
+    <div *ngIf="!loading && !error && filteredActivities.length > 0" class="data-table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:5%">#</th>
+            <th [style.width]="selectedRole?.shortCode === 'all' ? '10%' : '15%'">Activity Type</th>
+            <th [style.width]="selectedRole?.shortCode === 'all' ? '10%' : '15%'">Model Name</th>
+            <th [style.width]="selectedRole?.shortCode === 'all' ? '20%' : '25%'">Page Visited</th>
+            <th [style.width]="selectedRole?.shortCode === 'all' ? '25%' : '20%'">Activity Time</th>
+            <th class="col-action">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let activity of pagedActivities; let i = index" class="row-clickable">
+            <td>{{ (activityPage - 1) * activityPageSize + i + 1 }}</td>
+            <td><span class="table-link">{{ formatActivityType(activity.activity_type) }}</span></td>
+            <td>
+              {{ activity.model_name || activity.model || activity.record_created || '-' }}
+            </td>
+            <td>{{ cleanPageVisited(activity.page_visited) }}</td>
+            <td>{{ activity.entry_created | date:'dd MMM yyyy, hh:mm a' }}</td>
+            <td class="col-action" (click)="$event.stopPropagation()">
+              <app-three-dots-button
+                [active]="activePopupId === activity.id"
+                (menuClick)="openActionPopup(activity, $event)">
+              </app-three-dots-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+      <div *ngIf="!showActivityTable"
+     class="uh-prompt-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.4" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <p>
+  Select filters and click <strong>Apply</strong>
+  to view activities.
+</p>
+    </div>
+<div
+  *ngIf="
+    showActivityTable &&
+    !loading &&
+    !error &&
+    filteredActivities.length === 0
+  "
+  class="uh-prompt-state">
+
+  <p>No activities found.</p>
+
+</div>
+    <app-pagination-footer
+      *ngIf="filteredActivities.length > 0"
+      [totalItems]="filteredActivities.length"
+      [pageSize]="activityPageSize"
+      [currentPage]="activityPage"
+      itemLabel="activities"
+      (pageChange)="onCustomPageChange($event)">
+    </app-pagination-footer>
+
+  </div>
+
+  <app-filter-panel
+    [isOpen]="filterPanelOpen"
+    [isSuperAdmin]="isSuperAdmin"
+    [adminDropdownDisabled]="adminDropdownDisabled"
+    [admins]="admins"
+    [roles]="roles"
+    [subAdmins]="subAdmins"
+    [loadingSubAdmins]="loadingSubAdmins"
+    [selectedAdmin]="selectedAdmin"
+    [selectedRole]="selectedRole"
+    [selectedSubAdmin]="selectedSubAdmin"
+    [selectedRange]="selectedRange"
+    [selectedRangeLabel]="selectedRangeLabel"
+    [customRangeStart]="customRangeStart"
+    [customRangeEnd]="customRangeEnd"
+    [uniqueModels]="uniqueModels"
+    [uniqueActivityTypes]="uniqueActivityTypes"
+    [selectedModel]="selectedModel"
+    [selectedActivityType]="selectedActivityType"
+    (closed)="filterPanelOpen = false"
+    (applied)="onFilterApplied($event)"
+    (cleared)="onFilterCleared()"
+    (adminSelected)="onFilterAdminSelected($event)"
+    (roleSelected)="onFilterRoleSelected($event)"
+    (subAdminSelected)="onFilterSubAdminSelected($event)">
+  </app-filter-panel>
+
+  <app-popup-menu
+    *ngIf="activePopupId !== null"
+    title="ACTIONS"
+    [items]="actionMenuItems"
+    [position]="popupPosition"
+    [width]="190"
+    (closeClick)="closeActionPopup()"
+    (itemClick)="onPopupItemClick($event)">
+  </app-popup-menu>
+
+</main>

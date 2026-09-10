@@ -1,0 +1,176 @@
+<app-common-header></app-common-header>
+<app-sidebar></app-sidebar>
+<main id="main" class="main">
+
+  <div class="id-topbar">
+
+    <div class="id-header">
+      <div class="id-header-left">
+        <button class="id-back-btn" (click)="goBack()" aria-label="Go back">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.9966 15.3332H20.7918V16.6665H12.9966L16.4398 20.2399L15.531 21.1865L10.5518 15.9999L15.531 10.8132L16.4398 11.7599L12.9966 15.3332Z" fill="#374151"/>
+          </svg>
+        </button>
+        <div class="id-header-vdivider"></div>
+        <div class="id-title-group">
+          <span class="id-item-name">{{ paymentTitle }}</span>
+          <span class="id-subtitle">Plan Payment History</span>
+        </div>
+      </div>
+      <div class="id-header-right">
+        <button class="id-more-btn" aria-label="More options">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="id-tabs">
+      <button class="id-tab active">Overview</button>
+    </div>
+
+    <div *ngIf="loading" class="id-loading">Loading payment details…</div>
+
+
+    <div class="id-content" *ngIf="!loading && paymentDetail as p">
+      <div class="id-columns">
+
+        <div class="id-col-left">
+          <div class="id-card">
+            <div class="id-section">
+              <div class="id-section-title">Plan / Purchase Details</div>
+              <div class="id-row">
+                <span class="id-label">Plan ID</span>
+                <span class="id-value">{{ p.plan_id || p.planId || '-' }}</span>
+              </div>
+              <div class="id-row">
+                <span class="id-label">Subscription ID</span>
+                <span class="id-value">{{ p.subscription_id || p.razorpay_subscription_id || '-' }}</span>
+              </div>
+              <div class="id-row">
+                <span class="id-label">Purchase Date</span>
+                <span class="id-value">{{ (p.purchase_date || p.paid_at || p.createdAt) ? ((p.purchase_date || p.paid_at || p.createdAt) | date:'medium') : '-' }}</span>
+              </div>
+
+              <div class="id-row">
+                <span class="id-label">Start Date</span>
+                <span class="id-value">{{ (p.starting_date || p.Plan?.starting_date) ? ((p.starting_date || p.Plan?.starting_date) | date:'medium') : '-' }}</span>
+              </div>
+              <div class="id-row">
+                <span class="id-label">Expiry Date</span>
+                <span class="id-value">{{ (p.expiration_date || p.Plan?.expiration_date) ? ((p.expiration_date || p.Plan?.expiration_date) | date:'medium') : '-' }}</span>
+              </div>
+              <div class="id-row">
+                <span class="id-label">Amount</span>
+                <span class="id-value">{{ p.amount }} {{ p.currency || '' }}</span>
+              </div>
+              <div class="id-row">
+                <span class="id-label">Prepaid Months</span>
+                <span class="id-value">{{ p.prepaid_months || '-' }}</span>
+              </div>
+              <div class="id-row">
+                <span class="id-label">Status</span>
+                <span class="id-value">{{ p.status }}</span>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="id-col-right-wrap">
+          <div class="id-col-top-row">
+
+            <div class="id-col-mid">
+              <div class="id-card">
+                <div class="id-section">
+                  <div class="id-section-title">Payment Method</div>
+                  <div class="id-row">
+                    <span class="id-label">Method</span>
+                    <span class="id-value">{{ p.payment_method || p.gateway_response?.method || '-' }}</span>
+                  </div>
+                  <div class="id-row">
+                    <span class="id-label">Transaction ID</span>
+
+                    <span class="id-value">{{ p.payment_id || p.gateway_response?.id || '-' }}</span>
+                  </div>
+                  <ng-container *ngIf="p.payment_method === 'upi' || p.gateway_response?.method === 'upi'">
+                    <div class="id-row">
+                      <span class="id-label">UPI VPA</span>
+                      <span class="id-value">{{ p.gateway_response?.upi?.vpa || p.gateway_response?.vpa || '-' }}</span>
+                    </div>
+                    <div class="id-row">
+                      <span class="id-label">UPI Flow</span>
+                      <span class="id-value">{{ p.gateway_response?.upi?.flow || '-' }}</span>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="p.payment_method === 'card' || p.gateway_response?.method === 'card'">
+                    <div class="id-row">
+                      <span class="id-label">Bank / Issuer</span>
+                      <span class="id-value">{{ p.gateway_response?.bank || p.gateway_response?.card?.bank || '-' }}</span>
+                    </div>
+                    <div class="id-row">
+                      <span class="id-label">Card Last 4</span>
+                      <span class="id-value">{{ p.gateway_response?.card?.last4 || p.gateway_response?.card?.last_digits || '-' }}</span>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="p.gateway_response?.acquirer_data">
+                    <div class="id-row" *ngIf="p.gateway_response.acquirer_data?.rrn || p.gateway_response.acquirer_data?.bank_transaction_id">
+                      <span class="id-label">{{ p.gateway_response.acquirer_data?.rrn ? 'RRN' : 'Bank Txn ID' }}</span>
+                      <span class="id-value">{{ p.gateway_response.acquirer_data?.rrn || p.gateway_response.acquirer_data?.bank_transaction_id }}</span>
+                    </div>
+                    <div class="id-row" *ngIf="p.gateway_response.acquirer_data?.upi_transaction_id">
+                      <span class="id-label">UPI Txn ID</span>
+                      <span class="id-value">{{ p.gateway_response.acquirer_data?.upi_transaction_id }}</span>
+                    </div>
+                  </ng-container>
+                  <div class="id-row" *ngIf="p.gateway_response?.created_at">
+                    <span class="id-label">Gateway Created At</span>
+                    <span class="id-value">{{ (p.gateway_response.created_at * 1000) | date:'medium' }}</span>
+                  </div>
+                  <div class="id-row" *ngIf="p.gateway_response?.fee !== undefined">
+                    <span class="id-label">Fee</span>
+                    <span class="id-value">{{ p.gateway_response.fee }}</span>
+                  </div>
+                  <div class="id-row" *ngIf="p.gateway_response?.tax !== undefined">
+                    <span class="id-label">Tax</span>
+                    <span class="id-value">{{ p.gateway_response.tax }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="id-col-right">
+              <div class="id-card">
+                <div class="id-section">
+                  <div class="id-section-title">Plan Details</div>
+                  <div class="id-row">
+                    <span class="id-label">Plan Name</span>
+                    <span class="id-value">{{ p.Plan?.plan_name || '-' }}</span>
+                  </div>
+                  <div class="id-row">
+                    <span class="id-label">Razorpay Plan ID</span>
+                    <span class="id-value">{{ p.Plan?.razorpay_plan_id || '-' }}</span>
+                  </div>
+                  <div class="id-row">
+                    <span class="id-label">Billing Cycle</span>
+                    <span class="id-value">{{ p.Plan?.billing_cycle || '-' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="!loading && !paymentDetail" class="id-loading">
+      No payment details found.
+    </div>
+    <div *ngIf="error" class="id-loading">{{ error }}</div>
+
+  </div>
+
+</main>

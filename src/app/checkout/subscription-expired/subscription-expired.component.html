@@ -1,0 +1,15 @@
+<div class="sub-expired-container">
+  <div class="sub-expired-card">
+    <div class="sub-expired-icon">🔒</div>
+    <h2>Access Paused</h2>
+    <p class="sub-expired-message">{{ message }}</p>
+    <p class="sub-expired-plan" *ngIf="planName">Assigned plan: {{ planName }}</p>
+
+    <div class="sub-expired-actions">
+      <button class="btn btn-primary" (click)="checkAgain()" [disabled]="isChecking">
+        {{ isChecking ? 'Checking…' : 'Check Again' }}
+      </button>
+      <button class="btn btn-secondary" (click)="logout()">Log Out</button>
+    </div>
+  </div>
+</div>

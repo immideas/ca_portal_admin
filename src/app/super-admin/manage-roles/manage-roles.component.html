@@ -1,0 +1,104 @@
+<main id="main" class="main-main">
+  <div class="filter-layout">
+    <div class="table-section">
+      <div class="workflow-container">
+        <div class="pagetitle">
+          <h1>Manage Roles</h1>
+          <p class="subtitle">View and manage all system roles</p>
+        </div>
+
+        <div class="toolbar-list-desgin">
+          <div class="toolbar-list-desgin-left">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search Roles..." [(ngModel)]="search" (input)="onSearchChange()" />
+            </div>
+            <button class="btn-reset" (click)="resetFilter()" title="Reset Filters">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+
+          <div class="toolbar-list-desgin-right">
+            <button class="btn-add" (click)="navigateToAddRole()">
+              <i class="bi bi-plus-lg"></i> Add Role
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table id="rolesTable" class="modern-table">
+          <thead>
+            <tr>
+              <th>
+                <div class="th-inner">Role Name</div>
+              </th>
+              <th>
+                <div class="th-inner">Description</div>
+              </th>
+              <th class="action-col-header">
+                <div>Actions</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let role of roles; let i = index" [class.active-row]="activePopup?.index === i"
+              (click)="navigateToViewRole(role.id)" class="clickable-row">
+              <td class="td-primary">{{ role.roleName }}</td>
+              <td class="td-secondary">{{ role.roleDescription || '-' }}</td>
+
+              <td class="action-col-data" (click)="$event.stopPropagation()">
+                <app-three-dots-button
+                  [active]="activePopup?.index === i"
+                  (menuClick)="openActionMenu(i, role, $event)">
+                </app-three-dots-button>
+              </td>
+            </tr>
+            <tr *ngIf="roles.length === 0">
+              <td colspan="3" class="text-center py-5">
+                <div class="text-muted">No roles found.</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <app-popup-menu
+          *ngIf="activePopup"
+          [title]="activePopup.config.title"
+          [items]="activePopup.config.items"
+          [width]="activePopup.config.width ?? 200"
+          [position]="activePopup.config.position"
+          (closeClick)="closePopup()"
+          (itemClick)="onMenuItemClick($event)">
+        </app-popup-menu>
+      </div>
+
+      <div class="pagination-footer" *ngIf="totalItems > 0">
+        <div class="pagination-info">
+          Showing {{ roles.length }} of {{ totalItems }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(1)"><i class="bi bi-chevron-bar-left"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <li class="page-item mx-1" *ngFor="let p of [].constructor(Math.ceil(totalItems/pageSize)); let i = index"
+              [class.active]="currentPage === (i + 1)">
+              <a class="page-link" (click)="onPageChange(i + 1)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)"><i class="bi bi-chevron-right"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(Math.ceil(totalItems/pageSize))"><i
+                  class="bi bi-chevron-bar-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</main>

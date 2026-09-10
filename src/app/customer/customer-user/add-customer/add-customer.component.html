@@ -1,0 +1,167 @@
+<main id="main" class="complaint-wrapper">
+  <div class="top-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="cancel()">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="icon">
+        </div>
+        <div>
+          <h4>{{ isViewMode ? 'View Customer' : isEditMode ? 'Edit Customer' : 'Add Customer' }}</h4>
+          <p>Customer &amp; Project Mapping</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" class="btn-save btn-active" (click)="enableEditMode()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button class="btn-cancel" type="button" (click)="cancel()">Cancel</button>
+        <button class="btn-save" [ngClass]="{ 'btn-active': customerForm.valid }" [disabled]="customerForm.invalid"
+          type="submit" form="customerForm">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+
+  <form [formGroup]="customerForm" id="customerForm" (ngSubmit)="save()">
+    <section class="section">
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="header-content">
+              <span class="header-text">Select Project / Group</span>
+            </div>
+          </div>
+
+          <div class="form-padding-wrap">
+            <div class="row mb-3">
+              <div class="col-md-12 form-group">
+                <label>Project <span class="text-danger">*</span></label>
+                <div style="position:relative;">
+                  <select formControlName="projectId" class="form-controler" (change)="onProjectChange()"
+                    [style.background]="isProjectDropdownLocked ? 'var(--bs-light)' : ''"
+                    [disabled]="isProjectDropdownLocked">
+                    <option value="">— Select a project —</option>
+                    <option *ngFor="let p of projects" [value]="p.id">
+                      {{ p.initials }} — {{ p.name }}
+                    </option>
+                  </select>
+                  <span *ngIf="isProjectDropdownLocked" style="position:absolute; right:36px; top:50%; transform:translateY(-50%);
+                             font-size:11px; color:#6c757d; pointer-events:none;">
+                    <i class="bi bi-lock-fill"></i> locked
+                  </span>
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px;"
+                  *ngIf="customerForm.get('projectId')?.touched && customerForm.get('projectId')?.invalid">
+                  Please select a project.
+                </div>
+              </div>
+            </div>
+
+            <ng-container *ngIf="selectedProject">
+              <div class="access-type-info d-flex align-items-center gap-3" style="margin-top: 16px;">
+                <span class="access-type-badge" [ngClass]="accessTypeBadgeClass">
+                  {{ accessTypeLabel }}
+                </span>
+                <ng-container [ngSwitch]="projectAccessType">
+                  <p *ngSwitchCase="'open'" class="access-info-text text-success mb-0">
+                    <i class="bi bi-globe2"></i>
+                    <strong>Open Group</strong> — any user can submit tickets for this project.
+                  </p>
+                  <p *ngSwitchCase="'open_location'" class="access-info-text text-warning mb-0">
+                    <i class="bi bi-geo-alt"></i>
+                    <strong>Open Group with Location</strong> — users must match location criteria.
+                  </p>
+                  <p *ngSwitchCase="'closed'" class="access-info-text text-primary mb-0">
+                    <i class="bi bi-lock"></i>
+                    <strong>Closed Group</strong> — only registered customers can submit tickets.
+                  </p>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div class="card complaint-card mb-3">
+        <div class="card-body-fixes">
+          <div class="section-title">
+            <div class="header-content">
+              <span class="header-text">Customer Details</span>
+            </div>
+          </div>
+
+          <div class="form-padding-wrap">
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Customer Name <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input type="text" formControlName="name" class="form-controler" placeholder="Enter name" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px;"
+                  *ngIf="customerForm.get('name')?.touched && customerForm.get('name')?.invalid">
+                  Name is required.
+                </div>
+              </div>
+              <div class="col-md-6 form-group">
+                <label>Email <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input type="email" formControlName="email" class="form-controler" placeholder="Enter email" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px;"
+                  *ngIf="customerForm.get('email')?.touched && customerForm.get('email')?.invalid">
+                  Valid email is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Phone <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <input type="text" formControlName="phone" class="form-controler"
+                    placeholder="Enter 10-digit phone" />
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px;"
+                  *ngIf="customerForm.get('phone')?.touched && customerForm.get('phone')?.invalid">
+                  Valid 10-digit phone is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-12 form-group">
+                <label>Address <span class="text-danger">*</span></label>
+                <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+                  <textarea formControlName="address" class="form-controler" style="height:80px;"
+                    placeholder="Enter address"></textarea>
+                </div>
+                <div class="text-danger mt-1" style="font-size:11px;"
+                  *ngIf="customerForm.get('address')?.touched && customerForm.get('address')?.invalid">
+                  Address is required.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </form>
+
+</main>

@@ -1,0 +1,311 @@
+<main id="main" class="sa-main-wrapper">
+
+
+    <header class="dash__header">
+      <div class="dash__header-left">
+        <div class="dash__title-group">
+          <h1 class="dash__title">Super Admin Dashboard</h1>
+          <p class="dash__subtitle">
+            System-wide view
+            <span class="subtitle-sep">·</span>
+            <span class="sa-badge sa-badge--info">All Admins</span>
+          </p>
+        </div>
+      </div>
+    </header>
+
+
+    <div class="filter-bar" *ngIf="activeTab === 'overview'">
+
+      <div class="filter-bar__icon-wrap">
+        <i class="bi bi-calendar3"></i>
+      </div>
+
+      <div class="filter-bar__content">
+        <div class="filter-group">
+          <label class="filter-bar__label">Quick Select</label>
+          <select class="date-field__inp select-range" [(ngModel)]="selectedRange">
+            <option *ngFor="let opt of rangeOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
+        <div class="filter-bar__inputs" *ngIf="selectedRange === 'custom'">
+          <div class="date-field">
+            <label class="date-field__label">From</label>
+            <input type="date" class="date-field__inp" [(ngModel)]="customStart" />
+          </div>
+          <div class="date-arrow"><i class="bi bi-arrow-right"></i></div>
+          <div class="date-field">
+            <label class="date-field__label">To</label>
+            <input type="date" class="date-field__inp" [(ngModel)]="customEnd" />
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar__actions">
+        <button class="btn-apply" (click)="applyFilters()" [disabled]="loading">
+          <i class="bi bi-funnel-fill"></i> Apply
+        </button>
+        <button class="btn-clr" (click)="clearFilters()" [disabled]="loading">
+          <i class="bi bi-x-lg"></i> Clear
+        </button>
+      </div>
+
+    </div>
+
+
+    <div class="status-banner status-banner--load" *ngIf="loading">
+      <div class="status-spinner"></div>
+      <span>Loading dashboard data…</span>
+    </div>
+
+
+    <div *ngIf="!loading && dashboard">
+
+      <div class="section">
+        <div class="section__head">
+          <div class="section__head-left">
+            <span class="section__accent"></span>
+            <h2 class="section__title">Key Metrics</h2>
+          </div>
+          <span class="section__count-badge">6 indicators</span>
+        </div>
+
+        <div class="kpi-grid">
+
+          <div class="kpi kpi--violet">
+            <div class="kpi__glow"></div>
+            <div class="kpi__top">
+              <div class="kpi__icon-wrap kpi__icon-wrap--violet">
+                <i class="bi bi-person-badge-fill"></i>
+              </div>
+              <span class="kpi__badge">Admins</span>
+            </div>
+            <div class="kpi__body">
+              <div class="kpi__num">{{ dashboard.summary.totalAdmins }}</div>
+              <div class="kpi__lbl">Admins Managed</div>
+            </div>
+          </div>
+
+          <div class="kpi kpi--blue">
+            <div class="kpi__glow"></div>
+            <div class="kpi__top">
+              <div class="kpi__icon-wrap kpi__icon-wrap--blue">
+                <i class="bi bi-kanban-fill"></i>
+              </div>
+              <span class="kpi__badge">Total</span>
+            </div>
+            <div class="kpi__body">
+              <div class="kpi__num">{{ dashboard.summary.totalProjects }}</div>
+              <div class="kpi__lbl">Total Projects</div>
+            </div>
+          </div>
+
+          <div class="kpi kpi--green">
+            <div class="kpi__glow"></div>
+            <div class="kpi__top">
+              <div class="kpi__icon-wrap kpi__icon-wrap--green">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <span class="kpi__badge kpi__badge--green">Active</span>
+            </div>
+            <div class="kpi__body">
+              <div class="kpi__num">{{ dashboard.summary.activeProjects }}</div>
+              <div class="kpi__lbl">Active Projects</div>
+            </div>
+          </div>
+
+
+
+          <div class="kpi kpi--amber">
+            <div class="kpi__glow"></div>
+            <div class="kpi__top">
+              <div class="kpi__icon-wrap kpi__icon-wrap--amber">
+                <i class="bi bi-ticket-perforated-fill"></i>
+              </div>
+              <span class="kpi__badge kpi__badge--amber">Tickets</span>
+            </div>
+            <div class="kpi__body">
+              <div class="kpi__num">{{ dashboard.summary.totalTickets | number }}</div>
+              <div class="kpi__lbl">Total Tickets</div>
+            </div>
+          </div>
+
+          <div class="kpi kpi--cyan">
+            <div class="kpi__glow"></div>
+            <div class="kpi__top">
+              <div class="kpi__icon-wrap kpi__icon-wrap--cyan">
+                <i class="bi bi-star-fill"></i>
+              </div>
+              <span class="kpi__badge">Rating</span>
+            </div>
+            <div class="kpi__body">
+              <div class="kpi__num">{{ dashboard.summary.avgCustomerRating | number:'1.1-1' }} ★</div>
+              <div class="kpi__lbl">Avg Customer Rating</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section__head">
+          <div class="section__head-left">
+            <span class="section__accent"></span>
+            <h2 class="section__title">Monthly Ticket Trend</h2>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="sa-chart-card__head">
+            <span class="sa-chart-card__title">Tickets created per month</span>
+          </div>
+          <div class="sa-chart-wrap sa-chart-wrap--tall">
+            <canvas #trendCanvas aria-label="Monthly ticket trend line chart" role="img">
+              Ticket creation trend months.
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section__head">
+          <div class="section__head-left">
+            <span class="section__accent"></span>
+            <h2 class="section__title">Ticket Distribution</h2>
+          </div>
+        </div>
+        <div class="sa-chart-row">
+
+          <div class="card chart-card">
+            <div class="sa-chart-card__head">
+              <span class="sa-chart-card__title">By Priority</span>
+            </div>
+            <div class="sa-chart-wrap">
+              <canvas #priorityCanvas aria-label="Ticket priority distribution doughnut" role="img">Priority distribution.</canvas>
+            </div>
+            <div class="sa-legend">
+              <span *ngFor="let item of dashboard.priorityChart; let i = index" class="sa-legend__item">
+                <span class="sa-legend__dot" [style.background]="['#3266ad','#1d9e75','#ba7517','#e24b4a','#534ab7','#888780'][i % 6]"></span>
+                {{ item.name }} ({{ item.value }})
+              </span>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="sa-chart-card__head">
+              <span class="sa-chart-card__title">By Status</span>
+            </div>
+            <div class="sa-chart-wrap">
+              <canvas #statusCanvas aria-label="Ticket status distribution doughnut" role="img">Status distribution.</canvas>
+            </div>
+            <div class="sa-legend">
+              <span *ngFor="let item of dashboard.statusChart; let i = index" class="sa-legend__item">
+                <span class="sa-legend__dot" [style.background]="['#3266ad','#1d9e75','#ba7517','#e24b4a','#534ab7','#888780'][i % 6]"></span>
+                {{ item.name }} ({{ item.value }})
+              </span>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="sa-chart-card__head">
+              <span class="sa-chart-card__title">Complaint Mode</span>
+            </div>
+            <div class="sa-chart-wrap">
+              <canvas #modeCanvas aria-label="Complaint mode distribution doughnut" role="img">Mode distribution.</canvas>
+            </div>
+            <div class="sa-legend">
+              <span *ngFor="let item of dashboard.modeChart; let i = index" class="sa-legend__item">
+                <span class="sa-legend__dot" [style.background]="['#534ab7','#3266ad','#1d9e75','#ba7517','#e24b4a','#888780'][i % 6]"></span>
+                {{ item.name }} ({{ item.value }})
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section__head">
+          <div class="section__head-left">
+            <span class="section__accent"></span>
+            <h2 class="section__title">Escalation &amp; Acquisition</h2>
+          </div>
+        </div>
+        <div class="sa-chart-row sa-chart-row--2col">
+
+          <div class="card chart-card">
+            <div class="sa-chart-card__head">
+              <span class="sa-chart-card__title">Escalation Levels</span>
+            </div>
+            <div class="sa-chart-wrap">
+              <canvas #escalationCanvas aria-label="Escalation level distribution bar chart" role="img">Escalation levels.</canvas>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="sa-chart-card__head">
+              <span class="sa-chart-card__title">Admin Acquisition</span>
+            </div>
+            <div class="sa-chart-wrap">
+              <canvas #acquisitionCanvas aria-label="Admin user acquisition trend bar chart" role="img">Admin creation over 12 months.</canvas>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section" *ngIf="dashboard.adminPerformance.length">
+        <div class="section__head">
+          <div class="section__head-left">
+            <span class="section__accent"></span>
+            <h2 class="section__title">Admin Performance Snapshot</h2>
+          </div>
+          <span class="section__count-badge">{{ dashboard.adminPerformance.length }} admins</span>
+        </div>
+
+        <div class="card chart-card">
+          <table class="sa-table">
+            <thead>
+              <tr>
+                <th>Admin</th>
+                <th>Total Tickets</th>
+                <th>Completed</th>
+                <th>Resolution Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let admin of dashboard.adminPerformance; trackBy: trackById">
+                <td>
+                  <div class="sa-user-cell">
+                    <div class="sa-avatar">{{ getInitials(admin.name) }}</div>
+                    <div>
+                      <div class="sa-user-name">{{ admin.name }}</div>
+                      <div class="sa-user-email">{{ admin.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ admin.totalTickets }}</td>
+                <td>{{ admin.resolvedTickets }}</td>
+                <td>
+                  <div class="sa-prog-wrap">
+                    <div class="sa-prog-bar">
+                      <div class="sa-prog-fill"
+                        [style.width.%]="admin.resolutionRate"
+                        [class.sa-prog-fill--success]="admin.resolutionRate >= 70"
+                        [class.sa-prog-fill--warn]="admin.resolutionRate >= 40 && admin.resolutionRate < 70"
+                        [class.sa-prog-fill--danger]="admin.resolutionRate < 40">
+                      </div>
+                    </div>
+                    <span class="sa-prog-label">{{ admin.resolutionRate }}%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+</main>

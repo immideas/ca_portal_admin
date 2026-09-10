@@ -1,0 +1,124 @@
+<main id="main" class="main-main">
+  <div class="filter-layout">
+    <div class="table-section">
+      <div class="workflow-container">
+        <div class="pagetitle">
+          <h1>Manage Plans</h1>
+          <p class="subtitle">View and manage all subscription plans</p>
+        </div>
+
+        <div class="toolbar-list-desgin">
+          <div class="toolbar-list-desgin-left">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search plans..." [(ngModel)]="search" (input)="onSearchChange()" />
+            </div>
+            <button class="btn-reset" (click)="resetFilter()" title="Reset Filters">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+          <div class="toolbar-list-desgin-right">
+            <button class="btn-add" (click)="add()">
+              <i class="bi bi-plus-lg"></i> Add Plan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table id="plansTable" class="modern-table">
+          <thead>
+            <tr>
+              <th>Plan Name</th>
+
+              <th>Price (INR)</th>
+              <th>Billing</th>
+              <th>Trial</th>
+              <th>Default</th>
+              <th>Status</th>
+              <th class="action-col-header"><div>Actions</div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of plans; let i = index"
+              [class.active-row]="activePopup?.index === i"
+              (click)="view(p.id)" class="clickable-row">
+
+              <td class="td-primary">{{ p.plan_name }}</td>
+
+              <td>{{ p.plan_price ? ('₹' + (p.plan_price | number:'1.2-2')) : '—' }}</td>
+              <td>{{ p.billing_cycle ?? '—' }}</td>
+              <td>
+                <span [class]="p.is_trial ? 'badge-trial' : 'badge-paid'">
+                  {{ p.is_trial ? 'Yes' : 'No' }}
+                </span>
+              </td>
+              <td>
+  <span [class]="p.is_default ? 'badge-default' : 'badge-paid'">
+    {{ p.is_default ? 'Yes' : 'No' }}
+  </span>
+</td>
+              <td>
+                <span [class]="p.status === '1' ? 'badge-active' : 'badge-inactive'">
+                  {{ p.status === '1' ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+
+              <td class="action-col-data" data-label="Actions" (click)="$event.stopPropagation()">
+                <app-three-dots-button
+                  [active]="activePopup?.index === i"
+                  (menuClick)="openActionMenu(i, p, $any($event))">
+                </app-three-dots-button>
+              </td>
+            </tr>
+
+            <tr *ngIf="plans.length === 0">
+              <td colspan="7" class="text-center py-5">
+                <div class="text-muted">No plans found.</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-footer" *ngIf="totalItems > 0">
+        <div class="pagination-info">
+          Showing {{ plans.length }} of {{ totalItems }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(1)"><i class="bi bi-chevron-bar-left"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <!-- UI FIX: cleaner page-number loop using a computed getter
+                 instead of the [].constructor(...) array-generation hack -->
+            <li class="page-item mx-1"
+              *ngFor="let pg of totalPages"
+              [class.active]="currentPage === pg">
+              <a class="page-link" (click)="onPageChange(pg)">{{ pg }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)"><i class="bi bi-chevron-right"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(Math.ceil(totalItems / pageSize))"><i class="bi bi-chevron-bar-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <app-popup-menu
+    *ngIf="activePopup"
+    [title]="activePopup.config.title"
+    [items]="activePopup.config.items"
+    [width]="activePopup.config.width ?? 180"
+    [position]="activePopup.config.position"
+    (closeClick)="closePopup()"
+    (itemClick)="onMenuItemClick($any($event))">
+  </app-popup-menu>
+</main>

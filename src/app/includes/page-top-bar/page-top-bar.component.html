@@ -1,0 +1,71 @@
+<div class="ptb">
+  <div class="ptb__left">
+    <button *ngIf="showBack" class="ptb__back-btn" type="button" (click)="onBack()" aria-label="Go back">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.9966 15.3332H20.7918V16.6665H12.9966L16.4398 20.2399L15.531 21.1865L10.5518 15.9999L15.531 10.8132L16.4398 11.7599L12.9966 15.3332Z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <div  *ngIf="showBack" class="ptb__separator" aria-hidden="true"></div>
+
+    <div class="ptb__title-block">
+      <h1
+        *ngIf="!titleEditable"
+        class="ptb__title"
+      >{{ title }}</h1>
+
+      <div
+        *ngIf="titleEditable && !_isEditingTitle"
+        class="ptb__title-editable-row"
+        (click)="startTitleEdit()"
+        title="Click to edit"
+      >
+        <h1 class="ptb__title">{{ title || titlePlaceholder }}</h1>
+        <svg class="ptb__edit-icon" width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10.0869 6.21333L12.7869 8.91333M3.33691 15.6633L6.6114 15.0035C6.78524 14.9685 6.94485 14.8829 7.0702 14.7575L14.4005 7.42322C14.7519 7.07158 14.7517 6.50158 14.3999 6.15024L12.8471 4.59918C12.4955 4.24798 11.9258 4.24822 11.5745 4.59972L4.24349 11.9348C4.11838 12.0599 4.03295 12.2192 3.99789 12.3927L3.33691 15.6633Z" stroke="#2969FF" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <input
+        #titleInput
+        *ngIf="titleEditable && _isEditingTitle"
+        class="ptb__title-input"
+        type="text"
+        [value]="_editingValue"
+        [placeholder]="titlePlaceholder"
+        (input)="onTitleInput($any($event.target).value)"
+        (keydown)="onTitleKeydown($event)"
+      />
+
+      <p class="ptb__subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+  </div>
+
+  <div class="ptb__actions" *ngIf="buttons.length">
+    <ng-container *ngFor="let btn of buttons">
+      <div class="ptb__actions-separator" *ngIf="btn.action === 'more'"></div>
+      <button
+        class="ptb__btn"
+        [class.ptb__btn--more]="btn.action === 'more'"
+        [class.ptb__btn--primary]="btn.type === 'primary'"
+        [class.ptb__btn--secondary]="(!btn.type || btn.type === 'secondary') && btn.icon !== 'save' && btn.icon !== 'bi-pencil'"
+        [class.ptb__btn--save]="btn.icon === 'save'"
+        [class.ptb__btn--edit]="btn.icon === 'bi-pencil'"
+        [class.ptb__btn--danger]="btn.type === 'danger'"
+        [disabled]="btn.disabled"
+        type="button"
+        (click)="onButtonClick(btn.action)"
+      >
+        <ng-container *ngIf="btn.icon === 'save'">
+          <svg width="15" height="20" viewBox="0 0 15 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.2049 14.0833V10.5833H9.81115V14.0833H10.9324V7.56167L9.35144 5.91667H3.08365V14.0833H4.2049ZM2.52303 4.75H9.81115L12.0537 7.08333V14.6667C12.0537 14.83 11.9995 14.9681 11.8911 15.0808C11.7827 15.1936 11.65 15.25 11.493 15.25H2.52303C2.36605 15.25 2.23337 15.1936 2.12498 15.0808C2.0166 14.9681 1.9624 14.83 1.9624 14.6667V5.33333C1.9624 5.17 2.0166 5.03194 2.12498 4.91917C2.23337 4.80639 2.36605 4.75 2.52303 4.75ZM5.32615 11.75V14.0833H8.6899V11.75H5.32615Z" fill="currentColor"/>
+          </svg>
+        </ng-container>
+        <ng-container *ngIf="btn.icon && btn.icon !== 'save'">
+          <i [class]="'bi ' + btn.icon"></i>
+        </ng-container>
+        <span *ngIf="btn.action !== 'more'">{{ btn.label }}</span>
+      </button>
+    </ng-container>
+  </div>
+</div>

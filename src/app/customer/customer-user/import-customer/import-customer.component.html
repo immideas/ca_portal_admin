@@ -1,0 +1,212 @@
+<main id="main" class="complaint-wrapper">
+
+  <div class="top-header">
+
+    <div class="header-left">
+
+      <button class="back-btn" (click)="cancel()">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="icon">
+        </div>
+
+        <div>
+          <h4>Import Customers</h4>
+          <p>Bulk upload customers using Excel file</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        class="btn-cancel"
+        type="button"
+        (click)="cancel()">
+        Cancel
+      </button>
+
+      <button
+        class="btn-save btn-active"
+        type="button"
+        (click)="upload()"
+        [disabled]="!selectedFile || isUploading">
+
+        <i class="bi bi-box-arrow-in-down"></i>
+
+        <span>
+          {{ isUploading ? 'Uploading...' : 'Upload & Import' }}
+        </span>
+
+      </button>
+
+    </div>
+  </div>
+
+  <section class="section">
+
+    <div class="card complaint-card">
+
+      <div class="card-body-fixes">
+
+        <div class="section-title">
+          <div class="header-content">
+            <span class="header-text">
+              Upload Excel File
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="file-upload-area"
+          [class.has-file]="selectedFile">
+
+          <label
+            for="fileInput"
+            class="file-upload-label">
+
+            <i
+              class="bi bi-file-earmark-spreadsheet"
+              style="font-size: 2rem;">
+            </i>
+
+            <div *ngIf="!selectedFile">
+
+              <p>
+                Click to select or drag & drop your Excel file
+              </p>
+
+              <small class="text-muted">
+                Supported: .xls, .xlsx
+              </small>
+
+            </div>
+
+            <div *ngIf="selectedFile">
+
+              <p class="text-success">
+                <i class="bi bi-check-circle"></i>
+                {{ fileName }}
+              </p>
+
+              <small class="text-muted">
+                Click to change file
+              </small>
+
+            </div>
+
+          </label>
+
+          <input
+            id="fileInput"
+            type="file"
+            accept=".xls,.xlsx"
+            (change)="onFileSelect($event)"
+            style="display: none;" />
+
+        </div>
+
+        <div
+          *ngIf="isUploading"
+          class="mt-3 text-center text-muted">
+
+          <div
+            class="spinner-border spinner-border-sm me-2"
+            role="status">
+          </div>
+
+          Processing your file, please wait...
+
+        </div>
+
+        <div
+          *ngIf="false"
+          class="import-result mt-4">
+
+          <div
+            [ngClass]="
+              importResult.success
+                ? 'alert alert-success'
+                : 'alert alert-warning'
+            ">
+
+            <strong>
+              {{ importResult.message }}
+            </strong>
+
+          </div>
+
+          <div
+            *ngIf="
+              importResult.failedRows &&
+              importResult.failedRows.length > 0
+            "
+            class="mt-3">
+
+            <h6 class="text-danger">
+
+              <i class="bi bi-exclamation-triangle"></i>
+
+              {{ importResult.failedRows.length }}
+              row(s) failed
+
+            </h6>
+
+            <div class="table-responsive">
+
+              <table class="modern-table">
+
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="th-inner">
+                        Row #
+                      </div>
+                    </th>
+
+                    <th>
+                      <div class="th-inner">
+                        Reason
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  <tr *ngFor="let fr of importResult.failedRows">
+
+                    <td>
+                      <div class="td-primary">
+                        Row {{ fr.row }}
+                      </div>
+                    </td>
+
+                    <td>
+                      <div class="td-secondary text-danger">
+                        {{ fr.reason }}
+                      </div>
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>

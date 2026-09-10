@@ -1,0 +1,456 @@
+<main id="main" class="main-main">
+<div class="report-page">
+
+  <header class="rpt-header">
+    <div class="rpt-header__left">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span class="live-text">LIVE</span>
+      </div>
+      <div>
+        <h2 class="rpt-title">Reports & Analytics</h2>
+        <p class="rpt-subtitle">
+          Real-time reporting
+          <ng-container *ngIf="lastUpdated">
+            <span class="sub-sep">·</span>
+            <span class="sub-time">Updated {{ formatTime() }}</span>
+          </ng-container>
+          <span class="filtered-tag" *ngIf="isFiltered">
+            <i class="bi bi-funnel-fill"></i> Filtered
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="rpt-header__right">
+
+      <div class="interval-rack" *ngIf="autoRefresh">
+        <span class="interval-rack__label">Refresh</span>
+        <div class="interval-rack__pills">
+          <button *ngFor="let s of INTERVALS" class="interval-pill"
+            [class.interval-pill--on]="refreshSec === s"
+            (click)="setRefreshInterval(s)">{{ s }}s
+          </button>
+        </div>
+      </div>
+
+      <button class="ring-btn" (click)="toggleAutoRefresh()"
+        [title]="autoRefresh ? 'Pause auto-refresh' : 'Resume auto-refresh'">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="16" fill="none" stroke="#e2e8f0" stroke-width="2.5"/>
+          <circle cx="20" cy="20" r="16" fill="none" stroke="#7c3aed" stroke-width="2.5"
+            stroke-linecap="round" stroke-dasharray="100.53"
+            [attr.stroke-dashoffset]="autoRefresh ? countdownDash : 100.53"
+            transform="rotate(-90 20 20)"
+            style="transition:stroke-dashoffset 0.95s linear;"/>
+        </svg>
+        <i class="bi ring-btn__icon"
+          [class.bi-pause-fill]="autoRefresh"
+          [class.bi-play-fill]="!autoRefresh"></i>
+      </button>
+
+      <button class="btn-refresh-manual" (click)="fetchReport()" [disabled]="isLoading">
+        <i class="bi bi-arrow-clockwise" [class.spin]="isLoading"></i>
+        <span>Refresh</span>
+      </button>
+
+      <button class="btn-download btn-excel" (click)="downloadExcel()">
+        <i class="bi bi-file-earmark-excel-fill"></i> Excel
+      </button>
+      <button class="btn-download btn-pdf" (click)="downloadPDF()">
+        <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+      </button>
+
+    </div>
+  </header>
+
+  <div class="filter-bar">
+
+    <div class="filter-bar__icon-wrap">
+      <i class="bi bi-calendar3"></i>
+    </div>
+
+    <div class="filter-bar__divider"></div>
+
+    <select class="filter-select" [(ngModel)]="range_type" (change)="onRangeTypeChange()">
+      <option value="all">All Time</option>
+      <option value="today">Today</option>
+      <option value="last_7_days">Last 7 Days</option>
+      <option value="last_30_days">Last 30 Days</option>
+      <option value="custom">Custom Range</option>
+    </select>
+
+    <select class="filter-select" [(ngModel)]="selectedProjectId" (change)="onProjectChange()">
+      <option value="">All Projects</option>
+      <option *ngFor="let p of allProjectsList" [ngValue]="p.id">{{ p.name }}</option>
+    </select>
+
+    <ng-container *ngIf="range_type === 'custom'">
+      <input type="date" class="filter-date-inp" [(ngModel)]="dateFrom"
+        [max]="todayDate" (change)="onDateChange()" placeholder="From"/>
+      <span class="filter-bar__arrow"><i class="bi bi-arrow-right"></i></span>
+      <input type="date" class="filter-date-inp" [(ngModel)]="dateTo"
+        [min]="dateFrom || ''" [max]="todayDate" (change)="onDateChange()" placeholder="To"/>
+    </ng-container>
+
+    <div class="filter-bar__divider"></div>
+
+    <button class="btn-apply" (click)="applyFilter()"
+      [disabled]="range_type === 'custom' && (!dateFrom || !dateTo)">
+      <i class="bi bi-funnel-fill"></i> Apply
+    </button>
+
+    <button class="btn-clr"
+      *ngIf="range_type !== 'all' || selectedProjectId || dateFrom || dateTo"
+      (click)="clearFilter()">
+      <i class="bi bi-x-lg"></i> Clear
+    </button>
+
+
+
+  </div>
+
+  <div class="alert-error" *ngIf="rangeError">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ rangeError }}
+  </div>
+
+  <div class="loading-bar" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <span>Fetching live data…</span>
+  </div>
+
+  <div class="tabs">
+    <button [class.active]="selectedTab==='overview'"    (click)="changeTab('overview')">
+      <i class="bi bi-grid-1x2-fill"></i> Overview
+    </button>
+    <button [class.active]="selectedTab==='performance'" (click)="changeTab('performance')">
+      <i class="bi bi-person-lines-fill"></i> Performance
+    </button>
+    <button [class.active]="selectedTab==='sla'"         (click)="changeTab('sla')">
+      <i class="bi bi-shield-check"></i> SLA
+    </button>
+    <button [class.active]="selectedTab==='customer'"    (click)="changeTab('customer')">
+      <i class="bi bi-star-half"></i> Customer
+    </button>
+    <button [class.active]="selectedTab==='project'"     (click)="changeTab('project')">
+      <i class="bi bi-briefcase-fill"></i> Projects
+    </button>
+  </div>
+
+  <div *ngIf="selectedTab === 'overview'">
+
+    <div class="kpi-row">
+      <div class="kpi-card kpi-violet">
+        <div class="kpi-icon"><i class="bi bi-ticket-perforated-fill"></i></div>
+        <span class="kpi-num">{{ totalTickets }}</span>
+        <span class="kpi-lbl">Total Tickets</span>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:100%"></div></div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-icon"><i class="bi bi-hourglass-split"></i></div>
+        <span class="kpi-num">{{ pendingTickets }}</span>
+        <span class="kpi-lbl">Pending</span>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" [style.width.%]="getPct(pendingTickets)"></div></div>
+        <span class="kpi-pct">{{ getPct(pendingTickets) }}%</span>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="bi bi-arrow-repeat"></i></div>
+        <span class="kpi-num">{{ inProgressTickets }}</span>
+        <span class="kpi-lbl">In Progress</span>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" [style.width.%]="getPct(inProgressTickets)"></div></div>
+        <span class="kpi-pct">{{ getPct(inProgressTickets) }}%</span>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <span class="kpi-num">{{ completedTickets }}</span>
+        <span class="kpi-lbl">Completed</span>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" [style.width.%]="getPct(completedTickets)"></div></div>
+        <span class="kpi-pct">{{ getPct(completedTickets) }}%</span>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
+        <span class="kpi-num">{{ reopenedTickets }}</span>
+        <span class="kpi-lbl">Reopened</span>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" [style.width.%]="getPct(reopenedTickets)"></div></div>
+        <span class="kpi-pct">{{ getPct(reopenedTickets) }}%</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ticket Volume Trend</h3>
+      <div class="chart-wrap">
+        <ngx-charts-bar-vertical [results]="trendData" [scheme]="barScheme"
+          [xAxis]="true" [yAxis]="true"
+          [showXAxisLabel]="true" xAxisLabel="Date"
+          [showYAxisLabel]="true" yAxisLabel="Tickets"
+          [yAxisTickFormatting]="yFmt">
+        </ngx-charts-bar-vertical>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Priority vs Status</h3>
+        <div class="chart-wrap">
+          <ngx-charts-bar-vertical-stacked [results]="priorityStatusChart" [scheme]="stackedScheme"
+            [xAxis]="true" [yAxis]="true" [yAxisTickFormatting]="yFmt">
+          </ngx-charts-bar-vertical-stacked>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Mode of Complaint</h3>
+        <div class="chart-wrap">
+          <ngx-charts-pie-chart [results]="modeOfComplaintChart" [scheme]="barScheme"
+            [legend]="true" [labels]="true">
+          </ngx-charts-pie-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Escalation Levels</h3>
+      <div class="chart-wrap chart-wrap--sm">
+        <ngx-charts-bar-horizontal [results]="escalationChart" [scheme]="stackedScheme"
+          [xAxis]="true" [yAxis]="true"
+          xAxisLabel="Tickets" yAxisLabel="Level">
+        </ngx-charts-bar-horizontal>
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="selectedTab === 'performance'">
+
+    <div class="up-stats-bar" *ngIf="userSolvedData.length">
+      <div class="up-stat-chip">
+        <div class="up-stat-chip__icon up-stat-chip__icon--violet">
+          <i class="bi bi-check2-square"></i>
+        </div>
+        <div class="up-stat-chip__body">
+          <span class="up-stat-chip__val">{{ totalResolved }}</span>
+          <span class="up-stat-chip__lbl">Total Resolved</span>
+        </div>
+      </div>
+      <div class="up-stat-divider"></div>
+      <div class="up-stat-chip">
+        <div class="up-stat-chip__icon up-stat-chip__icon--blue">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="up-stat-chip__body">
+          <span class="up-stat-chip__val">{{ userSolvedData.length }}</span>
+          <span class="up-stat-chip__lbl">Active Users</span>
+        </div>
+      </div>
+      <div class="up-stat-divider"></div>
+      <div class="up-stat-chip">
+        <div class="up-stat-chip__icon up-stat-chip__icon--emerald">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <div class="up-stat-chip__body">
+          <span class="up-stat-chip__val">{{ avgTicketsPerUser }}</span>
+          <span class="up-stat-chip__lbl">Avg / User</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-actions">
+      <div class="tab-group">
+        <button class="tab-btn" [class.tab-btn--on]="selectedUserMetric === 'total'"
+          (click)="onUserMetricChange('total')">
+          <i class="bi bi-bar-chart-fill"></i> Total Solved
+        </button>
+        <button class="tab-btn" [class.tab-btn--on]="selectedUserMetric === 'project'"
+          (click)="onUserMetricChange('project')">
+          <i class="bi bi-layers-fill"></i> Project Wise
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>{{ selectedUserMetric === 'total' ? 'Developer — Total Tickets Resolved' : 'Developer — Project-wise Breakdown' }}</h3>
+      <div class="chart-wrap chart-wrap--tall" *ngIf="userSolvedData.length; else noData">
+
+        <ngx-charts-bar-vertical *ngIf="selectedUserMetric === 'total'"
+          [results]="userSolvedData" [scheme]="barScheme"
+          [xAxis]="true" [yAxis]="true"
+          xAxisLabel="Developer" yAxisLabel="Resolved"
+          [yAxisTickFormatting]="yFmt">
+        </ngx-charts-bar-vertical>
+
+        <ngx-charts-bar-vertical-stacked *ngIf="selectedUserMetric === 'project' && userSolvedStackedData.length"
+          [results]="userSolvedStackedData" [scheme]="stackedScheme"
+          [xAxis]="true" [yAxis]="true" [legend]="true"
+          xAxisLabel="Developer" yAxisLabel="Resolved"
+          [yAxisTickFormatting]="yFmt">
+        </ngx-charts-bar-vertical-stacked>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="selectedTab === 'sla'">
+
+    <div class="kpi-row">
+      <div class="kpi-card" [style.border-color]="slaColor">
+        <div class="kpi-icon" [style.background]="slaColor + '20'">
+          <i class="bi bi-shield-check" [style.color]="slaColor"></i>
+        </div>
+        <span class="kpi-num" [style.color]="slaColor">{{ slaPercentage }}%</span>
+        <span class="kpi-lbl">SLA Met</span>
+        <div class="kpi-bar-track">
+          <div class="kpi-bar-fill" [style.width.%]="slaPercentage" [style.background]="slaColor"></div>
+        </div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <span class="kpi-num">{{ slaBreached }}</span>
+        <span class="kpi-lbl">SLA Breached</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>SLA Compliance</h3>
+      <div class="sla-bar-track">
+        <div class="sla-bar-fill" [style.width.%]="slaPercentage" [style.background]="slaColor"></div>
+      </div>
+      <p class="sla-hint">
+        <ng-container *ngIf="slaPercentage >= 80">✅ Excellent — SLA targets are being met.</ng-container>
+        <ng-container *ngIf="slaPercentage >= 50 && slaPercentage < 80">⚠️ Moderate — Some tickets are breaching SLA.</ng-container>
+        <ng-container *ngIf="slaPercentage < 50">🔴 Critical — SLA performance needs attention.</ng-container>
+      </p>
+    </div>
+
+  </div>
+
+  <div *ngIf="selectedTab === 'customer'">
+
+    <div class="kpi-row">
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon"><i class="bi bi-star-fill"></i></div>
+        <div class="star-row">
+          <i class="bi" *ngFor="let ic of getStarIcons(avgRating)" [class]="ic"></i>
+        </div>
+        <span class="kpi-num">{{ avgRating }}</span>
+        <span class="kpi-lbl">Average Rating</span>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon"><i class="bi bi-chat-left-dots-fill"></i></div>
+        <span class="kpi-num">{{ totalRated }}</span>
+        <span class="kpi-lbl">Total Reviews</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Rating Distribution</h3>
+      <div class="chart-wrap">
+        <ngx-charts-bar-horizontal [results]="ratingChart" [scheme]="ratingScheme"
+          [xAxis]="true" [yAxis]="true"
+          xAxisLabel="Count" yAxisLabel="Stars"
+          [yAxisTickFormatting]="yFmt">
+        </ngx-charts-bar-horizontal>
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="selectedTab === 'project'">
+
+    <div class="card">
+      <h3>Top 10 Projects — Ticket Status</h3>
+      <div class="chart-wrap chart-wrap--tall" *ngIf="projectChart.length; else noData">
+        <ngx-charts-bar-vertical-stacked [results]="projectChart" [scheme]="stackedScheme"
+          [xAxis]="true" [yAxis]="true" [legend]="true"
+          xAxisLabel="Project" yAxisLabel="Tickets"
+          [yAxisTickFormatting]="yFmt">
+        </ngx-charts-bar-vertical-stacked>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Monthly Project Creation</h3>
+      <div class="chart-wrap">
+        <ngx-charts-bar-vertical [results]="projectMonthlyChart" [scheme]="barScheme"
+          [xAxis]="true" [yAxis]="true"
+          xAxisLabel="Month" yAxisLabel="Projects Created"
+          [yAxisTickFormatting]="yFmt">
+        </ngx-charts-bar-vertical>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #noData>
+    <div class="no-data">
+      <i class="bi bi-inbox" style="font-size:32px;margin-bottom:8px;display:block;"></i>
+      No data available for selected range.
+    </div>
+  </ng-template>
+
+</div>
+</main>
+
+<div class="exp-backdrop" *ngIf="showExportModal" (click)="closeExportModal()"></div>
+
+<div class="exp-modal" *ngIf="showExportModal" role="dialog" aria-modal="true">
+
+  <div class="exp-modal__header">
+    <div class="exp-modal__title-wrap">
+      <div class="exp-modal__icon"
+           [class.exp-modal__icon--excel]="exportType === 'excel'"
+           [class.exp-modal__icon--pdf]="exportType === 'pdf'">
+        <i class="bi" [class.bi-file-earmark-excel-fill]="exportType === 'excel'"
+                      [class.bi-file-earmark-pdf-fill]="exportType === 'pdf'"></i>
+      </div>
+      <div>
+        <h3 class="exp-modal__title">
+          Export as {{ exportType === 'excel' ? 'Excel' : 'PDF' }}
+        </h3>
+        <p class="exp-modal__sub">Select the sections to include in your report</p>
+      </div>
+    </div>
+    <button class="exp-modal__close" (click)="closeExportModal()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="exp-modal__select-all">
+    <label class="exp-check-item exp-check-item--all">
+      <input type="checkbox"
+             [checked]="allSectionsSelected"
+             (change)="toggleAllSections()" />
+      <span class="exp-check-box"></span>
+      <span class="exp-check-label">Select All Sections</span>
+    </label>
+  </div>
+
+  <div class="exp-modal__sections">
+    <label class="exp-check-item" *ngFor="let sec of exportSections">
+      <input type="checkbox" [(ngModel)]="sec.selected" />
+      <span class="exp-check-box"></span>
+      <i class="bi exp-check-icon" [class]="sec.icon"></i>
+      <span class="exp-check-label">{{ sec.label }}</span>
+    </label>
+  </div>
+
+  <div class="exp-modal__footer">
+    <span class="exp-modal__count">
+      {{ selectedSectionKeys.length }} of {{ exportSections.length }} sections selected
+    </span>
+    <div class="exp-modal__actions">
+      <button class="exp-btn exp-btn--cancel" (click)="closeExportModal()">Cancel</button>
+      <button class="exp-btn exp-btn--download"
+              [disabled]="selectedSectionKeys.length === 0 || isExporting"
+              (click)="confirmExport()">
+        <span *ngIf="!isExporting">
+          <i class="bi bi-download"></i>
+          Download {{ exportType === 'excel' ? 'Excel' : 'PDF' }}
+        </span>
+        <span *ngIf="isExporting">
+          <i class="bi bi-hourglass-split spin"></i> Generating…
+        </span>
+      </button>
+    </div>
+  </div>
+
+</div>

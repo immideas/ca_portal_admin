@@ -1,0 +1,9 @@
+.field-wrap.icon-category-sub {
+  --field-icon: url('/assets/img/category-sub.svg');
+}
+
+.view-mode-uploader {
+  pointer-events: none;
+  opacity: .6;
+}
+

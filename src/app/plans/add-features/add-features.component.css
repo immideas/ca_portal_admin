@@ -1,0 +1,35 @@
+.permission-group-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.permission-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  transition: all 0.15s ease-in-out;
+  user-select: none;
+}
+
+.permission-chip:hover:not(.disabled) {
+  border-color: #4a6cf7;
+}
+
+.permission-chip.selected {
+  background: #eef2ff;
+  border-color: #4a6cf7;
+  color: #4a6cf7;
+  font-weight: 500;
+}
+
+.permission-chip.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}

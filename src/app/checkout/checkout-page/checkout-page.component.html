@@ -1,0 +1,173 @@
+
+<div class="floating-shape shape1"></div>
+<div class="floating-shape shape2"></div>
+<div class="floating-shape shape3"></div>
+
+<div class="container mt-4">
+  <div class="checkout-card">
+    <div class="card-header">
+      <div class="logo-icon">🚀</div>
+      <h1 class="card-title">Resolvenest</h1>
+      <p class="card-subtitle">Your innovation journey starts here</p>
+    </div>
+
+    <div class="card-body">
+      <div class="welcome-section">
+        <h2 class="welcome-text">Hello, {{ displayName }}</h2>
+      </div>
+
+      <div *ngIf="plansLoading" class="loading-state">
+        <div class="spinner"></div>
+        <span class="loading-text">Loading your plan...</span>
+      </div>
+
+      <ng-container *ngIf="!plansLoading && selectedPlan">
+
+        <div class="plan-box">
+          <span class="plan-badge">Assigned Plan</span>
+          <div class="plan-header">
+            <div class="plan-name">{{ selectedPlan.plan_name }}</div>
+            <button class="btn btn-secondary" (click)="loadAvailablePlans()">
+              Change Plan
+            </button>
+          </div>
+
+          <div class="plan-features">
+            <div class="feature-pill">
+              <span class="feature-icon">✓</span>
+              {{ selectedPlan.no_of_users }} Users
+            </div>
+            <div class="feature-pill">
+              <span class="feature-icon">✓</span>
+              {{ selectedPlan.no_of_customers }} Customers
+            </div>
+            <div class="feature-pill">
+              <span class="feature-icon">✓</span>
+              {{ selectedPlan.no_of_projects }} Projects
+            </div>
+            <div class="feature-pill">
+              <span class="feature-icon">✓</span>
+              {{ selectedPlan.tickets_per_month }} Tickets/month
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showPlanModal" class="plan-selection-section">
+          <h3>Select a Plan</h3>
+          <p class="trial-expiry-message">Choose a different plan if you'd like — setup cost (if this is your first payment) applies to whichever plan you pick.</p>
+
+          <div class="plan-options">
+            <label *ngFor="let plan of availablePlans" class="plan-option">
+              <input
+                type="radio"
+                name="planSelection"
+                [value]="plan.id"
+                [checked]="selectedPlan?.id === plan.id"
+                (change)="selectPlan(plan)"
+              />
+              <span class="plan-name">{{ plan.plan_name }}</span>
+              <span class="plan-price">₹{{ plan.plan_price }}/{{ plan.billing_cycle || 'month' }}</span>
+            </label>
+          </div>
+
+          <button class="btn btn-secondary" (click)="showPlanModal = false">Cancel</button>
+        </div>
+
+        <div *ngIf="displayName" class="greeting">
+          <span class="greeting-icon">💳</span>
+          <span
+            >We noticed your account has a pending payment. Please complete it
+            below to continue enjoying your plan benefits.</span
+          >
+        </div>
+
+        <div class="invoice-card">
+          <div class="invoice-header">
+            <span class="invoice-icon">🧾</span>
+            <h3 class="invoice-title">Invoice Summary</h3>
+            <span class="invoice-badge" *ngIf="includeSetupCost">First Payment</span>
+          </div>
+
+          <div class="invoice-line">
+            <div class="invoice-line-left">
+              <span class="invoice-line-label">Plan Cost</span>
+              <span class="invoice-line-sub">{{ selectedPlan.plan_name }} · {{ selectedPlan.billing_cycle || 'Monthly' }}</span>
+            </div>
+            <span class="invoice-line-value">₹{{ paymentSummary.planSubtotal | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="invoice-line" *ngIf="includeSetupCost">
+            <div class="invoice-line-left">
+              <span class="invoice-line-label">Setup Cost</span>
+              <span class="invoice-line-sub">One-time · charged on first payment only</span>
+            </div>
+            <span class="invoice-line-value">₹{{ paymentSummary.setupSubtotal | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="invoice-tax-group">
+            <div class="invoice-line tax">
+              <span class="invoice-line-label">CGST</span>
+              <span class="invoice-line-value">₹{{ paymentSummary.totalCGST | number:'1.2-2' }}</span>
+            </div>
+            <div class="invoice-line tax">
+              <span class="invoice-line-label">SGST</span>
+              <span class="invoice-line-value">₹{{ paymentSummary.totalSGST | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="invoice-divider"></div>
+
+          <div class="invoice-total-row">
+            <div class="invoice-total-left">
+              <span class="invoice-total-label">Total Due Now</span>
+              <span class="invoice-total-sub" *ngIf="includeSetupCost">Plan + Setup Cost + Taxes</span>
+              <span class="invoice-total-sub" *ngIf="!includeSetupCost">Plan Cost + Taxes</span>
+            </div>
+            <span class="invoice-total-value">₹{{ paymentSummary.grandTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+<div *ngIf="autopay" class="alert alert-success payment-info-card">
+  <strong>Auto Renewal Enabled</strong><br />
+  Your subscription will renew automatically every billing cycle.
+</div>
+
+<div *ngIf="!autopay" class="alert alert-info payment-info-card">
+  <strong>Manual Payment</strong><br />
+  This is a one-time payment.
+</div>
+        <div class="button-group">
+           <button class="btn btn-secondary" (click)="logout()">
+            <span>←</span> Logout
+          </button>
+          <button
+            class="btn btn-primary"
+            (click)="proceedToPayment()"
+            [disabled]="isLoading"
+          >
+            <span>💳</span>
+            {{ autopay ? "Proceed to Subscribe" : "Proceed to Pay" }}
+          </button>
+
+
+          <button
+            *ngIf="skipAllowed"
+            class="btn btn-secondary"
+            (click)="goToDashboard()"
+          >
+             Skip Payment<span>→</span>
+          </button>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-state">
+          <div class="spinner"></div>
+          <span class="loading-text">Preparing your secure payment...</span>
+        </div>
+
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+

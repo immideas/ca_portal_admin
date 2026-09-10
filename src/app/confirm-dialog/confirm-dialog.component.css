@@ -1,0 +1,21 @@
+/* Add any styles for the confirm dialog component here */
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.no-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.yes-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.no-button:hover, .yes-button:hover {
+  opacity: 0.8;
+}

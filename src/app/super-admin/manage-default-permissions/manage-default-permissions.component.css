@@ -1,0 +1,74 @@
+
+/* ================= PAGE ================= */
+
+.premium-ui {
+
+  background: #f4f6fa;
+
+  min-height: 100vh;
+
+}
+
+
+/* ================= MAIN ================= */
+
+.main.premium-ui {
+
+  padding-top: 0 !important;
+
+}
+
+
+/* ================= TOP BAR ================= */
+
+app-page-top-bar {
+
+  display: block;
+
+ width: calc(100% + 72px);
+
+  margin-left: -40px;
+
+  /* margin-top: -20px; */
+
+}
+
+
+/* ================= INTERNAL TOP BAR FIX ================= */
+
+app-page-top-bar ::ng-deep .ptb {
+
+  padding-left: 40px !important;
+
+  padding-right: 20px !important;
+
+}
+
+
+/* ================= SPACING ================= */
+
+.ptb-bleed {
+
+  margin-bottom: 20px;
+
+}
+
+
+/* ================= SECTION ================= */
+
+.section.profile {
+
+  margin-top: 0;
+
+}
+
+
+/* ================= LOADER ================= */
+
+.spinner-border {
+
+  width: 3rem;
+
+  height: 3rem;
+
+}

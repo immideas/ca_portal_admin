@@ -1,0 +1,209 @@
+.error-message {
+  color: red;
+  font-size: 0.875em;
+  margin-top: 0.25em;
+}
+
+.btn:disabled {
+  background: grey;
+  cursor: not-allowed;
+}
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #000;
+}
+
+
+
+/* ── Plan Detail Card ──────────────────────────────────────────── */
+.pd-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+}
+
+.pd-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary, #1e1c1c);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+/* Info grid */
+.pd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.pd-item {
+  background: var(--surface-alt, #f9fafb);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pd-label {
+  font-size: 11px;
+  color: var(--text-muted, #6b7280);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pd-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary, #1e1c1c);
+}
+
+/* Feature grid */
+.pd-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.pd-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #9ca3af;
+  background: var(--surface-alt, #f9fafb);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+.pd-feature i {
+  font-size: 15px;
+  color: #d1d5db;
+}
+
+.pd-feature.pd-feature--on {
+  color: var(--text-primary, #1e1c1c);
+  font-weight: 500;
+}
+
+.pd-feature.pd-feature--on i {
+  color: #10b981;
+}
+
+/* Badges */
+.pd-plan-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary, #4f46e5);
+}
+
+.pd-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.pd-badge--trial {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.pd-badge--paid {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.pd-badge--active {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.pd-badge--inactive {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+
+/* ── Plan radio-card stack ─────────────────────────────────────── */
+.plan-radio-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.plan-radio-card {
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+.plan-radio-card:hover {
+  border-color: var(--primary, #4f46e5);
+}
+
+.plan-radio-card--selected {
+  border-color: var(--primary, #4f46e5);
+  box-shadow: 0 0 0 1px var(--primary, #4f46e5);
+}
+
+.plan-radio-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.plan-radio-card__head input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary, #4f46e5);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.plan-radio-card__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 0;
+  width: 100%;
+}
+
+.plan-radio-card__price {
+  font-weight: 600;
+  color: var(--text-primary, #1e1c1c);
+}
+
+.plan-radio-card .pd-section-header {
+  padding: 0 16px;
+}
+
+.plan-radio-card .form-padding-wrap {
+  border-top: 1px solid var(--border-color, #f0f0f0);
+  padding-top: 14px;
+}
+
+

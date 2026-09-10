@@ -1,0 +1,847 @@
+<main id="main" class="main-dashborad-wrapper">
+
+<div class="trial-info-banner"
+     *ngIf="subscriptionBanner?.show"
+     [ngClass]="{
+       'trial-info-banner--trial': subscriptionBanner?.type === 'trial',
+       'trial-info-banner--buffer': subscriptionBanner?.type === 'buffer',
+       'trial-info-banner--purge': subscriptionBanner?.type === 'purge'
+     }">
+
+  <div class="trial-info-banner__left">
+    <div class="trial-info-banner__icon">
+      <i class="bi"
+         [class.bi-clock-history]="subscriptionBanner?.type === 'trial'"
+         [class.bi-hourglass-split]="subscriptionBanner?.type === 'buffer'"
+         [class.bi-exclamation-triangle-fill]="subscriptionBanner?.type === 'purge'"></i>
+    </div>
+
+    <div class="trial-info-banner__text">
+      <div class="trial-info-banner__title">
+        <span class="trial-badge">{{ subscriptionBanner?.title }}</span>
+      </div>
+      <p class="trial-info-banner__msg">
+        {{ subscriptionBanner?.message }}
+
+      </p>
+    </div>
+  </div>
+
+  <div class="trial-info-banner__right">
+    <button class="btn-upgrade-plan" (click)="goToCheckout()" *ngIf="!isSubAdmin">
+      <i class="bi bi-credit-card-fill"></i>
+      {{ subscriptionBanner?.buttonText || 'Purchase Plan' }}
+    </button>
+    <span class="trial-info-banner__contact-note" *ngIf="isSubAdmin" style="font-size: 13px; color: #6b7280; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+      <i class="bi bi-info-circle"></i>
+      Contact your administrator to renew
+    </span>
+  </div>
+
+</div>
+    <header class="dash__header">
+      <div class="dash__header-left">
+        <div class="live-badge">
+          <span class="live-dot"></span>
+          <span class="live-text">LIVE</span>
+        </div>
+        <div class="dash__title-group">
+          <h1 class="dash__title">Tickets Dashboard</h1>
+          <p class="dash__subtitle">
+            Real-time overview
+            <ng-container *ngIf="lastUpdated">
+              <span class="subtitle-sep">·</span>
+              <span class="subtitle-time">Updated {{ formatTime() }}</span>
+            </ng-container>
+            <span class="filtered-tag" *ngIf="isFiltered">
+              <i class="bi bi-funnel-fill"></i> Filtered
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div class="dash__header-right">
+        <div class="interval-rack" *ngIf="autoRefresh">
+          <span class="interval-rack__label">Refresh</span>
+          <div class="interval-rack__pills">
+            <button *ngFor="let s of INTERVALS" class="interval-pill" [class.interval-pill--on]="refreshSec === s"
+              (click)="setRefreshInterval(s)">{{ s }}s
+            </button>
+          </div>
+        </div>
+
+        <button class="ring-btn" (click)="toggleAutoRefresh()"
+          [title]="autoRefresh ? 'Pause auto-refresh' : 'Resume auto-refresh'">
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="16" fill="none" stroke="var(--border)" stroke-width="2.5" />
+            <circle cx="20" cy="20" r="16" fill="none" stroke="var(--v500)" stroke-width="2.5" stroke-linecap="round"
+              stroke-dasharray="100.53" [attr.stroke-dashoffset]="autoRefresh ? countdownDash : 100.53"
+              transform="rotate(-90 20 20)" style="transition:stroke-dashoffset 0.95s linear;" />
+          </svg>
+          <i class="bi ring-btn__icon" [class.bi-pause-fill]="autoRefresh" [class.bi-play-fill]="!autoRefresh"></i>
+        </button>
+
+        <button class="btn-refresh" (click)="fetchDashboard()" [disabled]="isLoading">
+          <i class="bi bi-arrow-clockwise" [class.spin]="isLoading"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </header>
+
+
+    <div class="status-banner status-banner--load" *ngIf="isLoading">
+      <div class="status-spinner"></div>
+      <span>Fetching live data…</span>
+    </div>
+    <div class="status-banner status-banner--err" *ngIf="errorMsg && !isLoading">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ errorMsg }}</span>
+      <button class="status-banner__retry" (click)="fetchDashboard()">Retry</button>
+    </div>
+
+
+    <div class="filter-bar">
+
+      <div class="filter-bar__icon-wrap">
+        <i class="bi bi-calendar3"></i>
+      </div>
+
+      <div class="filter-bar__content">
+
+        <div class="qf-group">
+          <label class="filter-bar__label">Quick Select</label>
+          <select class="date-field__inp select-range" [(ngModel)]="range_type" (change)="onRangeTypeChange(false)">
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="last_7_days">Last 7 Days</option>
+            <option value="last_30_days">Last 30 Days</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+
+        <div class="qf-group">
+          <label class="filter-bar__label">Project</label>
+          <select class="date-field__inp select-range" [(ngModel)]="selectedProjectId" (change)="onProjectChange()">
+            <option value="">All Projects</option>
+            <option *ngFor="let proj of allProjectsList" [ngValue]="proj.id">
+              {{ proj.name }}
+            </option>
+          </select>
+        </div>
+
+
+
+        <div class="filter-bar__inputs" *ngIf="range_type === 'custom'">
+          <div class="date-field">
+            <label class="date-field__label">From</label>
+            <input type="date" class="date-field__inp" [(ngModel)]="dateFrom" [max]="todayDate"
+              (change)="onDateChange()" />
+          </div>
+
+          <div class="date-arrow">
+            <i class="bi bi-arrow-right"></i>
+          </div>
+
+          <div class="date-field">
+            <label class="date-field__label">To</label>
+            <input type="date" class="date-field__inp" [(ngModel)]="dateTo" [min]="dateFrom || ''" [max]="todayDate"
+              (change)="onDateChange()" />
+          </div>
+        </div>
+
+      </div>
+
+      <div class="filter-bar__actions">
+        <button class="btn-apply" (click)="applyFilter()"
+          [disabled]="range_type === 'custom' && (!dateFrom || !dateTo)">
+          <i class="bi bi-funnel-fill"></i> Apply
+        </button>
+        <button class="btn-clr" *ngIf="range_type !== 'all' || selectedProjectId || dateFrom || dateTo"
+          (click)="clearFilter()">
+          <i class="bi bi-x-lg"></i> Clear
+        </button>
+      </div>
+
+      <div class="filter-bar__status">
+        <span class="filter-hint" *ngIf="!isFiltered">Showing: {{ range_type | titlecase }}</span>
+        <span class="filter-active" *ngIf="isFiltered">
+          <i class="bi bi-check-circle-fill"></i> Active Filter
+        </span>
+      </div>
+
+    </div>
+
+    <div class="alert alert-danger mt-2" *ngIf="rangeError">
+      <i class="bi bi-exclamation-triangle-fill"></i> {{ rangeError }}
+    </div>
+
+
+    <section class="section">
+      <div class="section__head">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">Key Metrics</h2>
+        </div>
+        <span class="section__count-badge">6 indicators</span>
+      </div>
+
+      <div class="kpi-grid">
+
+        <div class="kpi kpi--violet">
+          <div class="kpi__glow"></div>
+          <div class="kpi__top">
+            <div class="kpi__icon-wrap kpi__icon-wrap--violet">
+              <i class="bi bi-ticket-perforated-fill"></i>
+            </div>
+            <span class="kpi__badge">Total</span>
+          </div>
+          <div class="kpi__body">
+            <div class="kpi__num">{{ totalTickets | number }}</div>
+            <div class="kpi__lbl">Total Tickets</div>
+          </div>
+          <div class="kpi__footer">
+            <div class="kpi__bar-track">
+              <div class="kpi__bar-fill" style="width:100%"></div>
+            </div>
+            <span class="kpi__pct-label">100%</span>
+          </div>
+        </div>
+
+        <div class="kpi kpi--amber">
+          <div class="kpi__glow"></div>
+          <div class="kpi__top">
+            <div class="kpi__icon-wrap kpi__icon-wrap--amber">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <span class="kpi__badge kpi__badge--amber">{{ getPct(pendingTickets) }}%</span>
+          </div>
+          <div class="kpi__body">
+            <div class="kpi__num">{{ pendingTickets | number }}</div>
+            <div class="kpi__lbl">Pending</div>
+          </div>
+          <div class="kpi__footer">
+            <div class="kpi__bar-track">
+              <div class="kpi__bar-fill" [style.width.%]="getPct(pendingTickets)"></div>
+            </div>
+            <span class="kpi__pct-label">{{ getPct(pendingTickets) }}%</span>
+          </div>
+        </div>
+
+        <div class="kpi kpi--cyan">
+          <div class="kpi__glow"></div>
+          <div class="kpi__top">
+            <div class="kpi__icon-wrap kpi__icon-wrap--cyan">
+              <i class="bi bi-gear-wide-connected"></i>
+            </div>
+            <span class="kpi__badge kpi__badge--cyan">{{ getPct(inProgressTickets) }}%</span>
+          </div>
+          <div class="kpi__body">
+            <div class="kpi__num">{{ inProgressTickets | number }}</div>
+            <div class="kpi__lbl">In Progress</div>
+          </div>
+          <div class="kpi__footer">
+            <div class="kpi__bar-track">
+              <div class="kpi__bar-fill" [style.width.%]="getPct(inProgressTickets)"></div>
+            </div>
+            <span class="kpi__pct-label">{{ getPct(inProgressTickets) }}%</span>
+          </div>
+        </div>
+
+        <div class="kpi kpi--green">
+          <div class="kpi__glow"></div>
+          <div class="kpi__top">
+            <div class="kpi__icon-wrap kpi__icon-wrap--green">
+              <i class="bi bi-check2-all"></i>
+            </div>
+            <span class="kpi__badge kpi__badge--green">{{ getPct(completedTickets) }}%</span>
+          </div>
+          <div class="kpi__body">
+            <div class="kpi__num">{{ completedTickets | number }}</div>
+            <div class="kpi__lbl">Completed</div>
+          </div>
+          <div class="kpi__footer">
+            <div class="kpi__bar-track">
+              <div class="kpi__bar-fill" [style.width.%]="getPct(completedTickets)"></div>
+            </div>
+            <span class="kpi__pct-label">{{ getPct(completedTickets) }}%</span>
+          </div>
+        </div>
+
+        <div class="kpi kpi--red">
+          <div class="kpi__glow"></div>
+          <div class="kpi__top">
+            <div class="kpi__icon-wrap kpi__icon-wrap--red">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </div>
+            <span class="kpi__badge kpi__badge--red">{{ getPct(reopenedTickets) }}%</span>
+          </div>
+          <div class="kpi__body">
+            <div class="kpi__num">{{ reopenedTickets | number }}</div>
+            <div class="kpi__lbl">Reopened</div>
+          </div>
+          <div class="kpi__footer">
+            <div class="kpi__bar-track">
+              <div class="kpi__bar-fill" [style.width.%]="getPct(reopenedTickets)"></div>
+            </div>
+            <span class="kpi__pct-label">{{ getPct(reopenedTickets) }}%</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">SLA &amp; Resolution Analytics</h2>
+        </div>
+      </div>
+
+      <div class="sla-metric-row">
+
+        <div class="sla-m">
+          <div class="sla-m__icon-wrap sla-m__icon-wrap--green">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div class="sla-m__body">
+            <div class="sla-m__lbl">SLA Compliance</div>
+            <div class="sla-m__val" [style.color]="slaColor">{{ slaPercentage }}%</div>
+            <div class="sla-m__sub">Resolved within threshold</div>
+            <div class="sla-m__bar">
+              <div class="sla-m__bar-fill sla-m__bar-fill--green" [style.width.%]="slaPercentage"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sla-m">
+          <div class="sla-m__icon-wrap sla-m__icon-wrap--violet">
+            <i class="bi bi-speedometer2"></i>
+          </div>
+          <div class="sla-m__body">
+            <div class="sla-m__lbl">Resolution Rate</div>
+            <div class="sla-m__val" style="color:var(--v500)">{{ getPct(completedTickets) }}%</div>
+            <div class="sla-m__sub">{{ completedTickets }} of {{ totalTickets }} closed</div>
+            <div class="sla-m__bar">
+              <div class="sla-m__bar-fill sla-m__bar-fill--violet" [style.width.%]="getPct(completedTickets)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sla-m">
+          <div class="sla-m__icon-wrap sla-m__icon-wrap--red">
+            <i class="bi bi-exclamation-circle-fill"></i>
+          </div>
+          <div class="sla-m__body">
+            <div class="sla-m__lbl">Open Tickets</div>
+            <div class="sla-m__val" style="color:var(--red)">{{ openTickets }}</div>
+            <div class="sla-m__sub">Pending + In Progress</div>
+            <div class="sla-m__bar">
+              <div class="sla-m__bar-fill sla-m__bar-fill--red"
+                [style.width.%]="totalTickets ? (openTickets / totalTickets) * 100 : 0"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sla-m">
+          <div class="sla-m__icon-wrap sla-m__icon-wrap--amber">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <div class="sla-m__body">
+            <div class="sla-m__lbl">Avg Customer Rating</div>
+            <div class="sla-m__val" style="color:var(--amber)">
+              {{ totalRated > 0 ? (avgRating | number:'1.1-1') : '—' }}
+            </div>
+            <div class="sla-m__sub">{{ totalRated }} ratings received</div>
+            <div class="sla-m__bar">
+              <div class="sla-m__bar-fill sla-m__bar-fill--amber"
+                [style.width.%]="totalRated > 0 ? (avgRating / 5) * 100 : 0"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <section class="section">
+      <div class="section__head section__head--between">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">{{ isDrillDownView ? drillDownTitle : trendLabel }}</h2>
+        </div>
+
+        <div class="section__actions">
+          <button *ngIf="isDrillDownView" class="btn-clr" (click)="goBackToMain()">
+            <i class="bi bi-arrow-left"></i> Back to Overview
+          </button>
+
+          <div class="tab-group" *ngIf="!isDrillDownView">
+            <button type="button" class="tab-btn" (click)="setTrendView('today')"
+              [class.tab-btn--on]="currentTrendView === 'today'">Today</button>
+            <button type="button" class="tab-btn" (click)="setTrendView('week')"
+              [class.tab-btn--on]="currentTrendView === 'week'">This Week</button>
+            <button type="button" class="tab-btn" (click)="setTrendView('month')"
+              [class.tab-btn--on]="currentTrendView === 'month'">This Month</button>
+            <button type="button" class="tab-btn" (click)="setTrendView('year')"
+              [class.tab-btn--on]="currentTrendView === 'year'">This Year</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <ng-container *ngIf="!isDrillDownView">
+          <div class="chart-controls-row" style="display: flex; justify-content: flex-start; padding: 10px 20px;">
+            <div class="custom-radio-group">
+              <label class="radio-item" [class.active]="selectedMetric === 'total'">
+                <input type="radio" name="metric" value="total" [(ngModel)]="selectedMetric"
+                  (change)="onMetricChange('total')">
+                <span class="radio-dot"></span> Total Tickets
+              </label>
+              <label class="radio-item" [class.active]="selectedMetric === 'priority'">
+                <input type="radio" name="metric" value="priority" [(ngModel)]="selectedMetric"
+                  (change)="onMetricChange('priority')">
+                <span class="radio-dot"></span> Priority
+              </label>
+              <label class="radio-item" [class.active]="selectedMetric === 'status'">
+                <input type="radio" name="metric" value="status" [(ngModel)]="selectedMetric"
+                  (change)="onMetricChange('status')">
+                <span class="radio-dot"></span> Status
+              </label>
+            </div>
+          </div>
+
+          <ng-container *ngIf="trendData.length; else noTrend">
+            <div class="chart-wrap chart-wrap--tall">
+              <ngx-charts-bar-vertical *ngIf="selectedMetric === 'total'" [results]="trendData" [scheme]="trendScheme"
+                [xAxis]="true" [yAxis]="true" [showXAxisLabel]="true" [xAxisLabel]="dynamicTimelineLabel"
+                [showYAxisLabel]="true" yAxisLabel="Total Tickets" [yAxisTickFormatting]="yFmt">
+              </ngx-charts-bar-vertical>
+
+              <ngx-charts-bar-vertical-stacked *ngIf="selectedMetric !== 'total'" [results]="trendStackedData"
+                [scheme]="stackedScheme" [customColors]="dynamicColors" [xAxis]="true" [yAxis]="true" [legend]="true"
+                [legendTitle]="selectedMetric | titlecase" [showXAxisLabel]="true" [xAxisLabel]="dynamicTimelineLabel"
+                [showYAxisLabel]="true" yAxisLabel="Tickets Count" [yAxisTickFormatting]="yFmt">
+              </ngx-charts-bar-vertical-stacked>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+
+      <ng-template #noTrend>
+        <div class="chart-empty">No data found for this period</div>
+      </ng-template>
+    </section>
+
+
+    <section class="section">
+      <div class="section__head">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">Feedback &amp; Complaint Modes</h2>
+        </div>
+      </div>
+
+      <div class="two-col">
+
+
+
+        <div class="card fcc-card premium-rating-card">
+          <div class="fcc-card__header">
+            <div>
+              <h3 class="fcc-card__title">Customer Satisfaction</h3>
+            </div>
+            <span class="count-pill" *ngIf="totalRated > 0">
+              {{ totalRated }} Review{{ totalRated !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <ng-container *ngIf="totalRated > 0; else noRating">
+
+            <div class="rating-score-row">
+              <span class="score-big">{{ avgRating | number:'1.1-1' }}</span>
+              <div class="stars-inline">
+                <ng-container *ngFor="let star of getStarIcons(avgRating)">
+                  <i class="bi" [ngClass]="star"></i>
+                </ng-container>
+              </div>
+              <span class="score-max">/ 5.0</span>
+            </div>
+
+            <div style="position: relative; height: 220px; margin-top: 12px;">
+              <ngx-charts-bar-horizontal [results]="ratingBarData" [scheme]="ratingBarScheme"
+                [customColors]="ratingCustomColors" [xAxis]="true" [yAxis]="true" [showXAxisLabel]="false"
+                [showYAxisLabel]="false" [xScaleMax]="100" [barPadding]="8" [roundEdges]="true"
+                [tooltipDisabled]="false" [animations]="true" [xAxisTickFormatting]="pctFmt">
+              </ngx-charts-bar-horizontal>
+            </div>
+
+          </ng-container>
+
+          <ng-template #noRating>
+            <div class="chart-empty">
+              <div class="chart-empty__icon"><i class="bi bi-star"></i></div>
+              <span class="chart-empty__title">No ratings available yet</span>
+            </div>
+          </ng-template>
+        </div>
+        <div class="card adv-card">
+          <div class="adv-card__header">
+            <div>
+              <h3 class="adv-card__title">Escalation Level Distribution</h3>
+            </div>
+            <span class="count-pill" *ngIf="escalationChart.length">
+              {{ escalationChart.length }} level{{ escalationChart.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+          <div class="chart-wrap" *ngIf="escalationChart.length; else noEscl"
+            style="position: relative; margin-bottom: 50px; height: 250px;">
+            <ngx-charts-pie-chart [results]="escalationChart" [scheme]="escalationScheme" [legend]="true"
+              [legendTitle]="''" [legendPosition]="legendPosition" [maxLabelLength]="20"
+              (select)="onEscalationSelect($event)">
+            </ngx-charts-pie-chart>
+          </div>
+
+          <ng-template #noEscl>
+            <div class="chart-empty">
+              <div class="chart-empty__icon"><i class="bi bi-layers"></i></div>
+              <span class="chart-empty__title">No escalation data</span>
+            </div>
+          </ng-template>
+        </div>
+
+      </div>
+    </section>
+
+
+    <section class="section">
+      <div class="section__head">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">Advanced Analytics</h2>
+        </div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="card fcc-card">
+          <div class="fcc-card__header">
+            <div>
+              <h3 class="fcc-card__title">Mode of Complaint</h3>
+              <p class="fcc-card__sub">Channels distribution</p>
+            </div>
+            <span class="count-pill" *ngIf="modeOfComplaintChart.length">
+              {{ modeOfComplaintChart.length }} modes
+            </span>
+          </div>
+
+          <div class="chart-wrap" *ngIf="modeLineChart.length; else noMode">
+            <ngx-charts-line-chart [results]="modeLineChart" [scheme]="modeScheme" [legend]="false" [xAxis]="true"
+              [yAxis]="true" (select)="onModeSelect1($event)">
+            </ngx-charts-line-chart>
+          </div>
+
+          <div class="selected-info" *ngIf="selectedMode">
+            <i class="bi bi-chat-dots-fill"></i>
+            <div>
+              <strong>{{ selectedMode.name }}</strong>
+              <span>{{ selectedMode.value }} tickets</span>
+            </div>
+          </div>
+
+          <ng-template #noMode>
+            <div class="chart-empty chart-empty--sm">
+              <div class="chart-empty__icon"><i class="bi bi-chat-dots"></i></div>
+              <span class="chart-empty__title">No mode data</span>
+            </div>
+          </ng-template>
+
+          <div class="mode-pills" *ngIf="modeOfComplaintChart.length">
+            <span class="mode-pill" *ngFor="let m of modeOfComplaintChart">
+              {{ m.name }} <strong>{{ m.value }}</strong>
+            </span>
+          </div>
+        </div>
+
+        <div class="card adv-card">
+          <div class="adv-card__header">
+            <div>
+              <h3 class="adv-card__title">Project Workload Distribution</h3>
+              <p class="adv-card__sub">Tickets breakdown by status per project</p>
+            </div>
+            <span class="count-pill">Top Up to 10 Projects</span>
+          </div>
+
+          <div class="chart-wrap" *ngIf="projectChart.length; else noProj">
+            <ngx-charts-bar-horizontal-stacked [results]="projectChart" [scheme]="stackedScheme"
+              [customColors]="customColors" [xAxis]="true" [yAxis]="true" [legend]="true" [legendTitle]="''"
+              [legendPosition]="legendPosition" [showDataLabel]="true" [barPadding]="15">
+            </ngx-charts-bar-horizontal-stacked>
+          </div>
+
+          <ng-template #noProj>
+            <div class="chart-empty">
+              <div class="chart-empty__icon"><i class="bi bi-kanban"></i></div>
+              <span class="chart-empty__title">No project data available</span>
+            </div>
+          </ng-template>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">Advanced Analytics</h2>
+        </div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="card adv-card">
+          <div class="adv-card__header">
+            <div>
+              <h3 class="adv-card__title">User Growth & Activity</h3>
+              <p class="adv-card__sub">Monthly new user registrations</p>
+            </div>
+            <span class="count-pill" *ngIf="userChart.length">
+              {{ userChart.length }} Month{{ userChart.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <div class="chart-wrap" *ngIf="userChart.length; else noUsers">
+            <ngx-charts-bar-vertical [results]="userChart" [scheme]="userScheme" [xAxis]="true" [yAxis]="true"
+              [showDataLabel]="true" [barPadding]="20">
+            </ngx-charts-bar-vertical>
+          </div>
+
+          <ng-template #noUsers>
+            <div class="chart-empty">
+              <div class="chart-empty__icon"><i class="bi bi-people"></i></div>
+              <span class="chart-empty__title">No user data available</span>
+            </div>
+          </ng-template>
+
+          <div class="selected-info" *ngIf="totalUsersCount">
+            <i class="bi bi-person-check-fill"></i>
+            <div>
+              <strong>Total Platform Users</strong>
+              <span>{{ totalUsersCount }} registered users</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card adv-card">
+          <div class="adv-card__header">
+            <div>
+              <h3 class="adv-card__title">Project Growth</h3>
+              <p class="adv-card__sub">Monthly new project registrations</p>
+            </div>
+            <span class="count-pill" *ngIf="projectMonthlyChart.length">
+              {{ projectMonthlyChart.length }} Month{{ projectMonthlyChart.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <div class="chart-wrap" *ngIf="projectMonthlyChart.length; else noProjects">
+            <ngx-charts-bar-vertical [results]="projectMonthlyChart" [scheme]="projectScheme" [xAxis]="true"
+              [yAxis]="true" [showDataLabel]="true" [barPadding]="20">
+            </ngx-charts-bar-vertical>
+          </div>
+
+          <ng-template #noProjects>
+            <div class="chart-empty">
+              <div class="chart-empty__icon"><i class="bi bi-diagram-3"></i></div>
+              <span class="chart-empty__title">No project data available</span>
+            </div>
+          </ng-template>
+
+          <div class="selected-info" *ngIf="totalProjectsCount">
+            <i class="bi bi-briefcase-fill"></i>
+            <div>
+              <strong>Total Active Projects</strong>
+              <span>{{ totalProjectsCount }} projects registered</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section">
+
+      <div class="section__head section__head--between">
+        <div class="section__head-left">
+          <span class="section__accent"></span>
+          <h2 class="section__title">User Performance</h2>
+        </div>
+
+        <div class="section__actions">
+          <div class="tab-group">
+            <button type="button" class="tab-btn" [class.tab-btn--on]="selectedUserMetric === 'total'"
+              (click)="onUserMetricChange('total')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M9 21V9" />
+              </svg>
+              Total Solved
+            </button>
+            <button type="button" class="tab-btn" [class.tab-btn--on]="selectedUserMetric === 'project'"
+              (click)="onUserMetricChange('project')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
+              </svg>
+              Project Wise
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+
+        <div class="up-stats-bar" *ngIf="userSolvedData.length">
+
+          <div class="up-stat-chip">
+            <div class="up-stat-chip__icon up-stat-chip__icon--violet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
+            </div>
+            <div class="up-stat-chip__body">
+              <span class="up-stat-chip__val">{{ totalResolved }}</span>
+              <span class="up-stat-chip__lbl">Total Resolved</span>
+            </div>
+          </div>
+
+          <div class="up-stat-divider"></div>
+
+          <div class="up-stat-chip">
+            <div class="up-stat-chip__icon up-stat-chip__icon--blue">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
+            </div>
+            <div class="up-stat-chip__body">
+              <span class="up-stat-chip__val">{{ userSolvedData.length }}</span>
+              <span class="up-stat-chip__lbl">Active Users</span>
+            </div>
+          </div>
+
+          <div class="up-stat-divider"></div>
+
+          <div class="up-stat-chip">
+            <div class="up-stat-chip__icon up-stat-chip__icon--emerald">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <div class="up-stat-chip__body">
+              <span class="up-stat-chip__val">{{ avgTicketsPerUser }}</span>
+              <span class="up-stat-chip__lbl">Avg / User</span>
+            </div>
+          </div>
+
+          <ng-container *ngIf="selectedUserMetric === 'project'">
+            <div class="up-stat-divider"></div>
+            <div class="up-stat-chip">
+              <div class="up-stat-chip__icon up-stat-chip__icon--amber">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <div class="up-stat-chip__body">
+                <span class="up-stat-chip__val">{{ projectDeveloperGroups.length }}</span>
+                <span class="up-stat-chip__lbl">Projects</span>
+              </div>
+            </div>
+          </ng-container>
+
+        </div>
+
+        <ng-container *ngIf="userSolvedData.length; else noUserData">
+
+          <div class="chart-wrap chart-wrap--tall" *ngIf="selectedUserMetric === 'total'">
+            <ngx-charts-bar-vertical [results]="userSolvedData" [scheme]="trendScheme" [xAxis]="true" [yAxis]="true"
+              [showXAxisLabel]="true" xAxisLabel="Team Members" [showYAxisLabel]="true" yAxisLabel="Tickets Resolved"
+              [yAxisTickFormatting]="yFmt">
+            </ngx-charts-bar-vertical>
+          </div>
+
+          <div class="up-chart-panel up-chart-panel--split" *ngIf="selectedUserMetric === 'project'">
+
+            <div class="chart-wrap chart-wrap--tall up-chart-canvas--flex">
+              <ngx-charts-bar-vertical-stacked [results]="userSolvedStackedData" [scheme]="stackedScheme" [xAxis]="true"
+                [yAxis]="true" [legend]="false" [showXAxisLabel]="true" xAxisLabel="Team Members"
+                [showYAxisLabel]="true" yAxisLabel="Tickets Resolved" [yAxisTickFormatting]="yFmt">
+              </ngx-charts-bar-vertical-stacked>
+            </div>
+
+            <div class="up-legend-panel">
+
+              <div class="up-legend-header">
+                <span class="up-legend-title">Project Breakdown</span>
+                <span class="up-legend-badge">{{ projectDeveloperGroups.length }} projects</span>
+              </div>
+
+              <div class="up-legend-body">
+                <div class="up-legend-group" *ngFor="let proj of projectDeveloperGroups">
+
+                  <div class="up-legend-proj-head" (click)="toggleProject(proj.projectName)">
+                    <div class="up-legend-proj-left">
+                      <span class="up-arrow" [class.rotated]="expandedProjects[proj.projectName]">▸</span>
+                      <span class="up-legend-dot" [style.background]="projectColorMap[proj.projectName]"></span>
+                      <span class="up-legend-proj-name" [style.color]="projectColorMap[proj.projectName]">
+                        {{ proj.projectName }}
+                      </span>
+                    </div>
+                    <span class="up-legend-proj-total" [style.background]="projectColorMap[proj.projectName]"
+                      [style.color]="'#fff'">
+                      {{ getProjectTotal(proj.developers) }}
+                    </span>
+                  </div>
+
+                  <div class="up-legend-dev-row" *ngIf="expandedProjects[proj.projectName]">
+                    <span class="up-legend-dev-chip" *ngFor="let dev of proj.developers">
+                      {{ dev.userName }} <strong>({{ dev.count }})</strong>
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </ng-container>
+
+        <ng-template #noUserData>
+          <div class="chart-empty">
+            <div class="chart-empty__icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <span class="chart-empty__title">No resolved tickets data</span>
+            <p>Data will appear once tickets are resolved by team members.</p>
+          </div>
+        </ng-template>
+
+      </div>
+
+    </section>
+
+</main>

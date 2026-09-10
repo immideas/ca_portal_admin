@@ -1,0 +1,117 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <header class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add">
+        </div>
+        <div class="title-text">
+          <h4>
+            {{ isViewMode ? 'View Template' : isEditMode ? 'Edit Template' : 'Add Template' }}
+          </h4>
+          <p>Email template details and configuration</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+     <ng-container *ngIf="isViewMode; else editOrSaveMode">
+  <button *ngIf="canEdit" type="button" class="btn-save btn-active" (click)="enableEdit()">
+    <i class="bi bi-pencil-square"></i>
+    <span>Edit</span>
+  </button>
+</ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+
+        <button type="submit" form="templateForm" class="btn-save" [ngClass]="{ 'btn-active': templateForm.valid }"
+          [disabled]="templateForm.invalid">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info">
+      </div>
+      <div class="header-content">
+        <span class="header-text">Email Details Form</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+        </span>
+      </div>
+    </div>
+
+    <form [formGroup]="templateForm" id="templateForm" (ngSubmit)="save()" class="form-padding-wrap">
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="title">
+            Title <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap">
+            <input id="title" type="text" formControlName="title"
+              class="form-controler" placeholder="Enter template title" />
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="eventId">
+            Event <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap">
+            <select id="eventId" formControlName="event_id" class="form-controler">
+              <option [ngValue]="null" disabled>Select an event</option>
+              <option *ngFor="let ev of events" [ngValue]="ev.id">{{ ev.name }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label for="subject">
+            Subject <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap">
+            <input id="subject" type="text" formControlName="subject"
+              class="form-controler" placeholder="Enter email subject" />
+          </div>
+        </div>
+      </div>
+
+    
+      <div class="row mb-3">
+  <div class="col-md-12 form-group">
+    <label>
+      Body <img src="assets/img/star.svg" class="required-icon" alt="required">
+    </label>
+    <div class="editor-container mt-1"
+         [class.editor-locked]="templateForm.get('body')?.disabled"
+         [attr.aria-disabled]="templateForm.get('body')?.disabled">
+      
+      <swiftlyme-editor formControlName="body"></swiftlyme-editor>
+    </div>
+    
+  </div>
+</div>
+      
+    </form>
+  </article>
+</main>

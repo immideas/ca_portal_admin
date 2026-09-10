@@ -1,0 +1,47 @@
+<div class="pagination-bar" *ngIf="totalItems > 0">
+  <span class="pagination-info">
+    Showing {{ showingFrom }}–{{ showingTo }} of {{ totalItems }} {{ itemLabel }}
+  </span>
+
+  <div class="pagination-controls">
+    <button class="page-btn" (click)="goFirst()" [disabled]="currentPage === 1" title="First page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M8.70652 8L11.8535 11.146L11.1455 11.854L7.29252 8L11.1455 4.146L11.8535 4.853L8.70652 8ZM5.70652 8L8.85352 11.146L8.14552 11.854L4.29252 8L8.14552 4.146L8.85352 4.853L5.70652 8Z"
+          fill="currentColor" />
+      </svg>
+    </button>
+
+    <button class="page-btn" (click)="goPrev()" [disabled]="currentPage === 1" title="Previous page">
+      <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M6.41397 6.99996L9.18346 9.88163L8.39858 10.71L4.83301 6.99996L8.39858 3.28996L9.18346 4.11829L6.41397 6.99996Z"
+          fill="currentColor" />
+      </svg>
+    </button>
+
+    <button
+      *ngFor="let p of pages"
+      class="page-btn"
+      [class.active]="p === currentPage"
+      (click)="goTo(p)">
+      {{ p }}
+    </button>
+
+    <button class="page-btn" (click)="goNext()" [disabled]="currentPage === totalPages" title="Next page">
+      <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M7.6025 6.99996L4.83301 4.11829L5.61788 3.28996L9.18346 6.99996L5.61788 10.71L4.83301 9.88163L7.6025 6.99996Z"
+          fill="currentColor" />
+      </svg>
+    </button>
+
+    <button class="page-btn" (click)="goLast()" [disabled]="currentPage === totalPages" title="Last page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M7.29348 8L4.14648 4.854L4.85448 4.146L8.70748 8L4.85448 11.854L4.14648 11.147L7.29348 8ZM10.2935 8L7.14648 4.854L7.85448 4.146L11.7075 8L7.85448 11.854L7.14648 11.147L10.2935 8Z"
+          fill="currentColor" />
+      </svg>
+    </button>
+  </div>
+</div>

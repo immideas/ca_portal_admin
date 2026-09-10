@@ -1,0 +1,320 @@
+<main id="main" class="complaint-wrapper">
+  <div class="top-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="cancel()">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+      <div class="divider"></div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="icon">
+        </div>
+        <div>
+          <h4>{{ isViewMode ? 'View Project' : isEditMode ? 'Edit Project' : 'Add Project' }}</h4>
+          <p>Project details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" class="btn-save btn-active" (click)="enableEditMode()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button class="btn-cancel" type="button" (click)="cancel()">Cancel</button>
+
+        <span class="uploading-indicator" *ngIf="isUploading">
+          <span class="status-spinner-small"></span> {{ uploadingSlotLabel || 'Uploading...' }}
+        </span>
+
+       
+        <button
+          class="btn-save"
+          [ngClass]="{ 'btn-active': projectForm.valid && !isUploading }"
+          [disabled]="projectForm.invalid || isUploading || (isEditMode && !canEdit)"
+          type="submit"
+          form="projectForm">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">
+    {{ errorMessage }}
+  </div>
+
+  <section class="section">
+
+    <div class="card complaint-card mb-3">
+      <div class="card-body-fixes">
+        <div class="section-title">
+          <div class="header-content">
+            <span class="header-text">Project Details</span>
+          </div>
+        </div>
+
+       
+        <form [formGroup]="projectForm" id="projectFormFields">
+          <div class="form-padding-wrap-image">
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Project Name <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <input type="text" formControlName="name" class="form-controler"
+                    placeholder="Enter project name" />
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('name')?.touched && projectForm.get('name')?.invalid">
+                  Project Name is required.
+                </div>
+              </div>
+              <div class="col-md-6 form-group">
+                <label>Project Initials <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <input type="text" formControlName="initials" class="form-controler"
+                    placeholder="e.g. PRJ" />
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('initials')?.touched && projectForm.get('initials')?.invalid">
+                  Project Initials are required.
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Who can add ticket? <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <select class="form-controler" formControlName="accessType">
+                    <option value="" disabled selected>Select</option>
+                    <option value="open">Open Group</option>
+                    <option value="open_location">Open Group with Location Parameters</option>
+                    <option value="closed">Closed Group</option>
+                  </select>
+                </div>
+              </div>
+
+              <ng-container *ngIf="projectForm.get('accessType')?.value === 'open_location'">
+                <div class="col-md-6 form-group">
+                  <label>Location Parameter <span class="text-danger">*</span></label>
+                  <div class="field-wrap icon-category-sub">
+                    <input type="text" formControlName="locationParam" class="form-controler"
+                      placeholder="e.g. City, State" />
+                  </div>
+                  <div class="text-danger mt-1 field-error-text"
+                    *ngIf="projectForm.get('locationParam')?.touched && projectForm.get('locationParam')?.invalid">
+                    Location Parameter is required.
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+
+            <div class="row mb-3" *ngIf="isEditMode || isViewMode">
+              <div class="col-md-6 form-group">
+                <label>Project Status <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <select class="form-controler" formControlName="status">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        
+        <div class="form-padding-wrap-image">
+          <div class="row mb-3">
+            <div class="col-md-12 form-group">
+              <label class="upload-main-label">
+                Images <span class="sub-label">(up to {{ maxImages }} · PNG, JPG, WEBP)</span>
+              </label>
+
+              <div *ngIf="isViewMode && imageUrls.length" class="attachment-wrapper">
+                <button
+                  type="button"
+                  *ngFor="let url of imageUrls"
+                  class="attachment-link"
+                  (click)="openImagePreview(url)"
+                >
+                  <img [src]="url" alt="project-image" class="attachment-thumbnail-small">
+                </button>
+              </div>
+
+              <div *ngIf="isViewMode && !imageUrls.length" class="text-muted no-images-text">
+                No images uploaded.
+              </div>
+
+              <div class="uploader-container mt-2" *ngIf="!isViewMode" #uploaderHost>
+                <lib-image-uploader-lib
+                [imageUrls]="imageUrls"
+                  [maxImages]="maxImages"
+                  [aspectRatio]="600/200"
+                  [layoutMode]="'grid'"
+                  [allowDrag]="true"
+                  [allowEdit]="true"
+                  [allowDelete]="true"
+                  [allowReplace]="true"
+                  (imagesChange)="handleImagesChange($event)"
+                  (imageUpload)="onImageUpload($event)"
+                  (imageReplace)="onImageReplace($event)"
+                  (imageDelete)="onImageDelete($event)"
+                  (imageEdit)="onImageEdit($event)">
+                </lib-image-uploader-lib>
+
+                <div
+                  class="upload-slot-overlay"
+                  *ngFor="let slot of uploadingSlots | keyvalue"
+                  [style.top.px]="slot.value.top"
+                  [style.left.px]="slot.value.left"
+                  [style.width.px]="slot.value.width"
+                  [style.height.px]="slot.value.height">
+                  <span class="status-spinner-small"></span>
+                  <span class="upload-slot-percent">{{ slot.value.progress | number:'1.0-0' }}%</span>
+                </div>
+              </div>
+              <div class="text-muted mt-1 field-error-text" *ngIf="isViewMode">
+                <i class="bi bi-lock-fill"></i> Switch to Edit mode to change images.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="card complaint-card mb-3">
+      <div class="card-body-fixes">
+        <div class="section-title">
+          <div class="header-content">
+            <span class="header-text">SMTP Details</span>
+          </div>
+        </div>
+
+       
+        <form [formGroup]="projectForm" id="projectForm" (ngSubmit)="save()">
+          <div class="form-padding-wrap">
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Host <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <input type="text" formControlName="host" class="form-controler"
+                    placeholder="e.g. smtp.gmail.com" />
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('host')?.touched && projectForm.get('host')?.invalid">
+                  Host is required.
+                </div>
+              </div>
+              <div class="col-md-6 form-group">
+                <label>Port <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <input type="text" formControlName="port" class="form-controler"
+                    placeholder="e.g. 465" />
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('port')?.touched && projectForm.get('port')?.invalid">
+                  Port is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Connection Security <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <select class="form-controler" formControlName="secure">
+                    <option value="" disabled selected>Select Security Type</option>
+                    <option value="true">SSL (Secure — true)</option>
+                    <option value="false">None / STARTTLS (false)</option>
+                  </select>
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('secure')?.touched && projectForm.get('secure')?.invalid">
+                  Please select a security mode.
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 form-group">
+                <label>Username <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <input type="text" formControlName="authUser" class="form-controler"
+                    placeholder="Enter auth username" />
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('authUser')?.touched && projectForm.get('authUser')?.invalid">
+                  Username is required.
+                </div>
+              </div>
+              <div class="col-md-6 form-group">
+                <label>Password <span class="text-danger">*</span></label>
+                <div class="field-wrap icon-category-sub">
+                  <input type="password" formControlName="authPass" class="form-controler"
+                    placeholder="Enter auth password" />
+                </div>
+                <div class="text-danger mt-1 field-error-text"
+                  *ngIf="projectForm.get('authPass')?.touched && projectForm.get('authPass')?.invalid">
+                  Password is required.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </section>
+
+
+  <section class="section" *ngIf="showCustomerCard">
+    <div class="card complaint-card mb-3">
+      <div class="card-body-fixes">
+        <div class="section-title">
+          <div class="header-content">
+            <span class="header-text">Customer Details</span>
+          </div>
+          <div class="header-subtitle">
+            This is a <strong>Closed Group</strong> project — only registered customers can submit tickets.
+          </div>
+        </div>
+
+        <div class="form-padding-wrap">
+          <div class="d-flex gap-3 pt-2">
+            <button class="btn-save btn-active" (click)="goToCustomerList()">
+              <i class="bi bi-people-fill"></i>
+              <span>See Customers</span>
+            </button>
+            <button class="btn-save btn-active" (click)="goToAddCustomer()">
+              <i class="bi bi-person-plus-fill"></i>
+              <span>Add Customer</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="image-modal-backdrop" *ngIf="showImageModal" (click)="closeImagePreview()">
+    <div class="image-modal-content" (click)="$event.stopPropagation()">
+      <button type="button" class="image-modal-close" (click)="closeImagePreview()" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <img [src]="modalImageUrl" alt="preview" class="image-modal-img">
+    </div>
+  </div>
+
+</main>

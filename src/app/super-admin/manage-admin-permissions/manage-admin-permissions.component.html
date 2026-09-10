@@ -1,0 +1,31 @@
+<main id="main" class="main premium-ui">
+
+  <app-page-top-bar
+    class="ptb-bleed"
+    title="Grant Permissions"
+    [buttons]="[
+      { action: 'cancel', label: 'Cancel', type: 'secondary' },
+      {
+        action: 'save',
+        label: 'Set Permissions',
+        type: 'primary',
+        icon: 'save',
+        disabled: tableSections.length === 0 || !selectedAdmin
+      }
+    ]"
+    (backClick)="goBack()"
+    (buttonClick)="onTopBarButton($event)">
+  </app-page-top-bar>
+
+  <section class="section profile">
+      <ng-container *ngIf="selectedAdmin">
+      <app-permissions-table
+        [tableSections]="tableSections"
+        [selectedUser]="selectedAdmin"
+        mode="edit"
+        (permChange)="syncGroupedPermissions()">
+      </app-permissions-table>
+      </ng-container>
+
+  </section>
+</main>

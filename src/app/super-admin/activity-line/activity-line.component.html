@@ -1,0 +1,124 @@
+<main id="main" class="complaint-wrapper">
+  <header class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="goBack()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="activity">
+        </div>
+        <div class="title-text">
+          <h4>Activity Line Details</h4>
+          <p>Session activity information</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info">
+      </div>
+      <div class="header-content">
+        <span class="header-text">Activity Information</span>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="status-state">
+      <span class="status-spinner"></span>
+      <p>Loading activity details...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger mx-4 mt-3" role="alert">
+      {{ error }}
+    </div>
+
+    <div *ngIf="activity" class="form-padding-wrap">
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label>ID</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.id" readonly />
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label>Session ID</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.session_id" readonly />
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label>User ID</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.user_id" readonly />
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label>Activity Type</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.activity_type" readonly />
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label>Page Visited</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.page_visited" readonly />
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label>Record ID</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.record_id" readonly />
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label>Record Created</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.record_created" readonly />
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label>Activity Time</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler" [value]="activity.entry_created | date:'medium'" readonly />
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label>Last Updated</label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input type="text" class="form-controler"
+              [value]="activity.entry_updated ? (activity.entry_updated | date:'medium') : '-'"
+              readonly />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </article>
+</main>

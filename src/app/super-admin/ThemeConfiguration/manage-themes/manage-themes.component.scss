@@ -1,0 +1,50 @@
+.theme-preview-col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-active {
+  background: #e6f7ee;
+  color: #1a7f4b;
+}
+
+.status-inactive {
+  background: #fdeaea;
+  color: #b3261e;
+}
+.btn-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  margin-right: 8px;
+  border-radius: 6px;
+  border: 1px solid #1a7f4b;
+  background: #e6f7ee;
+  color: #1a7f4b;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: #1a7f4b;
+    color: #fff;
+  }
+}

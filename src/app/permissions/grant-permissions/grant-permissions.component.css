@@ -1,0 +1,606 @@
+/* =========================================================
+   FONT
+   ========================================================= */
+
+:host {
+  font-family: inherit;
+
+  /*
+   * All theme colors come from ThemeConfigService.
+   * Font-family remains inherited from global style.css.
+   */
+}
+
+/* =========================================================
+   TOP BREADCRUMB / BACK BAR
+   ========================================================= */
+
+.gp-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px 10px;
+}
+
+.gp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 5px 10px 5px 7px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+  border: 1px solid var(--brand-border, #E5E7EB);
+  border-radius: 6px;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-text, #374151);
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+
+  line-height: 1;
+  font-family: inherit;
+}
+
+.gp-back-btn svg {
+  flex-shrink: 0;
+}
+
+.gp-back-btn:hover {
+  background: var(--brand-section-header,
+      #F1F5FF);
+
+  border-color: var(--brand-card-border,
+      #D6E4FF);
+}
+
+.gp-breadcrumb-sep {
+  font-size: 13px;
+  color: var(--brand-muted-text, #9CA3AF);
+  user-select: none;
+}
+
+.gp-breadcrumb-current {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-label, #6B7280);
+  font-family: inherit;
+}
+
+/* =========================================================
+   BASE CARD
+   ========================================================= */
+
+.premium-card {
+  border-radius: 10px;
+
+  box-shadow: 0 1px 4px color-mix(in srgb,
+      var(--brand-text, #111827) 8%,
+      transparent);
+
+  background: var(--brand-card-bg, #FFFFFF);
+
+  padding: 20px;
+
+  border: 1px solid var(--brand-card-border,
+      #D6E4FF);
+}
+
+.premium-card:hover {
+  transform: none;
+
+  box-shadow: 0 1px 4px color-mix(in srgb,
+      var(--brand-text, #111827) 8%,
+      transparent);
+}
+
+.dropdown-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.instruction-text {
+  font-size: 1rem;
+  color: var(--brand-text, #34495e);
+  margin: 0;
+}
+
+.info-icon {
+  font-size: 2rem;
+  color: var(--brand-primary, #3B82F6);
+}
+
+/* =========================================================
+   COLLAPSIBLE USER DETAILS PANEL
+   ========================================================= */
+
+.ai-panel {
+  background: var(--brand-card-bg, #FFFFFF);
+
+  border: 1px solid var(--brand-border,
+      #E5E7EB);
+
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.ai-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 50px;
+
+  padding: 16px 18px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+
+  border-radius: 8px;
+
+  cursor: pointer;
+  user-select: none;
+
+  gap: 8px;
+
+  box-sizing: border-box;
+
+  transition: background 0.15s ease;
+}
+
+.ai-panel__header--open {
+  background: var(--brand-section-header,
+      #E9F0FF);
+
+  border-radius: 8px 8px 0 0;
+}
+
+.ai-panel__header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-panel__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+}
+
+.ai-panel__title {
+  font-size: 14px;
+  font-weight: 700;
+
+  color: var(--brand-heading,
+      var(--brand-text, #111827));
+
+  font-family: inherit;
+}
+
+.ai-panel__body {
+  padding: 16px 18px;
+
+  border-top: 1px solid var(--brand-border,
+      #E5E7EB);
+
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  background: var(--brand-card-bg, #FFFFFF);
+}
+
+/* =========================================================
+   USER DETAILS GRID
+   ========================================================= */
+
+.ud-field-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 16px 24px;
+}
+
+.ud-field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ud-field-label {
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.28px;
+
+  color: var(--brand-label,
+      #6B7280);
+
+  text-transform: uppercase;
+  font-family: inherit;
+}
+
+.ud-field-value {
+  font-size: 0.9375rem;
+
+  color: var(--brand-text,
+      #111827);
+
+  font-family: inherit;
+}
+
+/* =========================================================
+   PERMISSION SECTION CARD
+   ========================================================= */
+
+.perm-section-card {
+  background: var(--brand-card-bg,
+      #FFFFFF);
+
+  border: 1px solid var(--brand-card-border,
+      #D6E4FF);
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  box-shadow: 0 1px 4px color-mix(in srgb,
+      var(--brand-text, #111827) 6%,
+      transparent);
+}
+
+.perm-section-header {
+  padding: 12px 18px;
+
+  font-size: 0.97rem;
+  font-weight: 600;
+
+  font-family: inherit;
+
+  color: var(--brand-heading,
+      #1E293B);
+
+  background: var(--brand-section-header,
+      #F1F5FF);
+
+  border-bottom: 1px solid var(--brand-card-border,
+      #D6E4FF);
+}
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.perm-table-wrapper {
+  overflow-x: auto;
+}
+
+.perm-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 700px;
+}
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.perm-table thead tr {
+  background: var(--brand-section-header,
+      #F8F9FB);
+}
+
+.perm-table th {
+  padding: 9px 12px;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  font-family: inherit;
+
+  color: var(--brand-label,
+      #64748B);
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+
+  border-bottom: 1px solid var(--brand-card-border,
+      #D6E4FF);
+
+  border-right: 1px solid var(--brand-card-border,
+      #D6E4FF);
+
+  white-space: nowrap;
+
+  text-align: left;
+}
+
+.perm-table th:last-child {
+  border-right: none;
+}
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.perm-table td {
+  padding: 6px 12px;
+
+  font-size: 0.875rem;
+
+  font-family: inherit;
+
+  color: var(--brand-text,
+      #334155);
+
+  border-bottom: 1px solid var(--brand-border,
+      #F1F3F6);
+
+  border-right: 1px solid var(--brand-border,
+      #E8EAED);
+
+  vertical-align: middle;
+}
+
+.perm-table td:last-child {
+  border-right: none;
+}
+
+.perm-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.perm-table tbody tr:hover td {
+  background-color: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 4%,
+      var(--brand-card-bg, #FFFFFF));
+}
+
+/* =========================================================
+   TABLE COLUMNS
+   ========================================================= */
+
+.col-particulars {
+  text-align: left;
+
+  min-width: 150px;
+
+  font-weight: 500;
+
+  color: var(--brand-heading,
+      #1E293B);
+}
+
+.col-check {
+  text-align: center;
+  width: 62px;
+}
+
+.col-check mat-checkbox {
+  display: flex;
+  justify-content: center;
+}
+
+.col-others {
+  text-align: left;
+  min-width: 120px;
+}
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+.perm-checkbox ::ng-deep .mdc-checkbox__ripple {
+  display: none;
+}
+
+.perm-checkbox ::ng-deep .mdc-checkbox .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate=true])~.mdc-checkbox__background {
+  border-color: var(--brand-muted-text,
+      #94A3B8) !important;
+
+  background-color: transparent !important;
+}
+
+.perm-checkbox ::ng-deep .mdc-checkbox .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+
+.perm-checkbox ::ng-deep .mdc-checkbox .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+  background-color: var(--brand-primary,
+      #4F46E5) !important;
+
+  border-color: var(--brand-primary,
+      #4F46E5) !important;
+}
+
+.perm-checkbox ::ng-deep .mdc-checkbox__background {
+  border-radius: 4px !important;
+}
+
+/* =========================================================
+   MORE PERMISSIONS
+   ========================================================= */
+
+.more-perms-link {
+  color: var(--brand-primary,
+      #4F46E5);
+
+  font-size: 0.85rem;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  font-weight: 500;
+}
+
+.more-perms-link:hover {
+  color: var(--brand-primary-hover,
+      #4338CA);
+
+  text-decoration: underline;
+}
+
+/* =========================================================
+   OTHERS POPUP
+   ========================================================= */
+
+.others-popup-container {
+  position: relative;
+  display: inline-block;
+}
+
+.others-popup {
+  position: absolute;
+
+  top: 26px;
+  left: 0;
+
+  z-index: 300;
+
+  background: var(--brand-card-bg,
+      #FFFFFF);
+
+  border: 1px solid var(--brand-card-border,
+      #D6E4FF);
+
+  border-radius: 8px;
+
+  box-shadow: 0 6px 20px color-mix(in srgb,
+      var(--brand-text, #111827) 12%,
+      transparent);
+
+  padding: 10px 14px 12px;
+
+  min-width: 230px;
+  max-width: 320px;
+}
+
+.popup-close {
+  position: absolute;
+
+  top: 6px;
+  right: 8px;
+
+  background: none;
+
+  border: none;
+
+  font-size: 1rem;
+
+  color: var(--brand-muted-text,
+      #94A3B8);
+
+  cursor: pointer;
+
+  line-height: 1;
+
+  padding: 0 2px;
+}
+
+.popup-close:hover {
+  color: var(--brand-text,
+      #334155);
+}
+
+.popup-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 4px 0;
+}
+
+.popup-info-icon {
+  font-size: 1rem;
+
+  color: var(--brand-primary,
+      #F0A500);
+
+  cursor: help;
+
+  vertical-align: middle;
+}
+
+.no-data {
+  text-align: center;
+
+  color: var(--brand-muted-text,
+      #94A3B8);
+
+  padding: 20px;
+}
+
+/* =========================================================
+   SAVE / SET PERMISSIONS BUTTON
+   ========================================================= */
+
+.set-permissions-button {
+  background: var(--brand-primary,
+      #4F46E5) !important;
+
+  color: #FFFFFF !important;
+
+  border: none;
+
+  border-radius: 8px !important;
+
+  padding: 10px 32px;
+
+  font-size: 0.95rem;
+
+  font-weight: 500;
+}
+
+.set-permissions-button:hover {
+  background: var(--brand-primary-hover,
+      #4338CA) !important;
+}
+
+.set-permissions-button:disabled {
+  background: var(--brand-input-disabled-bg,
+      #CBD5E1) !important;
+
+  color: var(--brand-muted-text,
+      #94A3B8) !important;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   DROPDOWN BUTTON
+   ========================================================= */
+
+.btn-primary {
+  background: var(--brand-primary,
+      #4F46E5);
+
+  border: none;
+
+  color: #FFFFFF;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--brand-primary-hover,
+      #4338CA);
+
+  color: #FFFFFF;
+
+  box-shadow: 0 2px 8px color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 30%,
+      transparent);
+}

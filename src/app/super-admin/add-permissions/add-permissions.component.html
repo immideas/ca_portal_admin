@@ -1,0 +1,147 @@
+
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <header class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back">
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add">
+        </div>
+        <div class="title-text">
+          <h4>
+            {{ isViewMode ? 'View Permission' : isEditMode ? 'Edit Permission' : 'Add Permission' }}
+          </h4>
+          <p>Permission details and group configuration</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button type="button" class="btn-save btn-active" (click)="enableEditMode()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+        <button type="submit" form="permissionForm" class="btn-save"
+          [ngClass]="{ 'btn-active': permissionForm.valid }"
+          [disabled]="permissionForm.invalid">
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save">
+          <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info">
+      </div>
+      <div class="header-content">
+        <span class="header-text">Permission Details</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img src="assets/img/star.svg" class="required-icon" alt="required-star">
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="permissionForm" id="permissionForm" (ngSubmit)="savePermission()" class="form-padding-wrap">
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="name">
+            Name <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/sub-category.svg')">
+            <input id="name" type="text" formControlName="name" class="form-controler" placeholder="Enter name" />
+          </div>
+          <div class="text-danger mt-1" style="font-size: 11px;"
+            *ngIf="permissionForm.get('name')?.invalid && permissionForm.get('name')?.touched">
+            Name is required and cannot be blank.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="groupName">
+            Group Name <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input list="groupNameOptions" id="groupName" formControlName="groupName" class="form-controler"
+              placeholder="Enter or select group name" />
+            <datalist id="groupNameOptions">
+              <option *ngFor="let groupName of groupNames" [value]="groupName"></option>
+            </datalist>
+          </div>
+          <div class="text-danger mt-1" style="font-size: 11px;"
+            *ngIf="permissionForm.get('groupName')?.invalid && permissionForm.get('groupName')?.touched">
+            Group Name is required and cannot be blank.
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="permission">
+            Permission <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/sub-category.svg')">
+            <input id="permission" type="text" formControlName="permission" class="form-controler"
+              placeholder="Auto-generated from name" readonly />
+          </div>
+          <div class="text-danger mt-1" style="font-size: 11px;"
+            *ngIf="permissionForm.get('permission')?.invalid && permissionForm.get('permission')?.touched">
+            Permission is required and cannot be blank.
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="groupCode">
+            Group Code <img src="assets/img/star.svg" class="required-icon" alt="required">
+          </label>
+          <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+            <input id="groupCode" type="text" formControlName="groupCode" class="form-controler"
+              placeholder="Auto-generated from group name" readonly />
+          </div>
+          <div class="text-danger mt-1" style="font-size: 11px;"
+            *ngIf="permissionForm.get('groupCode')?.invalid && permissionForm.get('groupCode')?.touched">
+            Group Code is required and cannot be blank.
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label for="description">Description</label>
+                    <div class="field-wrap" style="--field-icon: url('assets/img/category-sub.svg')">
+
+          <textarea id="description" formControlName="description" class="form-controler" rows="3"
+            placeholder="Enter description" style="padding-left: 14px;"></textarea>
+</div>
+            <div class="text-danger mt-1" style="font-size: 11px;"
+            *ngIf="permissionForm.get('description')?.invalid && permissionForm.get('description')?.touched">
+            Description cannot exceed 500 characters.
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </article>
+</main>

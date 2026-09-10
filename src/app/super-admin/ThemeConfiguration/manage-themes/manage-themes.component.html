@@ -1,0 +1,119 @@
+<main id="main" class="main-main">
+  <div class="filter-layout">
+    <div class="table-section">
+      <div class="workflow-container">
+        <div class="pagetitle">
+          <h1>Manage Themes</h1>
+          <p class="subtitle">View and manage all UI theme configurations</p>
+        </div>
+
+        <div class="toolbar-list-desgin">
+          <div class="toolbar-list-desgin-left">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search Themes..." [(ngModel)]="search" (input)="onSearchChange()" />
+            </div>
+            <button class="btn-reset" (click)="resetFilter()" title="Reset Filters">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+
+          <div class="toolbar-list-desgin-right">
+            <button *ngIf="canAdd" class="btn-add" (click)="navigateToAddTheme()">
+              <i class="bi bi-plus-lg"></i> {{ (!isSuperAdmin && myTheme) ? 'Edit My Theme' : 'Add Theme' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table id="themesTable" class="modern-table">
+          <thead>
+            <tr>
+              <th><div class="th-inner">Theme Name</div></th>
+              <th><div class="th-inner">Description</div></th>
+              <th><div class="th-inner">Preview</div></th>
+              <th><div class="th-inner">Status</div></th>
+              <th class="action-col-header" *ngIf="canView || canEdit || canDelete"><div>Actions</div></th>
+            </tr>
+          </thead>
+          <tbody>
+           <tr *ngFor="let theme of themes; let i = index" 
+    [class.active-row]="activePopup?.index === i"
+    (click)="navigateToViewTheme(theme.id)" 
+    class="clickable-row">
+  <td class="td-primary">{{ theme.theme_name }}</td>
+  <td class="td-secondary">{{ theme.description || '-' }}</td>
+
+  <td class="theme-preview-col">
+    <span class="color-dot" [style.background]="theme.primary_color" title="Primary: {{theme.primary_color}}"></span>
+    <span class="color-dot" [style.background]="theme.sidebar_color" title="Sidebar: {{theme.sidebar_color}}"></span>
+    <span class="color-dot" [style.background]="theme.navbar_color" title="Navbar: {{theme.navbar_color}}"></span>
+  </td>
+
+  <td (click)="$event.stopPropagation()">
+    <app-status-toggle
+      [checked]="theme.status === 1"
+      [disabled]="!isSuperAdmin || !theme.is_owner"
+      (toggled)="onStatusToggle(theme)">
+    </app-status-toggle>
+  </td>
+
+  <td class="action-col-data" *ngIf="canView || canEdit || canDelete" (click)="$event.stopPropagation()">
+    <app-three-dots-button
+      [active]="activePopup?.index === i"
+      (menuClick)="openActionMenu(i, theme, $event)">
+    </app-three-dots-button>
+  </td>
+</tr>
+
+            <tr *ngIf="themes.length === 0">
+              <td colspan="5" class="text-center py-5">
+                <div class="text-muted">
+                  <i class="bi bi-palette" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                  No themes found. Try adjusting your search.
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <app-popup-menu
+          *ngIf="activePopup"
+          [title]="activePopup.config.title"
+          [items]="activePopup.config.items"
+          [width]="activePopup.config.width ?? 200"
+          [position]="activePopup.config.position"
+          (closeClick)="closePopup()"
+          (itemClick)="onMenuItemClick($event)">
+        </app-popup-menu>
+      </div>
+
+      <div class="pagination-footer" *ngIf="totalItems > 0">
+        <div class="pagination-info">
+          Showing {{ themes.length }} of {{ totalItems }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(1)"><i class="bi bi-chevron-bar-left"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <li class="page-item mx-1" *ngFor="let p of [].constructor(Math.ceil(totalItems/pageSize)); let i = index"
+              [class.active]="currentPage === (i + 1)">
+              <a class="page-link" (click)="onPageChange(i + 1)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)"><i class="bi bi-chevron-right"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(Math.ceil(totalItems/pageSize))"><i class="bi bi-chevron-bar-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</main>

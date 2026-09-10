@@ -1,0 +1,40 @@
+<main id="main" class="main premium-ui">
+
+  <app-page-top-bar
+    class="ptb-bleed"
+    title="Default Permissions"
+    [subtitle]="selectedRole ? selectedRole.roleName : 'Select a role to manage its default permissions'"
+    [buttons]="[
+      { action: 'cancel', label: 'Cancel', type: 'secondary' },
+      {
+        action: 'save',
+        label: 'Set Default Permissions',
+        type: 'primary',
+        icon: 'save',
+        disabled: tableSections.length === 0 || !selectedRole
+      }
+    ]"
+    (backClick)="goBack()"
+    (buttonClick)="onTopBarButton($event)">
+  </app-page-top-bar>
+
+  <section class="section profile">
+
+   
+    <div *ngIf="selectedRole">
+      <app-permissions-table
+        [tableSections]="tableSections"
+        [selectedUser]="selectedUserForTable"
+        mode="edit"
+        [showFull]="true"
+        (permChange)="syncGroupedPermissions()">
+      </app-permissions-table>
+    </div>
+
+    <div *ngIf="!selectedRole" class="empty-state">
+      <i class="bi bi-shield-lock empty-state-icon"></i>
+      <p class="empty-state-text">Choose a role above to view and manage its default permissions.</p>
+    </div>
+
+  </section>
+</main>

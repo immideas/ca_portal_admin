@@ -1,0 +1,197 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <header class="top-header">
+    <div class="header-left">
+      <button type="button" class="back-btn" (click)="cancel()" aria-label="Go back">
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="icon" />
+        </div>
+        <div class="title-text">
+          <h4>
+            {{ isViewMode ? "View Theme" : isEditMode ? "Edit Theme" : "Add Theme" }}
+          </h4>
+          <p>Theme colors and appearance settings</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button *ngIf="canEdit" type="button" class="btn-save btn-active" (click)="enableEditMode()">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+
+        <button
+          type="submit"
+          form="themeForm"
+          class="btn-save"
+          [ngClass]="{ 'btn-active': themeForm.valid }"
+          [disabled]="themeForm.invalid"
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+          <span>{{ isEditMode ? "Update" : "Save" }}</span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+      <div class="header-content">
+        <span class="header-text">Theme Details</span>
+      </div>
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img src="assets/img/star.svg" class="required-icon" alt="required-star" />
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="themeForm" id="themeForm" (ngSubmit)="saveTheme()" class="form-padding-wrap">
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="theme_name">
+            Theme Name
+            <img src="assets/img/star.svg" class="required-icon" alt="required" />
+          </label>
+          <div class="field-wrap">
+            <input
+              type="text"
+              id="theme_name"
+              formControlName="theme_name"
+              class="form-controler"
+              placeholder="Enter theme name"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="themeForm.get('theme_name')?.invalid && themeForm.get('theme_name')?.touched"
+          >
+            <div *ngIf="themeForm.get('theme_name')?.errors?.['required']">Theme name is required.</div>
+            <div *ngIf="themeForm.get('theme_name')?.errors?.['minlength']">
+              Theme name must be at least 3 characters long.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group">
+          <label for="status">
+            Status
+            <img src="assets/img/star.svg" class="required-icon" alt="required" />
+          </label>
+          <div class="field-wrap">
+            <select id="status" formControlName="status" class="form-controler">
+              <option [ngValue]="1">Active</option>
+              <option [ngValue]="0">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label for="description">Description</label>
+          <div class="field-wrap">
+            <textarea
+              id="description"
+              formControlName="description"
+              class="form-controler"
+              rows="2"
+              placeholder="Enter theme description (optional)"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= COLOR SETTINGS ================= -->
+      <div class="row mb-2">
+        <div class="col-12">
+          <span class="header-text font-weight-bold">Color Configurations</span>
+        </div>
+      </div>
+
+      <!-- Broken down into labeled groups instead of one long flat grid -->
+      <div
+        class="color-group-card"
+        *ngFor="let group of colorGroups; let gi = index"
+      >
+        <div class="color-group-header" (click)="toggleColorGroup(gi)">
+          <div class="color-group-title">
+            <i class="bi" [ngClass]="group.icon"></i>
+            <span>{{ group.title }}</span>
+            <span class="color-group-count">{{ group.fields.length }}</span>
+          </div>
+          <i
+            class="bi color-group-chevron"
+            [ngClass]="isColorGroupOpen(gi) ? 'bi-chevron-up' : 'bi-chevron-down'"
+          ></i>
+        </div>
+
+        <div class="color-group-body-outer" [class.open]="isColorGroupOpen(gi)">
+          <div class="row color-group-body">
+            <div class="col-md-6 col-lg-4 form-group" *ngFor="let field of group.fields">
+            <label [for]="field.key">
+              {{ field.label }}
+              <img src="assets/img/star.svg" class="required-icon" alt="required" />
+            </label>
+
+            <div class="color-field-wrap">
+              <!-- Edit / Add mode: interactive picker widget -->
+              <color-selection-method
+                *ngIf="!isViewMode"
+                [initialColor]="themeForm.get(field.key)?.value"
+                (colorPicked)="onColorPick(field.key, $event)">
+              </color-selection-method>
+
+              <!-- View mode: static swatch instead of the widget -->
+              <span
+                *ngIf="isViewMode"
+                class="color-swatch-preview"
+                [style.background]="themeForm.get(field.key)?.value">
+              </span>
+
+              <input
+                type="text"
+                [id]="field.key"
+                [formControlName]="field.key"
+                class="form-controler hex-readonly-chip"
+                readonly
+                placeholder="#000000"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="themeForm.get(field.key)?.invalid && themeForm.get(field.key)?.touched"
+            >
+              Enter a valid hex color code (e.g. #4F46E5).
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </article>
+</main>

@@ -1,0 +1,174 @@
+<main id="main" class="main-main">
+
+  <div class="filter-layout">
+    <div class="table-section">
+      <div class="workflow-container">
+        <div class="pagetitle">
+          <h1>Manage Category</h1>
+          <p class="subtitle">View and manage all system categories</p>
+        </div>
+
+        <div class="toolbar-list-desgin">
+          <div class="toolbar-list-desgin-left">
+            <div class="search-box">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search Category..." [(ngModel)]="searchCategory" (input)="onSearchChange()" />
+            </div>
+            <button class="btn-toolbar-list-desgin-icon" [class.filter-active]="showFilterPanel"
+              (click)="showFilterPanel = !showFilterPanel; $event.stopPropagation()">
+              <i class="bi bi-funnel"></i> Filter
+            </button>
+            <button class="btn-reset" (click)="resetFilter()" title="Reset Filters">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+
+          <div class="toolbar-list-desgin-right">
+            <button *ngIf="canAdd" class="btn-add" (click)="add()">
+              <i class="bi bi-plus-lg"></i> New Category
+            </button>
+          </div>
+        </div>
+      </div>
+
+<div class="filter-summary"
+     *ngIf="filterApplied && hasAppliedFilters()">
+
+  <span class="summary-label">
+    Selected Filters:
+  </span>
+
+  <span class="filter-chip"
+        *ngIf="appliedFilter.projectIds.length">
+
+    Project:
+    <strong>{{ getAppliedProjectNames() }}</strong>
+
+  </span>
+
+</div>
+      <div class="table-responsive">
+        <table id="categoriesTable" class="modern-table">
+          <thead>
+            <tr>
+              <th><div class="th-inner">Category Name</div></th>
+              <th><div class="th-inner">Project</div></th>
+              <th class="action-col-header"><div>Actions</div></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of categories; let i = index"
+                (click)="view(c.id)"
+                class="clickable-row">
+              <td class="td-primary">{{ c.name }}</td>
+              <td class="td-secondary">{{ c.project?.name || '-' }}</td>
+              <td class="action-col-data" (click)="$event.stopPropagation()">
+                <app-three-dots-button
+                  [active]="activePopup?.index === i"
+                  (menuClick)="openActionMenu(i, c, $any($event))">
+                </app-three-dots-button>
+              </td>
+            </tr>
+            <tr *ngIf="categories.length === 0">
+              <td colspan="3">
+                <div class="empty-state">
+                  <i class="bi bi-diagram-2"></i>
+                  <p>No categories found. Try adjusting your filters.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-footer" *ngIf="totalItems > 0">
+        <div class="pagination-info">
+          Showing {{ Math.min(pageSize, categories.length) }} of {{ totalItems }} entries
+        </div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(1)" title="First"><i class="bi bi-chevron-bar-left"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="onPageChange(currentPage - 1)" title="Previous"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <li class="page-item mx-1"
+                *ngFor="let p of [].constructor(Math.ceil(totalItems/pageSize)); let i = index"
+                [class.active]="currentPage === (i + 1)">
+              <a class="page-link" (click)="onPageChange(i + 1)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(currentPage + 1)" title="Next"><i class="bi bi-chevron-right"></i></a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage * pageSize >= totalItems">
+              <a class="page-link" (click)="onPageChange(Math.ceil(totalItems/pageSize))" title="Last"><i class="bi bi-chevron-bar-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="uh-fp-backdrop" *ngIf="showFilterPanel" (click)="showFilterPanel = false"></div>
+
+  <div class="uh-fp" [class.uh-fp--open]="showFilterPanel" (click)="$event.stopPropagation()">
+
+    <div class="uh-fp__header">
+      <span class="uh-fp__title">Filters</span>
+      <button class="uh-fp__close" (click)="showFilterPanel = false">
+        <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1l12 12M13 1L1 13" stroke="#6B7280" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="uh-fp__body">
+
+      <div class="uh-fp-section">
+        <div class="uh-fp-section__label">Project</div>
+        <div class="uh-fp-field">
+          <button type="button" class="uh-fp-select"
+            (click)="toggleDropdown('projectIds', $event)">
+            <span class="uh-fp-select__value"
+              [class.uh-fp-select__value--placeholder]="filter.projectIds.length === 0">
+              {{ getSelectedNamesFor('projectIds', projects) || 'All Projects' }}
+            </span>
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+              <path d="M5 7L10 12L15 7" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <ul class="uh-fp-dropdown" *ngIf="openDropdown === 'projectIds'"
+            (click)="$event.stopPropagation()">
+            <li *ngFor="let p of projects"
+              (click)="toggleSelection('projectIds', p.id)"
+              [class.uh-fp-dropdown__item--selected]="filter.projectIds.includes(p.id)">
+              {{ p.name }}
+            </li>
+            <li *ngIf="projects.length === 0" class="uh-fp-dropdown__empty">No projects found</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="uh-fp__footer">
+      <button type="button" class="uh-fp__btn-clear" (click)="resetFilter(); showFilterPanel = false">Clear</button>
+      <button type="button" class="uh-fp__btn-apply" (click)="applyFilter(); showFilterPanel = false">Apply</button>
+    </div>
+
+  </div>
+
+  <app-popup-menu
+    *ngIf="activePopup"
+    [title]="activePopup.config.title"
+    [items]="activePopup.config.items"
+    [width]="activePopup.config.width ?? 180"
+    [position]="activePopup.config.position"
+    (closeClick)="closePopup()"
+    (itemClick)="onMenuItemClick($any($event))">
+  </app-popup-menu>
+
+</main>

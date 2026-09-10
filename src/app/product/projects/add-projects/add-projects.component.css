@@ -1,0 +1,17 @@
+.field-wrap.icon-category-sub {
+  --field-icon: url('/assets/img/category-sub.svg');
+}
+
+.field-error-text {
+  font-size: 11px;
+}
+
+.header-subtitle {
+  font-size: 12px;
+  color: var(--bs-secondary);
+  margin-top: 4px;
+}
+
+.uploader-container {
+  position: relative;
+}

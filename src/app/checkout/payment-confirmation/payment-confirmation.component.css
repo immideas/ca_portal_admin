@@ -1,0 +1,447 @@
+/* Payment Confirmation Component Styles */
+.confirmation-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated background elements */
+.bg-decoration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 6s ease-in-out infinite;
+}
+
+.circle-1 {
+  width: 80px;
+  height: 80px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 60px;
+  height: 60px;
+  top: 70%;
+  right: 15%;
+  animation-delay: -2s;
+}
+
+.circle-3 {
+  width: 100px;
+  height: 100px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: -4s;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+/* Main card styles */
+.confirmation-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: slideUp 0.8s ease-out;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Status section styles */
+.check-container {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.check-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+  animation: checkScale 0.6s ease-out 0.2s both;
+}
+
+.check-mark {
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  animation: checkAppear 0.4s ease-out 0.8s both;
+}
+
+@keyframes checkScale {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #666;
+  font-weight: 400;
+}
+
+/* Section styles */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.detail-row {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  padding: 12px 8px !important;
+  margin: 4px 0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row:hover {
+  background-color: rgba(102, 126, 234, 0.02) !important;
+  transform: translateX(4px);
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #222;
+  font-size: 14px;
+}
+
+/* Payment ID specific styles */
+.payment-id-text {
+  color: #4CAF50;
+  font-weight: 700;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+/* Button styles */
+.copy-btn {
+  background: rgba(102, 126, 234, 0.1) !important;
+  border: 1px solid rgba(102, 126, 234, 0.2) !important;
+  color: #667eea !important;
+  border-radius: 8px !important;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+}
+
+.copy-btn:hover {
+  background: rgba(102, 126, 234, 0.15) !important;
+  transform: translateY(-1px);
+  color: #667eea !important;
+  border-color: rgba(102, 126, 234, 0.3) !important;
+}
+
+.copy-btn:active {
+  transform: translateY(0) !important;
+}
+
+.copy-btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+.copied-badge {
+  background: #4CAF50 !important;
+  color: white !important;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Raw section styles */
+.raw-section {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.raw-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.toggle-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  color: white !important;
+}
+
+.toggle-btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+.raw-json {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  color: #495057;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    max-height: 0;
+    padding: 0 16px;
+  }
+
+  100% {
+    opacity: 1;
+    max-height: 200px;
+    padding: 16px;
+  }
+}
+
+/* Signature text */
+.signature-text {
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  color: #999;
+  word-break: break-all;
+}
+
+/* Currency highlighting */
+.currency {
+  color: #4CAF50 !important;
+  font-weight: 700;
+}
+
+/* Action buttons */
+.custom-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 14px 28px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.custom-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.custom-btn-primary:active {
+  transform: translateY(0) !important;
+}
+
+.custom-btn-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+}
+
+.custom-btn-secondary {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #666 !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 14px 28px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.custom-btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #666 !important;
+}
+
+.custom-btn-secondary:active {
+  transform: translateY(0) !important;
+}
+
+.custom-btn-secondary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Invoice button */
+.custom-btn-invoice {
+  background: linear-gradient(90deg, #17a673, #0f8b57) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  padding: 12px 22px;
+  font-weight: 700;
+}
+
+.custom-btn-invoice:hover {
+  opacity: 0.95;
+  transform: translateY(-2px);
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .confirmation-card {
+    padding: 32px 24px;
+    margin: 16px;
+    border-radius: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .payment-id {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+
+  .detail-label {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .actions .d-flex {
+    flex-direction: column;
+  }
+
+  .custom-btn-primary,
+  .custom-btn-secondary {
+    width: 100%;
+  }
+
+  .raw-section .d-flex:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmation-container {
+    padding: 16px 0;
+  }
+
+  .floating-circle {
+    opacity: 0.5;
+  }
+}

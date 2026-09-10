@@ -1,0 +1,51 @@
+/* ── Plan limit banner ───────────────────────────────────────── */
+
+.plan-limit-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+  margin-bottom: 14px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+
+  background: color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 8%,
+      var(--brand-card-bg, #FFFFFF));
+
+  color: var(--brand-primary,
+      #4F46E5);
+
+  border: 1px solid color-mix(in srgb,
+      var(--brand-primary, #4F46E5) 30%,
+      var(--brand-card-bg, #FFFFFF));
+}
+
+/* ── Limit reached state ────────────────────────────────────── */
+
+.plan-limit-banner.limit-reached {
+  background: color-mix(in srgb,
+      var(--brand-error, #DC2626) 8%,
+      var(--brand-card-bg, #FFFFFF));
+
+  color: var(--brand-error,
+      #DC2626);
+
+  border-color: color-mix(in srgb,
+      var(--brand-error, #DC2626) 30%,
+      var(--brand-card-bg, #FFFFFF));
+}
+
+.plan-limit-banner .limit-warning-text {
+  font-weight: 600;
+}
+
+/* ── Disabled Add button ────────────────────────────────────── */
+
+.btn-add[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
