@@ -225,29 +225,7 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
       },
     ],
   },
-  {
-    items: [
-      {
-        id: 'theme-configuration',
-        label: 'Theme Configuration',
-        icon: 'bi-palette',
-        children: [
-          {
-label: 'Choose Themes',
-icon: '',
-route: '/choose-theme',
-permission: 'manage_choose_theme'
-          },
-          {
-            label: 'Customize Theme',
-            icon: '',
-            route: '/customize-theme',
-            permission: 'manage_customize_theme'
-          },
-        ]
-      }
-    ]
-  },
+ 
   {
     items: [
       {
@@ -277,37 +255,60 @@ permission: 'manage_choose_theme'
       }
     ]
   },
+{
+  items: [
+    {
+      id: 'client-management',
+      label: 'Client Management',
+      icon: 'bi-person-vcard',
+      children: [
+        {
+          label: 'Manage Client Groups',
+          icon: '',
+          route: '/manage-client-groups',
+          permission: 'client_group_list',
+          activeRoutes: [
+            '/manage-client-groups',
+            '/add-client-group',
+            '/edit-client-group',
+            '/view-client-group'
+          ]
+        }
+      ]
+    }
+  ]
+},
+  // {
+  //   items: [
+  //     {
+  //       id: 'product',
+  //       label: 'Product',
+  //       icon: 'bi-kanban',
+  //       children: [
+  //         {
+  //           label: 'Manage Project',
+  //           icon: '',
+  //           route: '/manage-projects',
+  //           permission: 'manage_project'
+  //         },
+  //         {
+  //           label: 'Manage Categories',
+  //           icon: '',
+  //           route: '/manage-categories',
+  //           permission: 'manage_categories'
+  //         },
+  //         {
+  //           label: 'Manage Sub Category',
+  //           icon: '',
+  //           route: '/manage-sub-category',
+  //           permission: 'manage_subcategory'
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
 
-  {
-    items: [
-      {
-        id: 'product',
-        label: 'Product',
-        icon: 'bi-kanban',
-        children: [
-          {
-            label: 'Manage Project',
-            icon: '',
-            route: '/manage-projects',
-            permission: 'manage_project'
-          },
-          {
-            label: 'Manage Categories',
-            icon: '',
-            route: '/manage-categories',
-            permission: 'manage_categories'
-          },
-          {
-            label: 'Manage Sub Category',
-            icon: '',
-            route: '/manage-sub-category',
-            permission: 'manage_subcategory'
-          }
-        ]
-      }
-    ]
-  },
-
+  
 
   {
     items: [
@@ -373,6 +374,29 @@ permission: 'manage_choose_theme'
               activeRoutes: ['/manage-sms-templates']
 
           }
+        ]
+      }
+    ]
+  },
+   {
+    items: [
+      {
+        id: 'theme-configuration',
+        label: 'Theme Configuration',
+        icon: 'bi-palette',
+        children: [
+          {
+label: 'Choose Themes',
+icon: '',
+route: '/choose-theme',
+permission: 'manage_choose_theme'
+          },
+          {
+            label: 'Customize Theme',
+            icon: '',
+            route: '/customize-theme',
+            permission: 'manage_customize_theme'
+          },
         ]
       }
     ]

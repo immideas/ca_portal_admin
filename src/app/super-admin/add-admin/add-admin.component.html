@@ -253,8 +253,86 @@
             Role is required.
           </div>
         </div>
+      </div>
 
-        <div class="col-md-6 form-group mt-3">
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="firmName">
+            Firm Name
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              id="firmName"
+              type="text"
+              formControlName="firmName"
+              class="form-controler"
+              maxlength="150"
+              placeholder="Enter firm / practice name"
+              [readonly]="isViewMode"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              adminForm.get('firmName')?.invalid &&
+              adminForm.get('firmName')?.touched
+            "
+          >
+            <div *ngIf="adminForm.get('firmName')?.errors?.['maxlength']">
+              Firm name cannot exceed 150 characters.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 form-group mt-3 mt-md-0">
+          <label for="firmType">
+            Firm Type
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <select
+              id="firmType"
+              formControlName="firmType"
+              class="form-controler"
+              [disabled]="isViewMode"
+            >
+       <option value="" disabled>Select Firm Type</option>
+
+<option value="Individual Practice">
+  Individual
+</option>
+
+<option value="CA Firm">
+  CA Firm
+</option>
+            </select>
+          </div>
+          <div
+            *ngIf="
+              adminForm.get('firmType')?.invalid &&
+              adminForm.get('firmType')?.touched
+            "
+            class="text-danger small mt-1"
+            style="font-size: 11px"
+          >
+            Firm type is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
           <label for="adminTheme"> Theme </label>
           <div
             class="field-wrap"
@@ -313,9 +391,8 @@
             }}</span>
           </div>
         </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-md-6 form-group">
+
+        <div class="col-md-6 form-group mt-3 mt-md-0">
           <label for="allowTrial"> Allow Trial </label>
           <div class="form-check form-switch">
             <input
@@ -336,11 +413,78 @@
           </div>
         </div>
       </div>
+<!-- Payment Preference -->
+<div class="row mb-3">
+  <div class="col-md-12 form-group">
+    <label>Payment Preference</label>
 
+    <div class="row g-3 mt-1">
+
+      <!-- Manual Payment -->
+      <div class="col-md-6">
+        <div
+          class="payment-pref-card h-100"
+          [class.payment-pref-card--selected]="
+            adminForm.get('autopay')?.value === false
+          "
+        >
+          <div class="payment-pref-card__head">
+            <input
+              type="radio"
+              id="autopayManual"
+              formControlName="autopay"
+              [value]="false"
+              [attr.disabled]="isViewMode ? true : null"
+            />
+
+            <label
+              for="autopayManual"
+              class="payment-pref-card__title"
+            >
+              <i class="bi bi-cash-coin"></i>
+              <span class="pd-plan-name">Manual Payment</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto Pay -->
+      <div class="col-md-6">
+        <div
+          class="payment-pref-card h-100"
+          [class.payment-pref-card--selected]="
+            adminForm.get('autopay')?.value === true
+          "
+        >
+          <div class="payment-pref-card__head">
+            <input
+              type="radio"
+              id="autopayAuto"
+              formControlName="autopay"
+              [value]="true"
+              [attr.disabled]="isViewMode ? true : null"
+            />
+
+            <label
+              for="autopayAuto"
+              class="payment-pref-card__title"
+            >
+              <i class="bi bi-arrow-repeat"></i>
+              <span class="pd-plan-name">
+                Auto Pay (Subscription)
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
       <div class="row mb-3">
         <div class="col-md-12 form-group">
-          <label>
-            Plan
+          <label class="plans-section-label">
+            Select a Plan
             <img
               src="assets/img/star.svg"
               class="required-icon"
@@ -348,269 +492,42 @@
             />
           </label>
 
-          <div class="plan-radio-stack">
+          <div class="plan-select-row">
             <div
-              class="plan-radio-card"
+              class="plan-select-card"
               *ngFor="let p of plansList"
-              [class.plan-radio-card--selected]="
+              [class.plan-select-card--selected]="
                 adminForm.get('plan')?.value === p.id
               "
               (click)="selectPlan(p)"
+              role="button"
+              [attr.tabindex]="isViewMode ? -1 : 0"
+              (keyup.enter)="selectPlan(p)"
             >
-              <div class="plan-radio-card__head">
-                <input
-                  type="radio"
-                  name="planRadio"
-                  [id]="'plan_' + p.id"
-                  [value]="p.id"
-                  [checked]="adminForm.get('plan')?.value === p.id"
-                  [attr.disabled]="isViewMode ? true : null"
-                  (click)="$event.stopPropagation(); selectPlan(p)"
-                />
+              <input
+                type="radio"
+                class="plan-card__radio-hidden"
+                name="planRadio"
+                [id]="'plan_' + p.id"
+                [value]="p.id"
+                [checked]="adminForm.get('plan')?.value === p.id"
+                [attr.disabled]="isViewMode ? true : null"
+                (click)="$event.stopPropagation(); selectPlan(p)"
+              />
 
-                <label
-                  [for]="'plan_' + p.id"
-                  class="plan-radio-card__title"
-                  (click)="$event.stopPropagation()"
-                >
-                  <span class="pd-plan-name">{{ p.plan_name }}</span>
-                  <span class="plan-radio-card__price"
-                    >{{ p.currency || "INR" }} {{ p.plan_price }}</span
-                  >
-                  <ng-container *ngIf="p.features?.no_of_users">
-                    &middot;
-                    {{
-                      p.features.no_of_users === -1
-                        ? "Unlimited"
-                        : p.features.no_of_users
-                    }}
-                    users</ng-container
-                  >
-                </label>
+              <div class="plan-select-card__radio-ui">
+                <span
+                  class="plan-select-card__radio-dot"
+                  *ngIf="adminForm.get('plan')?.value === p.id"
+                ></span>
               </div>
 
-              <div
-                class="form-padding-wrap"
-                *ngIf="adminForm.get('plan')?.value === p.id"
-              >
-                <div class="pd-section-header">
-                  <div
-                    style="
-                      margin-left: auto;
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                    "
-                  >
-                    <span class="pd-badge pd-badge--trial" *ngIf="p.trial_days"
-                      >Trial</span
-                    >
-                    <span class="pd-badge pd-badge--paid" *ngIf="!p.trial_days"
-                      >Paid</span
-                    >
-                    <span
-                      class="pd-badge pd-badge--active"
-                      *ngIf="p.status === '1'"
-                      >Active</span
-                    >
-                    <span
-                      class="pd-badge pd-badge--inactive"
-                      *ngIf="p.status !== '1'"
-                      >Inactive</span
-                    >
-                  </div>
-                </div>
-
-                <div class="pd-section">
-                  <div class="pd-section-title">
-                    <i class="bi bi-credit-card"></i> Pricing &amp; Billing
-                  </div>
-                  <div class="pd-grid">
-                    <div class="pd-item">
-                      <span class="pd-label">Price</span>
-                      <span class="pd-value"
-                        >{{ p.currency || "INR" }}
-                        {{ p.plan_price ?? "—" }}</span
-                      >
-                    </div>
-                    <div class="pd-item">
-                      <span class="pd-label">Billing Cycle</span>
-                      <span class="pd-value">{{ p.billing_cycle ?? "—" }}</span>
-                    </div>
-                    <div class="pd-item">
-                      <span class="pd-label">Trial Days</span>
-                      <span class="pd-value">{{ p.trial_days ?? 0 }} days</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="pd-section">
-                  <div class="pd-section-title">
-                    <i class="bi bi-bar-chart"></i> Limits &amp; Quotas
-                  </div>
-                  <div class="pd-grid">
-                    <div class="pd-item">
-                      <span class="pd-label">Users (Seats)</span>
-                      <span class="pd-value">{{
-                        p.features?.no_of_users === -1
-                          ? "Unlimited"
-                          : (p.features?.no_of_users ?? "—")
-                      }}</span>
-                    </div>
-                    <div class="pd-item">
-                      <span class="pd-label">Customers</span>
-                      <span class="pd-value">{{
-                        p.features?.no_of_customers === -1
-                          ? "Unlimited"
-                          : (p.features?.no_of_customers ?? "—")
-                      }}</span>
-                    </div>
-                    <div class="pd-item">
-                      <span class="pd-label">Projects</span>
-                      <span class="pd-value">{{
-                        p.features?.no_of_projects === -1
-                          ? "Unlimited"
-                          : (p.features?.no_of_projects ?? "—")
-                      }}</span>
-                    </div>
-                    <div class="pd-item">
-                      <span class="pd-label">Open Tickets</span>
-                      <span class="pd-value">{{
-                        p.features?.open_tickets ?? "—"
-                      }}</span>
-                    </div>
-                    <div class="pd-item">
-                      <span class="pd-label">Tickets / Month</span>
-                      <span class="pd-value">{{
-                        p.features?.tickets_per_month === -1
-                          ? "Unlimited"
-                          : (p.features?.tickets_per_month ?? "—")
-                      }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  class="pd-section"
-                  style="border-bottom: none; margin-bottom: 0"
-                >
-                  <div class="pd-section-title">
-                    <i class="bi bi-toggles"></i> Features &amp; Modules
-                  </div>
-                  <div class="pd-feature-grid">
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.reports_analytics"
-                    >
-                      <i
-                        [class]="
-                          p.features?.reports_analytics
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>Reports &amp; Analytics</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.session_activities"
-                    >
-                      <i
-                        [class]="
-                          p.features?.session_activities
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>Session Tracking</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.customer_portal"
-                    >
-                      <i
-                        [class]="
-                          p.features?.customer_portal
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>Customer Portal</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.email_communication"
-                    >
-                      <i
-                        [class]="
-                          p.features?.email_communication
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>Email</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.sms_communication"
-                    >
-                      <i
-                        [class]="
-                          p.features?.sms_communication
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>SMS</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.whatsapp_communication"
-                    >
-                      <i
-                        [class]="
-                          p.features?.whatsapp_communication
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>WhatsApp</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.backend_encryption"
-                    >
-                      <i
-                        [class]="
-                          p.features?.backend_encryption
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>Backend Encryption</span>
-                    </div>
-
-                    <div
-                      class="pd-feature"
-                      [class.pd-feature--on]="p.features?.e2e_encryption"
-                    >
-                      <i
-                        [class]="
-                          p.features?.e2e_encryption
-                            ? 'bi bi-check-circle-fill'
-                            : 'bi bi-x-circle-fill'
-                        "
-                      ></i>
-                      <span>E2E Encryption</span>
-                    </div>
-                  </div>
-                </div>
+              <div class="plan-select-card__name">{{ p.plan_name }}</div>
+              <div class="plan-select-card__cycle">
+                {{ p.billing_cycle || "Monthly" }}
+              </div>
+              <div class="plan-select-card__price">
+                {{ p.currency || "₹" }}{{ p.plan_price }}
               </div>
             </div>
           </div>
@@ -619,61 +536,117 @@
             *ngIf="
               adminForm.get('plan')?.invalid && adminForm.get('plan')?.touched
             "
-            class="text-danger mt-1"
+            class="text-danger mt-2"
             style="font-size: 11px"
           >
             Plan is required.
           </div>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-md-12 form-group">
-          <label> Payment Preference </label>
 
-          <div class="plan-radio-stack">
-            <div
-              class="plan-radio-card"
-              [class.plan-radio-card--selected]="
-                adminForm.get('autopay')?.value === false
-              "
-            >
-              <div class="plan-radio-card__head">
-                <input
-                  type="radio"
-                  id="autopayManual"
-                  formControlName="autopay"
-                  [value]="false"
-                  [attr.disabled]="isViewMode ? true : null"
-                />
-                <label for="autopayManual" class="plan-radio-card__title">
-                  <i class="bi bi-cash-coin"></i>
-                  <span class="pd-plan-name">Manual Payment</span>
-                </label>
+          <!-- Detail panel for whichever plan is currently selected -->
+          <div class="plan-detail-card" *ngIf="selectedPlanDetails as p">
+            <div class="plan-detail-card__header">
+              <div class="plan-detail-card__header-left">
+                <div class="plan-detail-card__name">{{ p.plan_name }}</div>
+                <div class="plan-detail-card__badge-row">
+                  <span class="plan-cycle-badge">
+                    {{ p.billing_cycle || "Monthly" }}
+                  </span>
+                  <span class="pd-badge pd-badge--trial" *ngIf="p.trial_days">
+                    Trial
+                  </span>
+                  <span
+                    class="pd-badge pd-badge--inactive"
+                    *ngIf="p.status !== '1'"
+                  >
+                    Inactive
+                  </span>
+                </div>
+              </div>
+              <div class="plan-detail-card__price-block">
+                <div class="plan-detail-card__price">
+                  {{ p.currency || "₹" }}{{ p.plan_price }}
+                </div>
+                <div class="plan-detail-card__price-caption">
+                  per {{ (p.billing_cycle || "monthly").toLowerCase() }}
+                </div>
               </div>
             </div>
 
-            <div
-              class="plan-radio-card"
-              [class.plan-radio-card--selected]="
-                adminForm.get('autopay')?.value === true "
-            >
-              <div class="plan-radio-card__head">
-                <input
-                  type="radio"
-                  id="autopayAuto"
-                  formControlName="autopay"
-                  [value]="true"
-                  [attr.disabled]="isViewMode ? true : null"
-                />
-                <label for="autopayAuto" class="plan-radio-card__title">
-                  <i class="bi bi-arrow-repeat"></i>
-                  <span class="pd-plan-name">Auto Pay (Subscription)</span>
-                </label>
+            <div class="plan-detail-card__stats">
+              <div class="plan-detail-stat">
+                <div class="plan-detail-stat__icon">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="plan-detail-stat__value">
+                  {{
+                    p.features?.no_of_users === -1
+                      ? "Unlimited"
+                      : (p.features?.no_of_users ?? p.no_of_users ?? "—")
+                  }}
+                </div>
+                <div class="plan-detail-stat__label">Users</div>
+              </div>
+
+              <div class="plan-detail-stat">
+                <div class="plan-detail-stat__icon">
+                  <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="plan-detail-stat__value">
+                  {{
+                    p.features?.no_of_admins === -1
+                      ? "Unlimited"
+                      : (p.features?.no_of_admins ?? p.no_of_admins ?? "—")
+                  }}
+                </div>
+                <div class="plan-detail-stat__label">Admins</div>
+              </div>
+
+              <div class="plan-detail-stat">
+                <div class="plan-detail-stat__icon">
+                  <i class="bi bi-calendar3"></i>
+                </div>
+                <div class="plan-detail-stat__value">
+                  {{ p.validity_days ?? p.features?.validity_days ?? "—" }}
+                </div>
+                <div class="plan-detail-stat__label">Days validity</div>
+              </div>
+
+              <div class="plan-detail-stat">
+                <div class="plan-detail-stat__icon">
+                  <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="plan-detail-stat__value">
+                  {{ p.buffer_days ?? p.features?.buffer_days ?? "—" }}
+                </div>
+                <div class="plan-detail-stat__label">Buffer days</div>
+              </div>
+            </div>
+
+            <div class="plan-detail-card__features">
+              <div class="plan-detail-card__features-head">
+                <span class="feature-dot"></span>
+                <span>FEATURES</span>
+                <span class="feature-count-badge">
+                  {{ p.PlanFeatures?.length || 0 }}
+                </span>
+              </div>
+
+              <div class="feature-chip-list">
+                <span class="feature-chip" *ngFor="let pf of p.PlanFeatures">
+                  {{ pf.feature?.feature_name || pf.feature?.feature_code }}
+                  <ng-container *ngIf="pf.feature?.type !== 'boolean'">
+                    ({{
+                      pf.value_type === "unlimited" ? "Unlimited" : (pf.value ?? 0)
+                    }})
+                  </ng-container>
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+    
     </form>
 
     <div class="form-padding-wrap-image">

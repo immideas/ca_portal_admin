@@ -51,7 +51,8 @@ import { ManageSubadminPermissionsComponent } from './admin/manage-subadmin-perm
 
 import { ForgotPasswordComponent } from './admin/forgot-password/forgot-password.component';
 
-
+import { AddClientGroupComponent } from './admin/client-group/add-client-group/add-client-group.component';
+import { ClientGroupListComponent } from './admin/client-group/client-group-list/client-group-list.component';
 // ================= CATEGORY =================
 import { ManageCategoryComponent } from './product/category/manage-category/manage-category.component';
 import { AddCategoryComponent } from './product/category/add-category/add-category.component';
@@ -229,7 +230,44 @@ export const routes: Routes = [
       // Having a parent 'manage_X' permission no longer unlocks add/edit/view
       // sub-routes automatically — each action needs its own explicit grant.
       // =====================================================================
+// ---- Client Group Management ----
 
+{
+  path: 'manage-client-groups',
+  component: ClientGroupListComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ]
+},
+
+{
+  path: 'add-client-group',
+  component: AddClientGroupComponent,
+  canDeactivate: [CanDeactivateGuard],
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ]
+},
+
+{
+  path: 'edit-client-group/:id',
+  component: AddClientGroupComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ]
+},
+
+{
+  path: 'view-client-group/:id',
+  component: AddClientGroupComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ]
+},
       // ---- User Management ----
       { path: 'manage-users', component: ManageAdminUsersComponent,
         canActivate: [AdminAuthGuard, paymentStatusGuard, SubAdminPermissionGuard],

@@ -90,6 +90,19 @@ export class AddAdminComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.minLength(3), Validators.pattern('^[a-zA-Z ]+$')]],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+        firmName: [
+    '',
+    [
+      Validators.maxLength(150),
+    ],
+  ],
+
+  firmType: [
+    '',
+    [
+      Validators.required,
+    ],
+  ],
       role: ['', Validators.required],
       // password: [''],
       plan: [null, Validators.required],
@@ -230,6 +243,8 @@ export class AddAdminComponent implements OnInit, OnDestroy {
             name: admin.name,
             email: admin.email,
             phone: admin.phone,
+           firmName: admin.firmName || '',
+           firmType: admin.firmType || '',
             role: admin.role || this.adminForm.get('role')?.value,
             plan: admin.assigned_plan_id,
             allow_trial: admin.allow_trial,
@@ -305,6 +320,8 @@ export class AddAdminComponent implements OnInit, OnDestroy {
         name: formValue.name,
         email: formValue.email,
         phone: formValue.phone,
+          firmName: formValue.firmName?.trim() || null,
+  firmType: formValue.firmType?.trim() || null,
         role: formValue.role,
         // backend stores the user's plan in `assigned_plan_id`.
         // Keep `plan` as well for backwards compatibility.

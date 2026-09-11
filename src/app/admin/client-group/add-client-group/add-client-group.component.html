@@ -1,0 +1,304 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Client Group"
+                : isEditMode
+                  ? "Edit Client Group"
+                  : "Add Client Group"
+            }}
+          </h4>
+
+          <p>Client group details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else saveMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #saveMode>
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="cancel()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="clientGroupForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': clientGroupForm.valid && !isSaving
+          }"
+          [disabled]="clientGroupForm.invalid || isSaving"
+        >
+          <img
+            class="save-icon"
+            src="assets/img/Group-Save.svg"
+          />
+
+          <span>
+            {{ isEditMode ? "Update" : "Save Group" }}
+          </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <article class="card complaint-card">
+
+    <div class="section-title">
+      <div class="item-icon">
+        <img
+          src="assets/img/Information.svg"
+          alt="info"
+        />
+      </div>
+
+      <div class="header-content">
+        <span class="header-text">
+          Client Group Information
+        </span>
+      </div>
+
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+        </span>
+      </div>
+    </div>
+
+    <form
+      [formGroup]="clientGroupForm"
+      id="clientGroupForm"
+      (ngSubmit)="saveClientGroup()"
+      class="form-padding-wrap"
+    >
+
+      <!-- Group Name + Group Code -->
+      <div class="row mb-3">
+
+        <div class="col-md-6 form-group">
+
+          <label for="name">
+            Group Name
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="form-controler"
+              placeholder="Enter group name"
+            />
+          </div>
+
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              clientGroupForm.get('name')?.invalid &&
+              clientGroupForm.get('name')?.touched
+            "
+          >
+            <div
+              *ngIf="clientGroupForm.get('name')?.errors?.['required']"
+            >
+              Group name is required.
+            </div>
+
+            <div
+              *ngIf="clientGroupForm.get('name')?.errors?.['minlength']"
+            >
+              Group name must be at least 3 characters long.
+            </div>
+
+            <div
+              *ngIf="clientGroupForm.get('name')?.errors?.['maxlength']"
+            >
+              Group name cannot exceed 150 characters.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-md-6 form-group">
+
+          <label for="code">
+            Group Code
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              type="text"
+              id="code"
+              formControlName="code"
+              class="form-controler"
+              placeholder="Generated automatically"
+              readonly
+            />
+          </div>
+
+          <div
+            class="text-muted mt-1"
+            style="font-size: 11px"
+          >
+            Group code is generated automatically.
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Description + Status -->
+      <div class="row mb-3">
+
+        <div class="col-md-6 form-group">
+
+          <label for="description">
+            Description
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <textarea
+              id="description"
+              formControlName="description"
+              class="form-controler"
+              placeholder="Enter group description"
+              rows="4"
+            ></textarea>
+          </div>
+
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              clientGroupForm.get('description')?.invalid &&
+              clientGroupForm.get('description')?.touched
+            "
+          >
+            <div
+              *ngIf="clientGroupForm.get('description')?.errors?.['maxlength']"
+            >
+              Description cannot exceed 1000 characters.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-md-6 form-group">
+
+          <label for="status">
+            Status
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <select
+              id="status"
+              formControlName="status"
+              class="form-controler"
+            >
+              <option [ngValue]="null" disabled>
+                Select status
+              </option>
+
+              <option [ngValue]="1">
+                Active
+              </option>
+
+              <option [ngValue]="0">
+                Inactive
+              </option>
+            </select>
+          </div>
+
+          <div
+            *ngIf="
+              clientGroupForm.get('status')?.invalid &&
+              clientGroupForm.get('status')?.touched
+            "
+            class="text-danger small mt-1"
+          >
+            Status is required.
+          </div>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </article>
+</main>
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

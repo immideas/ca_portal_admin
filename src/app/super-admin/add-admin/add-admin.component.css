@@ -207,3 +207,369 @@
 }
 
 
+/* ============================================================
+   Section label
+   ============================================================ */
+.plans-section-label {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+/* ============================================================
+   Compact plan-select cards (row of small pick cards)
+   ============================================================ */
+.plan-select-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.plan-select-card {
+  position: relative;
+  width: 190px;
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.plan-select-card:hover {
+  border-color: #93c5fd;
+}
+
+.plan-select-card--selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  background: #f7faff;
+}
+
+.plan-card__radio-hidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.plan-select-card__radio-ui {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan-select-card--selected .plan-select-card__radio-ui {
+  border-color: #2563eb;
+}
+
+.plan-select-card__radio-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2563eb;
+}
+
+.plan-select-card__name {
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #111827;
+  margin-bottom: 4px;
+  padding-right: 22px;
+}
+
+.plan-select-card__cycle {
+  font-size: 12.5px;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.plan-select-card__price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+/* ============================================================
+   Selected-plan detail card
+   ============================================================ */
+.plan-detail-card {
+  margin-top: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.plan-detail-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px 22px;
+  background: #eaf2fd;
+}
+
+.plan-detail-card__name {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.plan-detail-card__badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.plan-cycle-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.pd-badge--trial {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pd-badge--inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.plan-detail-card__price-block {
+  text-align: right;
+}
+
+.plan-detail-card__price {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e40af;
+  line-height: 1;
+}
+
+.plan-detail-card__price-caption {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* ---- stats row ---- */
+.plan-detail-card__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.plan-detail-stat {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px 10px;
+  text-align: center;
+}
+
+.plan-detail-stat__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #dbeafe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  font-size: 15px;
+}
+
+.plan-detail-stat__value {
+  font-size: 19px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.plan-detail-stat__label {
+  font-size: 11.5px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* ---- features ---- */
+.plan-detail-card__features {
+  padding: 18px 22px 22px;
+}
+
+.plan-detail-card__features-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #374151;
+  margin-bottom: 14px;
+}
+
+.feature-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2563eb;
+  flex-shrink: 0;
+}
+
+.feature-count-badge {
+  margin-left: auto;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+.feature-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.feature-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 576px) {
+  .plan-select-card {
+    width: 100%;
+  }
+
+  .plan-detail-card__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plan-detail-card__price-block {
+    text-align: left;
+  }
+}
+/* ================================
+   Payment Preference
+   ================================ */
+
+.payment-pref-card {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid #d9dce3;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-pref-card__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Radio button */
+.payment-pref-card__head input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+/* Text + icon */
+.payment-pref-card__title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Icon */
+.payment-pref-card__title i {
+  font-size: 16px;
+}
+
+/* Selected card */
+.payment-pref-card--selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+/* Hover */
+.payment-pref-card:hover {
+  border-color: #2563eb;
+}
+
+/* Disabled/View mode */
+.payment-pref-card:has(input:disabled) {
+  cursor: default;
+}
+
+.payment-pref-card:has(input:disabled) .payment-pref-card__title {
+  cursor: default;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .payment-pref-card {
+    min-height: 54px;
+  }
+}
