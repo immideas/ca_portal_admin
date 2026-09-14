@@ -273,6 +273,18 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
             '/edit-client-group',
             '/view-client-group'
           ]
+        },
+        {
+          label: 'Manage Clients',
+          icon: '',
+          route: '/clients',
+          permission: 'client_list',
+          activeRoutes: [
+            '/clients',
+            '/add-client',
+            '/edit-client',
+            '/view-client'
+          ]
         }
       ]
     }

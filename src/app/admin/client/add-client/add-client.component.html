@@ -1,0 +1,711 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ================= HEADER ================= -->
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Client"
+                : isEditMode
+                  ? "Edit Client"
+                  : "Add Client"
+            }}
+          </h4>
+
+          <p>Client details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HEADER ACTIONS ================= -->
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else saveMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #saveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="clientForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': clientForm.valid && !isSaving,
+          }"
+          [disabled]="clientForm.invalid || isSaving"
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+
+          <span>
+            {{ isEditMode ? "Update" : "Save Client" }}
+          </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    [formGroup]="clientForm"
+    id="clientForm"
+    (ngSubmit)="saveClient()"
+    class="form-padding-wrap"
+  >
+    <!-- ===================================================== -->
+    <!-- BASIC CLIENT INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Basic Client Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- File Number -->
+
+          <div class="col-md-6 form-group">
+            <label for="fileNo"> File No </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="fileNo"
+                formControlName="fileNo"
+                class="form-controler"
+                placeholder="Generated automatically"
+                readonly
+              />
+            </div>
+
+            <div class="text-muted mt-1" style="font-size: 11px">
+              File number is generated automatically.
+            </div>
+          </div>
+
+          <!-- Client Type -->
+
+          <div class="col-md-6 form-group">
+            <label for="clientType">
+              Client Type
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="clientType"
+                formControlName="clientType"
+                class="form-controler"
+              >
+                <option [ngValue]="null" disabled>Select client type</option>
+
+                <option value="Individual">Individual</option>
+
+                <option value="Business">Business</option>
+              </select>
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                clientForm.get('clientType')?.invalid &&
+                clientForm.get('clientType')?.touched
+              "
+            >
+              Client type is required.
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <!-- Client Name -->
+
+          <div class="col-md-6 form-group">
+            <label for="clientName">
+              Client Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="clientName"
+                formControlName="clientName"
+                class="form-controler"
+                placeholder="Enter client name"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                clientForm.get('clientName')?.invalid &&
+                clientForm.get('clientName')?.touched
+              "
+            >
+              <div *ngIf="clientForm.get('clientName')?.errors?.['required']">
+                Client name is required.
+              </div>
+
+              <div *ngIf="clientForm.get('clientName')?.errors?.['minlength']">
+                Client name must be at least 3 characters long.
+              </div>
+
+              <div *ngIf="clientForm.get('clientName')?.errors?.['maxlength']">
+                Client name cannot exceed 150 characters.
+              </div>
+            </div>
+          </div>
+
+          <!-- Status -->
+
+          <div class="col-md-6 form-group">
+            <label for="status">
+              Status
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="status"
+                formControlName="status"
+                class="form-controler"
+              >
+                <option [ngValue]="null" disabled>Select status</option>
+
+                <option [ngValue]="1">Active</option>
+
+                <option [ngValue]="0">Inactive</option>
+              </select>
+            </div>
+
+            <div
+              class="text-danger small mt-1"
+              *ngIf="
+                clientForm.get('status')?.invalid &&
+                clientForm.get('status')?.touched
+              "
+            >
+              Status is required.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- BUSINESS INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4" *ngIf="isBusinessClient">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Business Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Business Details
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- Business Name -->
+
+          <div class="col-md-6 form-group">
+            <label for="businessName">
+              Business Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="businessName"
+                formControlName="businessName"
+                class="form-controler"
+                placeholder="Enter business name"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                clientForm.get('businessName')?.invalid &&
+                clientForm.get('businessName')?.touched
+              "
+            >
+              Business name is required.
+            </div>
+          </div>
+
+          <!-- Business Type -->
+
+          <div class="col-md-6 form-group">
+            <label for="businessType">
+              Business Type
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="businessType"
+                formControlName="businessType"
+                class="form-controler"
+              >
+                <option value="">Select business type</option>
+
+                <option value="Proprietorship">Proprietorship</option>
+
+                <option value="Partnership">Partnership</option>
+
+                <option value="LLP">LLP</option>
+
+                <option value="Private Limited">Private Limited</option>
+
+                <option value="Public Limited">Public Limited</option>
+
+                <option value="Trust">Trust</option>
+
+                <option value="Society">Society</option>
+
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                clientForm.get('businessType')?.invalid &&
+                clientForm.get('businessType')?.touched
+              "
+            >
+              Business type is required.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- TAX INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Tax Information </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- PAN -->
+
+          <div class="col-md-4 form-group">
+            <label for="pan"> PAN </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="pan"
+                formControlName="pan"
+                class="form-controler"
+                placeholder="Enter PAN"
+                maxlength="20"
+              />
+            </div>
+          </div>
+
+          <!-- GSTIN -->
+
+          <div class="col-md-4 form-group">
+            <label for="gstin"> GSTIN </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="gstin"
+                formControlName="gstin"
+                class="form-controler"
+                placeholder="Enter GSTIN"
+                maxlength="20"
+              />
+            </div>
+          </div>
+
+          <!-- TAN -->
+
+          <div class="col-md-4 form-group">
+            <label for="tan"> TAN </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="tan"
+                formControlName="tan"
+                class="form-controler"
+                placeholder="Enter TAN"
+                maxlength="20"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- CLIENT GROUP & CONTACT -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Client Group & Contact Information </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- Client Group -->
+
+          <div class="col-md-6 form-group">
+            <label for="clientGroupId"> Client Group </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="clientGroupId"
+                formControlName="clientGroupId"
+                class="form-controler"
+              >
+                <option [ngValue]="null">Select client group</option>
+
+                <option *ngFor="let group of clientGroups" [ngValue]="group.id">
+                  {{ group.name }} ({{ group.code }})
+                </option>
+              </select>
+            </div>
+
+            <div class="text-muted mt-1" style="font-size: 11px">
+              Client group is optional.
+            </div>
+          </div>
+
+          <!-- Phone -->
+
+          <div class="col-md-6 form-group">
+            <label for="phone"> Phone </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="phone"
+                formControlName="phone"
+                class="form-controler"
+                placeholder="Enter phone number"
+                maxlength="20"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <!-- Email -->
+
+          <div class="col-md-6 form-group">
+            <label for="email"> Email </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                class="form-controler"
+                placeholder="Enter email address"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                clientForm.get('email')?.invalid &&
+                clientForm.get('email')?.touched
+              "
+            >
+              Please enter a valid email address.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- ADDRESS INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Address Information </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- Address -->
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="address"> Address </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <textarea
+                id="address"
+                formControlName="address"
+                class="form-controler"
+                placeholder="Enter address"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <!-- City -->
+
+          <div class="col-md-4 form-group">
+            <label for="city"> City </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="city"
+                formControlName="city"
+                class="form-controler"
+                placeholder="Enter city"
+              />
+            </div>
+          </div>
+
+          <!-- State -->
+
+          <div class="col-md-4 form-group">
+            <label for="state"> State </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="state"
+                formControlName="state"
+                class="form-controler"
+                placeholder="Enter state"
+              />
+            </div>
+          </div>
+
+          <!-- Pincode -->
+
+          <div class="col-md-4 form-group">
+            <label for="pincode"> Pincode </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="pincode"
+                formControlName="pincode"
+                class="form-controler"
+                placeholder="Enter pincode"
+                maxlength="10"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <!-- Country -->
+
+          <div class="col-md-4 form-group">
+            <label for="country"> Country </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="country"
+                formControlName="country"
+                class="form-controler"
+                placeholder="Enter country"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </form>
+</main>
+
+<!-- Back to top -->
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>
