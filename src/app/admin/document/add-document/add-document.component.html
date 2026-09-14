@@ -1,0 +1,603 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ================= HEADER ================= -->
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Document"
+                : isEditMode
+                  ? "Edit Document"
+                  : "Add Document"
+            }}
+          </h4>
+
+          <p>Document details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HEADER ACTIONS ================= -->
+
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else saveMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #saveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="documentForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': documentForm.valid && !isSaving,
+          }"
+          [disabled]="documentForm.invalid || isSaving"
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+
+          <span>
+            {{ isEditMode ? "Update" : "Save Document" }}
+          </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    [formGroup]="documentForm"
+    id="documentForm"
+    (ngSubmit)="saveDocument()"
+    class="form-padding-wrap"
+  >
+    <!-- ===================================================== -->
+    <!-- DOCUMENT GROUP INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Document Group Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- Group Name + Group Code -->
+
+        <div class="row mb-3">
+          <!-- Group Name -->
+
+          <div class="col-md-6 form-group">
+            <label for="groupName">
+              Group Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="groupName"
+                formControlName="groupName"
+                class="form-controler"
+                placeholder="Enter document group name"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('groupName')?.invalid &&
+                documentForm.get('groupName')?.touched
+              "
+            >
+              <div *ngIf="documentForm.get('groupName')?.errors?.['required']">
+                Group name is required.
+              </div>
+
+              <div *ngIf="documentForm.get('groupName')?.errors?.['minlength']">
+                Group name must be at least 2 characters long.
+              </div>
+
+              <div *ngIf="documentForm.get('groupName')?.errors?.['maxlength']">
+                Group name cannot exceed 150 characters.
+              </div>
+            </div>
+          </div>
+
+          <!-- Group Code -->
+
+          <div class="col-md-6 form-group">
+            <label for="groupCode">
+              Group Code
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="groupCode"
+                formControlName="groupCode"
+                class="form-controler"
+                placeholder="Auto-generated"
+                readonly
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('groupCode')?.invalid &&
+                documentForm.get('groupCode')?.touched
+              "
+            >
+              <div *ngIf="documentForm.get('groupCode')?.errors?.['required']">
+                Group code is required.
+              </div>
+
+              <div *ngIf="documentForm.get('groupCode')?.errors?.['maxlength']">
+                Group code cannot exceed 50 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- DOCUMENT INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Document Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- Document Name + Document Code -->
+
+        <div class="row mb-3">
+          <!-- Document Name -->
+
+          <div class="col-md-6 form-group">
+            <label for="name">
+              Document Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                class="form-controler"
+                placeholder="Enter document name"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('name')?.invalid &&
+                documentForm.get('name')?.touched
+              "
+            >
+              <div *ngIf="documentForm.get('name')?.errors?.['required']">
+                Document name is required.
+              </div>
+
+              <div *ngIf="documentForm.get('name')?.errors?.['minlength']">
+                Document name must be at least 2 characters long.
+              </div>
+
+              <div *ngIf="documentForm.get('name')?.errors?.['maxlength']">
+                Document name cannot exceed 150 characters.
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Code -->
+
+          <div class="col-md-6 form-group">
+            <label for="documentCode">
+              Document Code
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="documentCode"
+                formControlName="documentCode"
+                class="form-controler"
+                placeholder="Auto-generated"
+                readonly
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('documentCode')?.invalid &&
+                documentForm.get('documentCode')?.touched
+              "
+            >
+              <div
+                *ngIf="documentForm.get('documentCode')?.errors?.['required']"
+              >
+                Document code is required.
+              </div>
+
+              <div
+                *ngIf="documentForm.get('documentCode')?.errors?.['maxlength']"
+              >
+                Document code cannot exceed 50 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document Type + Mandatory -->
+
+        <div class="row mb-3">
+          <!-- Document Type -->
+
+          <div class="col-md-6 form-group">
+            <label for="documentType"> Document Type </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="documentType"
+                formControlName="documentType"
+                class="form-controler"
+              >
+                <option value="">Select document type</option>
+
+                <option value="Certificate">Certificate</option>
+
+                <option value="Return">Return</option>
+
+                <option value="Statement">Statement</option>
+
+                <option value="Invoice">Invoice</option>
+
+                <option value="Identity Proof">Identity Proof</option>
+
+                <option value="Address Proof">Address Proof</option>
+
+                <option value="Financial Statement">Financial Statement</option>
+
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Mandatory -->
+
+          <div class="col-md-6 form-group">
+            <label for="isMandatory">
+              Mandatory
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="isMandatory"
+                formControlName="isMandatory"
+                class="form-controler"
+              >
+                <option [ngValue]="false">No</option>
+
+                <option [ngValue]="true">Yes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="description"> Description </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <textarea
+                id="description"
+                formControlName="description"
+                class="form-controler"
+                placeholder="Enter document description"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('description')?.invalid &&
+                documentForm.get('description')?.touched
+              "
+            >
+              Description cannot exceed 1000 characters.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- FILE CONFIGURATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> File Configuration </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- Allowed File Types -->
+
+          <div class="col-md-6 form-group">
+            <label for="allowedFileTypes"> Allowed File Types </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="allowedFileTypes"
+                formControlName="allowedFileTypes"
+                class="form-controler"
+                placeholder="e.g. PDF, JPG, PNG"
+                maxlength="255"
+              />
+            </div>
+
+            <div class="text-muted mt-1" style="font-size: 11px">
+              Enter allowed file extensions separated by commas.
+            </div>
+          </div>
+
+          <!-- Maximum File Size -->
+
+          <div class="col-md-6 form-group">
+            <label for="maxFileSize"> Maximum File Size (MB) </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="number"
+                id="maxFileSize"
+                formControlName="maxFileSize"
+                class="form-controler"
+                placeholder="Enter maximum file size"
+                min="1"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('maxFileSize')?.invalid &&
+                documentForm.get('maxFileSize')?.touched
+              "
+            >
+              Maximum file size must be greater than 0.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- STATUS INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Status Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <div class="col-md-6 form-group">
+            <label for="status">
+              Status
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="status"
+                formControlName="status"
+                class="form-controler"
+              >
+                <option [ngValue]="null" disabled>Select status</option>
+
+                <option [ngValue]="1">Active</option>
+
+                <option [ngValue]="0">Inactive</option>
+              </select>
+            </div>
+
+            <div
+              class="text-danger small mt-1"
+              *ngIf="
+                documentForm.get('status')?.invalid &&
+                documentForm.get('status')?.touched
+              "
+            >
+              Status is required.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </form>
+</main>
+
+<!-- Back to top -->
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

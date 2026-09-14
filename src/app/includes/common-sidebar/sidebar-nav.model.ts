@@ -229,12 +229,12 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
   {
     items: [
       {
-        id: 'user-management',
-        label: 'User Management',
+        id: 'Team-management',
+        label: 'Team Management',
         icon: 'bi-people',
         children: [
           {
-            label: 'Manage Users',
+            label: 'Manage user',
             icon: '',
             route: '/manage-users',
             permission: 'manage_sub_admin_users'
@@ -320,7 +320,31 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
   //   ]
   // },
 
-  
+  // ================= DOCUMENT MANAGEMENT =================
+
+{
+  items: [
+    {
+      id: 'document-management',
+      label: 'Document Management',
+      icon: 'bi-file-earmark-text',
+      children: [
+        {
+          label: 'Manage Documents',
+          icon: '',
+          route: '/documents',
+          permission: 'manage_documents',
+          activeRoutes: [
+            '/documents',
+            '/add-document',
+            '/edit-document',
+            '/view-document'
+          ]
+        }
+      ]
+    }
+  ]
+},
 
   {
     items: [

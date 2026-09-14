@@ -53,7 +53,12 @@ import { ClientGroupListComponent } from "./admin/client-group/client-group-list
 
 import { AddClientComponent } from "./admin/client/add-client/add-client.component";
 import { ClientListComponent } from "./admin/client/client-list/client-list.component";
+
+// ================= DOCUMENT =================
+import { DocumentListComponent } from "./admin/document/document-list/document-list.component";
+import { AddDocumentComponent } from "./admin/document/add-document/add-document.component";
 // ================= CATEGORY =================
+
 import { ManageCategoryComponent } from "./product/category/manage-category/manage-category.component";
 import { AddCategoryComponent } from "./product/category/add-category/add-category.component";
 
@@ -429,16 +434,52 @@ export const routes: Routes = [
   ],
 },
       // ---- User Management ----
-      {
-        path: "manage-users",
-        component: ManageAdminUsersComponent,
-        canActivate: [
-          AdminAuthGuard,
-          paymentStatusGuard,
-          SubAdminPermissionGuard,
-        ],
-        data: { permission: "sub_admin_users_list" },
-      },
+    {
+  path: "manage-users",
+  component: ManageAdminUsersComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard,
+  ],
+},
+// ---- Document Management ----
+
+{
+  path: "documents",
+  component: DocumentListComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ],
+},
+
+{
+  path: "add-document",
+  component: AddDocumentComponent,
+  canDeactivate: [CanDeactivateGuard],
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ],
+},
+
+{
+  path: "edit-document/:id",
+  component: AddDocumentComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ],
+},
+
+{
+  path: "view-document/:id",
+  component: AddDocumentComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ],
+},
 
       {
         path: "add-users",

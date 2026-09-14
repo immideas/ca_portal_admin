@@ -31,6 +31,7 @@
     "@swiftlyme/color-spotter": "^1.0.0",
     "@swiftlyme/editor": "^1.1.0",
     "@swiftlyme/image-uploader": "^1.0.1",
+    "@swiftlyme/locationbycsc": "^0.0.4",
     "@swimlane/ngx-charts": "^23.0.0-alpha.0",
     "angular-shepherd": "^19.0.2",
     "angularx-qrcode": "^19.0.0",

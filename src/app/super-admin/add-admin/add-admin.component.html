@@ -100,7 +100,7 @@
       class="form-padding-wrap"
     >
       <div class="row mb-3">
-        <div class="col-md-6 form-group">
+        <div class="col-md-12 form-group">
           <label for="adminName">
             Name
             <img
@@ -142,44 +142,7 @@
           </div>
         </div>
 
-        <div class="col-md-6 form-group mt-3 mt-md-0">
-          <label for="adminEmail">
-            Email
-            <img
-              src="assets/img/star.svg"
-              class="required-icon"
-              alt="required"
-            />
-          </label>
-          <div
-            class="field-wrap"
-            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-          >
-            <input
-              id="adminEmail"
-              type="email"
-              formControlName="email"
-              class="form-controler"
-              autocomplete="off"
-              placeholder="Enter email"
-              [readonly]="isViewMode"
-            />
-          </div>
-          <div
-            class="text-danger mt-1"
-            style="font-size: 11px"
-            *ngIf="
-              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
-            "
-          >
-            <div *ngIf="adminForm.get('email')?.errors?.['required']">
-              Email is required.
-            </div>
-            <div *ngIf="adminForm.get('email')?.errors?.['email']">
-              Invalid email format.
-            </div>
-          </div>
-        </div>
+       
       </div>
 
       <div class="row mb-3">
@@ -217,8 +180,46 @@
             Phone is required.
           </div>
         </div>
+         <div class="col-md-6 form-group mt-3 mt-md-0">
+          <label for="adminEmail">
+            Email
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              id="adminEmail"
+              type="email"
+              formControlName="email"
+              class="form-controler"
+              autocomplete="off"
+              placeholder="Enter email"
+              [readonly]="isViewMode"
+            />
+          </div>
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              adminForm.get('email')?.invalid && adminForm.get('email')?.touched
+            "
+          >
+            <div *ngIf="adminForm.get('email')?.errors?.['required']">
+              Email is required.
+            </div>
+            <div *ngIf="adminForm.get('email')?.errors?.['email']">
+              Invalid email format.
+            </div>
+          </div>
+        </div>
 
-        <div class="col-md-6 form-group mt-3 mt-md-0">
+        <!-- <div class="col-md-6 form-group mt-3 mt-md-0">
           <label for="adminRole">
             Role
             <img
@@ -252,7 +253,7 @@
           >
             Role is required.
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="row mb-3">
@@ -331,7 +332,7 @@
         </div>
       </div>
 
-      <div class="row mb-3">
+      <!-- <div class="row mb-3">
         <div class="col-md-6 form-group">
           <label for="adminTheme"> Theme </label>
           <div
@@ -412,7 +413,7 @@
             <i class="bi bi-lock-fill"></i> {{ trialLockedReason }}
           </div>
         </div>
-      </div>
+      </div> -->
 <!-- Payment Preference -->
 <div class="row mb-3">
   <div class="col-md-12 form-group">
