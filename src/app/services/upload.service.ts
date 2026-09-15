@@ -30,7 +30,8 @@ export class UploadService {
   [UploadType.SUB_ADMIN_IMAGE]: 'sub-admins/images',
   [UploadType.MESSAGE_IMAGE]: 'messages/images',
   [UploadType.MESSAGE_TRAIL]:'message_trail_admin/images',
-  [UploadType.REOPEN_TICKET]:'reopen_ticket/images'
+  [UploadType.REOPEN_TICKET]:'reopen_ticket/images',
+  [UploadType.CLIENT_KYC]: 'clients/kyc'
   };
 
   private getFolder(type: UploadType): string {

@@ -1,0 +1,772 @@
+<main id="main" class="complaint-wrapper">
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <header class="top-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="kyc" />
+        </div>
+
+        <div class="title-text">
+          <h4>Manage KYC</h4>
+          <p>Client KYC documents</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- HEADER ACTIONS -->
+
+    <div class="header-actions">
+
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+
+      <span
+        class="uploading-indicator"
+        *ngIf="isAnyKycUploading()"
+      >
+        <span class="status-spinner-small"></span>
+        Uploading...
+      </span>
+
+      <button
+  type="button"
+  class="btn-save"
+  [ngClass]="{
+    'btn-active': !isAnyKycUploading()
+  }"
+  [disabled]="isAnyKycUploading()"
+  (click)="saveKyc()"
+>
+  <img
+    class="save-icon"
+    src="assets/img/Group-Save.svg"
+    alt="save"
+  />
+
+  <span>Save</span>
+</button>
+    </div>
+
+  </header>
+
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    id="clientKycForm"
+    (ngSubmit)="saveKyc()"
+    class="form-padding-wrap"
+  >
+
+    <!-- ===================================================== -->
+    <!-- CLIENT INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+
+      <div class="section-title">
+
+        <div class="item-icon">
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text">
+            Client Information
+          </span>
+        </div>
+
+      </div>
+
+
+      <!-- SAME STRUCTURE AS ADD CLIENT -->
+
+      <div
+        class="form-padding-wrap"
+        *ngIf="client"
+      >
+
+        <!-- CLIENT NAME + CLIENT TYPE -->
+
+        <div class="row mb-3">
+
+          <!-- CLIENT NAME -->
+
+          <div class="col-md-6 form-group">
+
+            <label for="clientName">
+              Client Name
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="clientName"
+                class="form-controler"
+                [value]="client?.clientName || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+
+          <!-- CLIENT TYPE -->
+
+          <div class="col-md-6 form-group">
+
+            <label for="clientType">
+              Client Type
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="clientType"
+                class="form-controler"
+                [value]="client?.clientType || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- BUSINESS INFORMATION -->
+
+        <div
+          class="row mb-3"
+          *ngIf="client?.clientType === 'Business'"
+        >
+
+          <!-- BUSINESS NAME -->
+
+          <div class="col-md-6 form-group">
+
+            <label for="businessName">
+              Business Name
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="businessName"
+                class="form-controler"
+                [value]="client?.businessName || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+
+          <!-- BUSINESS TYPE -->
+
+          <div class="col-md-6 form-group">
+
+            <label for="businessType">
+              Business Type
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="businessType"
+                class="form-controler"
+                [value]="client?.businessType || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- TAX INFORMATION -->
+
+        <div class="row mb-3">
+
+          <!-- PAN -->
+
+          <div class="col-md-4 form-group">
+
+            <label for="pan">
+              PAN
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="pan"
+                class="form-controler"
+                [value]="client?.pan || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+
+          <!-- GSTIN -->
+
+          <div
+            class="col-md-4 form-group"
+            *ngIf="client?.clientType === 'Business'"
+          >
+
+            <label for="gstin">
+              GSTIN
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="gstin"
+                class="form-controler"
+                [value]="client?.gstin || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+
+          <!-- TAN -->
+
+          <div
+            class="col-md-4 form-group"
+            *ngIf="client?.clientType === 'Business'"
+          >
+
+            <label for="tan">
+              TAN
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="tan"
+                class="form-controler"
+                [value]="client?.tan || ''"
+                readonly
+              />
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </article>
+
+
+    <!-- ===================================================== -->
+    <!-- KYC DOCUMENTS -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+
+      <div class="section-title">
+
+        <div class="item-icon">
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text">
+            KYC Documents
+          </span>
+        </div>
+
+        <div class="required-group">
+
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- INDIVIDUAL -->
+      <!-- ================================================= -->
+
+      <div
+        class="form-padding-wrap"
+        *ngIf="client?.clientType === 'Individual'"
+      >
+
+        <!-- PAN -->
+
+        <div class="row mb-3">
+
+          <div class="col-md-12 form-group">
+
+            <label class="upload-main-label">
+              PAN Card
+
+              <span class="sub-label">
+                (PNG, JPG, WEBP)
+              </span>
+            </label>
+
+            <div
+              class="modern-uploader-wrapper"
+              #panUploaderHost
+            >
+
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('PAN')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'PAN')"
+                (imageUpload)="onKycImageUpload($event, 'PAN')"
+                (imageReplace)="onKycImageReplace($event, 'PAN')"
+                (imageDelete)="onKycImageDelete($event, 'PAN')"
+                (imageEdit)="onKycImageEdit($event, 'PAN')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.PAN | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+
+                <span class="status-spinner-small"></span>
+
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- AADHAAR -->
+
+        <div class="row mb-3">
+
+          <div class="col-md-12 form-group">
+
+            <label class="upload-main-label">
+              Aadhaar Card
+
+              <span class="sub-label">
+                (PNG, JPG, WEBP)
+              </span>
+            </label>
+
+            <div
+              class="modern-uploader-wrapper"
+              #aadhaarUploaderHost
+            >
+
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('AADHAAR')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'AADHAAR')"
+                (imageUpload)="onKycImageUpload($event, 'AADHAAR')"
+                (imageReplace)="onKycImageReplace($event, 'AADHAAR')"
+                (imageDelete)="onKycImageDelete($event, 'AADHAAR')"
+                (imageEdit)="onKycImageEdit($event, 'AADHAAR')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.AADHAAR | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+
+                <span class="status-spinner-small"></span>
+
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- BUSINESS -->
+      <!-- ================================================= -->
+
+      <div
+        class="form-padding-wrap"
+        *ngIf="client?.clientType === 'Business'"
+      >
+
+        <!-- PAN -->
+
+        <div class="row mb-3">
+
+          <div class="col-md-12 form-group">
+
+            <label class="upload-main-label">
+              PAN Card
+              <span class="sub-label">
+                (PNG, JPG, WEBP)
+              </span>
+            </label>
+
+            <div
+              class="modern-uploader-wrapper"
+              #panUploaderHost
+            >
+
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('PAN')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'PAN')"
+                (imageUpload)="onKycImageUpload($event, 'PAN')"
+                (imageReplace)="onKycImageReplace($event, 'PAN')"
+                (imageDelete)="onKycImageDelete($event, 'PAN')"
+                (imageEdit)="onKycImageEdit($event, 'PAN')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.PAN | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- GST -->
+
+        <div class="row mb-3">
+
+          <div class="col-md-12 form-group">
+
+            <label class="upload-main-label">
+              GST Certificate
+              <span class="sub-label">
+                (PNG, JPG, WEBP)
+              </span>
+            </label>
+
+            <div
+              class="modern-uploader-wrapper"
+              #gstUploaderHost
+            >
+
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('GST')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'GST')"
+                (imageUpload)="onKycImageUpload($event, 'GST')"
+                (imageReplace)="onKycImageReplace($event, 'GST')"
+                (imageDelete)="onKycImageDelete($event, 'GST')"
+                (imageEdit)="onKycImageEdit($event, 'GST')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.GST | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- TAN -->
+
+        <div class="row mb-3">
+
+          <div class="col-md-12 form-group">
+
+            <label class="upload-main-label">
+              TAN Certificate
+              <span class="sub-label">
+                (PNG, JPG, WEBP)
+              </span>
+            </label>
+
+            <div
+              class="modern-uploader-wrapper"
+              #tanUploaderHost
+            >
+
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('TAN')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'TAN')"
+                (imageUpload)="onKycImageUpload($event, 'TAN')"
+                (imageReplace)="onKycImageReplace($event, 'TAN')"
+                (imageDelete)="onKycImageDelete($event, 'TAN')"
+                (imageEdit)="onKycImageEdit($event, 'TAN')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.TAN | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- INCORPORATION -->
+
+        <div class="row mb-3">
+
+          <div class="col-md-12 form-group">
+
+            <label class="upload-main-label">
+              Incorporation Certificate
+              <span class="sub-label">
+                (PNG, JPG, WEBP)
+              </span>
+            </label>
+
+            <div
+              class="modern-uploader-wrapper"
+              #incorporationUploaderHost
+            >
+
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('INCORPORATION')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'INCORPORATION')"
+                (imageUpload)="onKycImageUpload($event, 'INCORPORATION')"
+                (imageReplace)="onKycImageReplace($event, 'INCORPORATION')"
+                (imageDelete)="onKycImageDelete($event, 'INCORPORATION')"
+                (imageEdit)="onKycImageEdit($event, 'INCORPORATION')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.INCORPORATION | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </form>
+
+
+  <!-- ===================================================== -->
+  <!-- IMAGE MODAL -->
+  <!-- ===================================================== -->
+
+  <div
+    class="image-modal-backdrop"
+    *ngIf="showImageModal"
+    (click)="closeImageModal()"
+  >
+
+    <div
+      class="image-modal-content"
+      (click)="$event.stopPropagation()"
+    >
+
+      <button
+        type="button"
+        class="image-modal-close"
+        (click)="closeImageModal()"
+        aria-label="Close"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <img
+        [src]="selectedImage"
+        class="image-modal-img"
+        alt="Preview"
+      />
+
+    </div>
+
+  </div>
+
+
+  <!-- BACK TO TOP -->
+
+  <a
+    href="#"
+    class="back-to-top d-flex align-items-center justify-content-center"
+    aria-label="Scroll to top"
+  >
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+</main>

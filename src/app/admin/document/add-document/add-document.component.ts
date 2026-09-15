@@ -242,13 +242,13 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
           groupCode: documentData.groupCode || "",
 
-          name: documentData.name || "",
+           name: documentData.documentName || "",
 
           documentCode: documentData.documentCode || "",
 
           documentType: documentData.documentType || "",
 
-          description: documentData.description || "",
+  description: documentData.documentDescription || "",
 
           isMandatory: documentData.isMandatory ?? false,
 
@@ -325,13 +325,13 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
       groupCode: formValue.groupCode?.trim(),
 
-      name: formValue.name?.trim(),
+     documentName: formValue.name?.trim(),
 
       documentCode: formValue.documentCode?.trim(),
 
       documentType: formValue.documentType?.trim() || null,
 
-      description: formValue.description?.trim() || null,
+      documentDescription: formValue.description?.trim() || null,
 
       isMandatory: formValue.isMandatory,
 

@@ -71,4 +71,34 @@ export class ClientService {
       { headers: this.getAuthHeaders() }
     );
   }
+  uploadClientKycDocument(data: {
+  clientId: number;
+  documentType: string;
+  fileName: string;
+  filePath: string;
+  fileType?: string;
+  fileSize?: number;
+}): Observable<any> {
+  return this.http.post(
+    `${environment.apiUrl}/client-kyc-documents/uploadClientKycDocument`,
+    data,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+getClientKycDocuments(clientId: string | number): Observable<any> {
+  return this.http.post(
+    `${environment.apiUrl}/client-kyc-documents/getClientKycDocuments`,
+    { clientId },
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+deleteClientKycDocument(id: string | number): Observable<any> {
+  return this.http.post(
+    `${environment.apiUrl}/client-kyc-documents/deleteClientKycDocument`,
+    { id },
+    { headers: this.getAuthHeaders() }
+  );
+}
 }

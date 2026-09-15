@@ -26,6 +26,7 @@ import { ConfirmDialogComponent } from "../../../confirm-dialog/confirm-dialog.c
 import { ClientService } from "../../../services/client.service";
 
 import { ClientGroupService } from "../../../services/client-group.service";
+import { getLocationDetails,getAllCountries,} from "@swiftlyme/locationbycsc";
 
 @Component({
   selector: "app-add-client",
@@ -64,6 +65,12 @@ export class AddClientComponent implements OnInit, OnDestroy {
   isSaving = false;
 
   clientGroups: any[] = [];
+  countries: any[] = [];
+states: any[] = [];
+cities: any[] = [];
+
+selectedCountry: any = null;
+selectedState: any = null;
 
   isBusinessClient = false;
 
@@ -146,6 +153,8 @@ export class AddClientComponent implements OnInit, OnDestroy {
      * Load client groups for dropdown.
      */
     this.loadClientGroups();
+     this.loadCountries();
+
 
     /*
      * Detect Individual / Business.
@@ -214,6 +223,162 @@ export class AddClientComponent implements OnInit, OnDestroy {
 
     businessTypeControl?.updateValueAndValidity();
   }
+  // =====================================================
+// LOAD COUNTRIES
+// =====================================================
+
+// =====================================================
+// LOAD COUNTRIES
+// =====================================================
+
+loadCountries(): void {
+  try {
+    this.countries = getAllCountries();
+
+    console.log("Countries loaded:", this.countries);
+  } catch (error) {
+    console.error("Failed to load countries:", error);
+
+    this.toastr.error(
+      "Failed to load countries",
+      "Error"
+    );
+  }
+}
+
+// =====================================================
+// COUNTRY CHANGE
+// =====================================================
+
+onCountryChange(event: Event): void {
+  const countryName = (event.target as HTMLSelectElement).value;
+
+  this.states = [];
+  this.cities = [];
+
+  this.selectedCountry = null;
+  this.selectedState = null;
+
+  this.clientForm.patchValue(
+    {
+      state: "",
+      city: "",
+    },
+    { emitEvent: false }
+  );
+
+  if (!countryName) {
+    return;
+  }
+
+  try {
+    const results = getLocationDetails(countryName);
+
+    const countryResult = results.find(
+      (location: any) =>
+        location.type === "Country" &&
+        location.data?.name?.toLowerCase() ===
+          countryName.toLowerCase()
+    );
+
+    if (!countryResult) {
+      console.warn("Country not found:", countryName);
+      return;
+    }
+
+    this.selectedCountry = countryResult;
+
+    /*
+     * Country result contains its child states.
+     */
+  this.states =
+  (countryResult as any).children_states ||
+  (countryResult as any).childrenStates ||
+  [];
+
+    console.log(
+      "Selected country:",
+      countryResult
+    );
+
+    console.log(
+      "States:",
+      this.states
+    );
+  } catch (error) {
+    console.error(
+      "Failed to load states:",
+      error
+    );
+
+    this.states = [];
+  }
+}
+
+// =====================================================
+// STATE CHANGE
+// =====================================================
+
+onStateChange(event: Event): void {
+  const stateName = (event.target as HTMLSelectElement).value;
+
+  this.cities = [];
+  this.selectedState = null;
+
+  this.clientForm.patchValue(
+    {
+      city: "",
+    },
+    { emitEvent: false }
+  );
+
+  if (!stateName) {
+    return;
+  }
+
+  try {
+    const results = getLocationDetails(stateName);
+
+    const stateResult = results.find(
+      (location: any) =>
+        location.type === "State" &&
+        location.data?.name?.toLowerCase() ===
+          stateName.toLowerCase()
+    );
+
+    if (!stateResult) {
+      console.warn("State not found:", stateName);
+      return;
+    }
+
+    this.selectedState = stateResult;
+
+    /*
+     * State result contains its child cities.
+     */
+  this.cities =
+  (stateResult as any).children_cities ||
+  (stateResult as any).childrenCities ||
+  [];
+
+    console.log(
+      "Selected state:",
+      stateResult
+    );
+
+    console.log(
+      "Cities:",
+      this.cities
+    );
+  } catch (error) {
+    console.error(
+      "Failed to load cities:",
+      error
+    );
+
+    this.cities = [];
+  }
+}
 
   // =====================================================
   // LOAD CLIENT GROUPS

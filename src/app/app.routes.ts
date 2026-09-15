@@ -53,7 +53,7 @@ import { ClientGroupListComponent } from "./admin/client-group/client-group-list
 
 import { AddClientComponent } from "./admin/client/add-client/add-client.component";
 import { ClientListComponent } from "./admin/client/client-list/client-list.component";
-
+import { ClientKycComponent } from "./admin/client/client-kyc/client-kyc.component";
 // ================= DOCUMENT =================
 import { DocumentListComponent } from "./admin/document/document-list/document-list.component";
 import { AddDocumentComponent } from "./admin/document/add-document/add-document.component";
@@ -428,6 +428,14 @@ export const routes: Routes = [
 {
   path: "view-client/:id",
   component: AddClientComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard
+  ],
+},
+{
+  path: "client-kyc/:id",
+  component: ClientKycComponent,
   canActivate: [
     AdminAuthGuard,
     paymentStatusGuard

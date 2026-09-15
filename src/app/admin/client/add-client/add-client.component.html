@@ -403,82 +403,95 @@
     <!-- TAX INFORMATION -->
     <!-- ===================================================== -->
 
-    <article class="card complaint-card mb-4">
-      <div class="section-title">
-        <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
-        </div>
+  <!-- ===================================================== -->
+<!-- TAX INFORMATION -->
+<!-- ===================================================== -->
 
-        <div class="header-content">
-          <span class="header-text"> Tax Information </span>
+<article class="card complaint-card mb-4">
+  <div class="section-title">
+    <div class="item-icon">
+      <img src="assets/img/Information.svg" alt="info" />
+    </div>
+
+    <div class="header-content">
+      <span class="header-text"> Tax Information </span>
+    </div>
+  </div>
+
+  <div class="form-padding-wrap">
+
+    <!-- GSTIN - Single Row -->
+    <div class="row mb-3">
+      <div class="col-md-12 form-group">
+        <label for="gstin">
+          GSTIN
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+          <input
+            type="text"
+            id="gstin"
+            formControlName="gstin"
+            class="form-controler"
+            placeholder="Enter GSTIN"
+            maxlength="20"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- PAN + TAN - Same Row -->
+    <div class="row mb-3">
+
+      <!-- PAN -->
+      <div class="col-md-6 form-group">
+        <label for="pan">
+          PAN
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+          <input
+            type="text"
+            id="pan"
+            formControlName="pan"
+            class="form-controler"
+            placeholder="Enter PAN"
+            maxlength="20"
+          />
         </div>
       </div>
 
-      <div class="form-padding-wrap">
-        <div class="row mb-3">
-          <!-- PAN -->
+      <!-- TAN -->
+      <div class="col-md-6 form-group">
+        <label for="tan">
+          TAN
+        </label>
 
-          <div class="col-md-4 form-group">
-            <label for="pan"> PAN </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="pan"
-                formControlName="pan"
-                class="form-controler"
-                placeholder="Enter PAN"
-                maxlength="20"
-              />
-            </div>
-          </div>
-
-          <!-- GSTIN -->
-
-          <div class="col-md-4 form-group">
-            <label for="gstin"> GSTIN </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="gstin"
-                formControlName="gstin"
-                class="form-controler"
-                placeholder="Enter GSTIN"
-                maxlength="20"
-              />
-            </div>
-          </div>
-
-          <!-- TAN -->
-
-          <div class="col-md-4 form-group">
-            <label for="tan"> TAN </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="tan"
-                formControlName="tan"
-                class="form-controler"
-                placeholder="Enter TAN"
-                maxlength="20"
-              />
-            </div>
-          </div>
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+          <input
+            type="text"
+            id="tan"
+            formControlName="tan"
+            class="form-controler"
+            placeholder="Enter TAN"
+            maxlength="20"
+          />
         </div>
       </div>
-    </article>
 
+    </div>
+
+  </div>
+</article>
     <!-- ===================================================== -->
     <!-- CLIENT GROUP & CONTACT -->
     <!-- ===================================================== -->
@@ -583,122 +596,219 @@
     <!-- ADDRESS INFORMATION -->
     <!-- ===================================================== -->
 
-    <article class="card complaint-card mb-4">
-      <div class="section-title">
-        <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
+   <!-- ===================================================== -->
+<!-- ADDRESS INFORMATION -->
+<!-- ===================================================== -->
+
+<article class="card complaint-card mb-4">
+
+  <div class="section-title">
+
+    <div class="item-icon">
+      <img
+        src="assets/img/Information.svg"
+        alt="info"
+      />
+    </div>
+
+    <div class="header-content">
+      <span class="header-text">
+        Address Information
+      </span>
+    </div>
+
+  </div>
+
+  <div class="form-padding-wrap">
+
+    <!-- ================================================= -->
+    <!-- COUNTRY + STATE -->
+    <!-- ================================================= -->
+
+    <div class="row mb-3">
+
+      <!-- COUNTRY -->
+      <div class="col-md-6 form-group">
+
+        <label for="country">
+          Country
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+
+          <select
+            id="country"
+            formControlName="country"
+            class="form-controler"
+            (change)="onCountryChange($event)"
+          >
+
+            <option value="">
+              Select country
+            </option>
+
+            <option
+              *ngFor="let country of countries"
+              [value]="country.name"
+            >
+              {{ country.name }}
+            </option>
+
+          </select>
+
         </div>
 
-        <div class="header-content">
-          <span class="header-text"> Address Information </span>
-        </div>
       </div>
 
-      <div class="form-padding-wrap">
-        <!-- Address -->
 
-        <div class="row mb-3">
-          <div class="col-md-12 form-group">
-            <label for="address"> Address </label>
+      <!-- STATE -->
+      <div class="col-md-6 form-group">
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        <label for="state">
+          State
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+
+          <select
+            id="state"
+            formControlName="state"
+            class="form-controler"
+            (change)="onStateChange($event)"
+            [disabled]="!states.length"
+          >
+
+            <option value="">
+              Select state
+            </option>
+
+            <option
+              *ngFor="let state of states"
+              [value]="state.name || state.data?.name"
             >
-              <textarea
-                id="address"
-                formControlName="address"
-                class="form-controler"
-                placeholder="Enter address"
-                rows="3"
-              ></textarea>
-            </div>
-          </div>
+              {{ state.name || state.data?.name }}
+            </option>
+
+          </select>
+
         </div>
 
-        <div class="row mb-3">
-          <!-- City -->
-
-          <div class="col-md-6 form-group">
-            <label for="city"> City </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="city"
-                formControlName="city"
-                class="form-controler"
-                placeholder="Enter city"
-              />
-            </div>
-          </div>
-
-          <!-- State -->
-
-          <div class="col-md-6 form-group">
-            <label for="state"> State </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="state"
-                formControlName="state"
-                class="form-controler"
-                placeholder="Enter state"
-              />
-            </div>
-          </div>
-
-          <!-- Pincode -->
-
-          
-        </div>
-
-        <div class="row mb-3">
-          <!-- Country -->
-           <div class="col-md-6 form-group">
-            <label for="pincode"> Pincode </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="pincode"
-                formControlName="pincode"
-                class="form-controler"
-                placeholder="Enter pincode"
-                maxlength="10"
-              />
-            </div>
-          </div>
-
-          <div class="col-md-6 form-group">
-            <label for="country"> Country </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="country"
-                formControlName="country"
-                class="form-controler"
-                placeholder="Enter country"
-              />
-            </div>
-          </div>
-        </div>
       </div>
-    </article>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CITY + PINCODE -->
+    <!-- ================================================= -->
+
+    <div class="row mb-3">
+
+      <!-- CITY -->
+      <div class="col-md-6 form-group">
+
+        <label for="city">
+          City
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+
+          <select
+            id="city"
+            formControlName="city"
+            class="form-controler"
+            [disabled]="!cities.length"
+          >
+
+            <option value="">
+              Select city
+            </option>
+
+            <option
+              *ngFor="let city of cities"
+              [value]="city.name || city.data?.name"
+            >
+              {{ city.name || city.data?.name }}
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- PINCODE -->
+      <div class="col-md-6 form-group">
+
+        <label for="pincode">
+          Pincode
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+
+          <input
+            type="text"
+            id="pincode"
+            formControlName="pincode"
+            class="form-controler"
+            placeholder="Enter pincode"
+            maxlength="10"
+          />
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ADDRESS -->
+    <!-- ================================================= -->
+
+    <div class="row mb-3">
+
+      <div class="col-md-12 form-group">
+
+        <label for="address">
+          Address
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+        >
+
+          <textarea
+            id="address"
+            formControlName="address"
+            class="form-controler"
+            placeholder="Enter address"
+            rows="3"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</article>
   </form>
 </main>
 
