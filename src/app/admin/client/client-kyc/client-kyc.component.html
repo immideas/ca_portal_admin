@@ -363,29 +363,112 @@
         *ngIf="client?.clientType === 'Individual'"
       >
 
-        <!-- PAN -->
-
+        <!-- AADHAAR FRONT + BACK SIDE BY SIDE -->
         <div class="row mb-3">
 
-          <div class="col-md-12 form-group">
-
+          <!-- AADHAAR FRONT -->
+          <div class="col-md-6 form-group">
             <label class="upload-main-label">
-              PAN Card
-
-              <span class="sub-label">
-                (PNG, JPG, WEBP)
-              </span>
+              Aadhaar Card - Front
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
             </label>
 
-            <div
-              class="modern-uploader-wrapper"
-              #panUploaderHost
-            >
+         <div
+  class="modern-uploader-wrapper aadhaar-uploader-wrapper"
+  #aadhaarFrontUploaderHost
+>
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('AADHAAR_FRONT')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1.59"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'AADHAAR_FRONT')"
+                (imageUpload)="onKycImageUpload($event, 'AADHAAR_FRONT')"
+                (imageReplace)="onKycImageReplace($event, 'AADHAAR_FRONT')"
+                (imageDelete)="onKycImageDelete($event, 'AADHAAR_FRONT')"
+                (imageEdit)="onKycImageEdit($event, 'AADHAAR_FRONT')"
+              >
+              </lib-image-uploader-lib>
 
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.AADHAAR_FRONT | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AADHAAR BACK -->
+          <div class="col-md-6 form-group">
+            <label class="upload-main-label">
+              Aadhaar Card - Back
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
+            </label>
+
+          <div
+  class="modern-uploader-wrapper aadhaar-uploader-wrapper"
+  #aadhaarBackUploaderHost
+>
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('AADHAAR_BACK')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1.59"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'AADHAAR_BACK')"
+                (imageUpload)="onKycImageUpload($event, 'AADHAAR_BACK')"
+                (imageReplace)="onKycImageReplace($event, 'AADHAAR_BACK')"
+                (imageDelete)="onKycImageDelete($event, 'AADHAAR_BACK')"
+                (imageEdit)="onKycImageEdit($event, 'AADHAAR_BACK')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.AADHAAR_BACK | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PAN BELOW AADHAAR -->
+        <div class="row mb-3">
+          <div class="col-md-6 form-group">
+            <label class="upload-main-label">
+              PAN Card
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
+            </label>
+
+            <div class="modern-uploader-wrapper" #panUploaderHost>
               <lib-image-uploader-lib
                 [imageUrls]="getKycImageUrls('PAN')"
                 [maxImages]="maxImages"
-                [aspectRatio]="1"
+                [aspectRatio]="1.59"
                 [layoutMode]="'grid'"
                 [allowDrag]="true"
                 [allowEdit]="true"
@@ -407,79 +490,13 @@
                 [style.width.px]="slot.value.width"
                 [style.height.px]="slot.value.height"
               >
-
                 <span class="status-spinner-small"></span>
-
                 <span class="upload-slot-percent">
                   {{ slot.value.progress | number: "1.0-0" }}%
                 </span>
-
               </div>
-
             </div>
-
           </div>
-
-        </div>
-
-
-        <!-- AADHAAR -->
-
-        <div class="row mb-3">
-
-          <div class="col-md-12 form-group">
-
-            <label class="upload-main-label">
-              Aadhaar Card
-
-              <span class="sub-label">
-                (PNG, JPG, WEBP)
-              </span>
-            </label>
-
-            <div
-              class="modern-uploader-wrapper"
-              #aadhaarUploaderHost
-            >
-
-              <lib-image-uploader-lib
-                [imageUrls]="getKycImageUrls('AADHAAR')"
-                [maxImages]="maxImages"
-                [aspectRatio]="1"
-                [layoutMode]="'grid'"
-                [allowDrag]="true"
-                [allowEdit]="true"
-                [allowDelete]="true"
-                [allowReplace]="true"
-                (imagesChange)="handleKycImagesChange($event, 'AADHAAR')"
-                (imageUpload)="onKycImageUpload($event, 'AADHAAR')"
-                (imageReplace)="onKycImageReplace($event, 'AADHAAR')"
-                (imageDelete)="onKycImageDelete($event, 'AADHAAR')"
-                (imageEdit)="onKycImageEdit($event, 'AADHAAR')"
-              >
-              </lib-image-uploader-lib>
-
-              <div
-                class="upload-slot-overlay"
-                *ngFor="let slot of uploadingSlots.AADHAAR | keyvalue"
-                [style.top.px]="slot.value.top"
-                [style.left.px]="slot.value.left"
-                [style.width.px]="slot.value.width"
-                [style.height.px]="slot.value.height"
-              >
-
-                <span class="status-spinner-small"></span>
-
-                <span class="upload-slot-percent">
-                  {{ slot.value.progress | number: "1.0-0" }}%
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
         </div>
 
       </div>
@@ -494,28 +511,19 @@
         *ngIf="client?.clientType === 'Business'"
       >
 
-        <!-- PAN -->
-
+        <!-- PAN TOP -->
         <div class="row mb-3">
-
-          <div class="col-md-12 form-group">
-
+          <div class="col-md-6 form-group">
             <label class="upload-main-label">
               PAN Card
-              <span class="sub-label">
-                (PNG, JPG, WEBP)
-              </span>
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
             </label>
 
-            <div
-              class="modern-uploader-wrapper"
-              #panUploaderHost
-            >
-
+            <div class="modern-uploader-wrapper" #panUploaderHost>
               <lib-image-uploader-lib
                 [imageUrls]="getKycImageUrls('PAN')"
                 [maxImages]="maxImages"
-                [aspectRatio]="1"
+                [aspectRatio]="1.59"
                 [layoutMode]="'grid'"
                 [allowDrag]="true"
                 [allowEdit]="true"
@@ -542,88 +550,21 @@
                   {{ slot.value.progress | number: "1.0-0" }}%
                 </span>
               </div>
-
             </div>
-
           </div>
-
         </div>
 
-
-        <!-- GST -->
-
+        <!-- TAN + INCORPORATION + GST SAME ROW -->
         <div class="row mb-3">
 
-          <div class="col-md-12 form-group">
-
-            <label class="upload-main-label">
-              GST Certificate
-              <span class="sub-label">
-                (PNG, JPG, WEBP)
-              </span>
-            </label>
-
-            <div
-              class="modern-uploader-wrapper"
-              #gstUploaderHost
-            >
-
-              <lib-image-uploader-lib
-                [imageUrls]="getKycImageUrls('GST')"
-                [maxImages]="maxImages"
-                [aspectRatio]="1"
-                [layoutMode]="'grid'"
-                [allowDrag]="true"
-                [allowEdit]="true"
-                [allowDelete]="true"
-                [allowReplace]="true"
-                (imagesChange)="handleKycImagesChange($event, 'GST')"
-                (imageUpload)="onKycImageUpload($event, 'GST')"
-                (imageReplace)="onKycImageReplace($event, 'GST')"
-                (imageDelete)="onKycImageDelete($event, 'GST')"
-                (imageEdit)="onKycImageEdit($event, 'GST')"
-              >
-              </lib-image-uploader-lib>
-
-              <div
-                class="upload-slot-overlay"
-                *ngFor="let slot of uploadingSlots.GST | keyvalue"
-                [style.top.px]="slot.value.top"
-                [style.left.px]="slot.value.left"
-                [style.width.px]="slot.value.width"
-                [style.height.px]="slot.value.height"
-              >
-                <span class="status-spinner-small"></span>
-                <span class="upload-slot-percent">
-                  {{ slot.value.progress | number: "1.0-0" }}%
-                </span>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- TAN -->
-
-        <div class="row mb-3">
-
-          <div class="col-md-12 form-group">
-
+          <!-- TAN -->
+          <div class="col-md-4 form-group">
             <label class="upload-main-label">
               TAN Certificate
-              <span class="sub-label">
-                (PNG, JPG, WEBP)
-              </span>
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
             </label>
 
-            <div
-              class="modern-uploader-wrapper"
-              #tanUploaderHost
-            >
-
+            <div class="modern-uploader-wrapper" #tanUploaderHost>
               <lib-image-uploader-lib
                 [imageUrls]="getKycImageUrls('TAN')"
                 [maxImages]="maxImages"
@@ -654,32 +595,17 @@
                   {{ slot.value.progress | number: "1.0-0" }}%
                 </span>
               </div>
-
             </div>
-
           </div>
 
-        </div>
-
-
-        <!-- INCORPORATION -->
-
-        <div class="row mb-3">
-
-          <div class="col-md-12 form-group">
-
+          <!-- INCORPORATION -->
+          <div class="col-md-4 form-group">
             <label class="upload-main-label">
               Incorporation Certificate
-              <span class="sub-label">
-                (PNG, JPG, WEBP)
-              </span>
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
             </label>
 
-            <div
-              class="modern-uploader-wrapper"
-              #incorporationUploaderHost
-            >
-
+            <div class="modern-uploader-wrapper" #incorporationUploaderHost>
               <lib-image-uploader-lib
                 [imageUrls]="getKycImageUrls('INCORPORATION')"
                 [maxImages]="maxImages"
@@ -710,16 +636,55 @@
                   {{ slot.value.progress | number: "1.0-0" }}%
                 </span>
               </div>
-
             </div>
+          </div>
 
+          <!-- GST -->
+          <div class="col-md-4 form-group">
+            <label class="upload-main-label">
+              GST Certificate
+              <span class="sub-label">(PNG, JPG, WEBP)</span>
+            </label>
+
+            <div class="modern-uploader-wrapper" #gstUploaderHost>
+              <lib-image-uploader-lib
+                [imageUrls]="getKycImageUrls('GST')"
+                [maxImages]="maxImages"
+                [aspectRatio]="1"
+                [layoutMode]="'grid'"
+                [allowDrag]="true"
+                [allowEdit]="true"
+                [allowDelete]="true"
+                [allowReplace]="true"
+                (imagesChange)="handleKycImagesChange($event, 'GST')"
+                (imageUpload)="onKycImageUpload($event, 'GST')"
+                (imageReplace)="onKycImageReplace($event, 'GST')"
+                (imageDelete)="onKycImageDelete($event, 'GST')"
+                (imageEdit)="onKycImageEdit($event, 'GST')"
+              >
+              </lib-image-uploader-lib>
+
+              <div
+                class="upload-slot-overlay"
+                *ngFor="let slot of uploadingSlots.GST | keyvalue"
+                [style.top.px]="slot.value.top"
+                [style.left.px]="slot.value.left"
+                [style.width.px]="slot.value.width"
+                [style.height.px]="slot.value.height"
+              >
+                <span class="status-spinner-small"></span>
+                <span class="upload-slot-percent">
+                  {{ slot.value.progress | number: "1.0-0" }}%
+                </span>
+              </div>
+            </div>
           </div>
 
         </div>
 
       </div>
 
-    </article>
+</article>
 
   </form>
 

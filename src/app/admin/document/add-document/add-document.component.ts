@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-
 import { Router, ActivatedRoute, RouterModule } from "@angular/router";
 
 import {
@@ -24,6 +23,8 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { ConfirmDialogComponent } from "../../../confirm-dialog/confirm-dialog.component";
 
 import { DocumentService } from "../../../services/document.service";
+
+import { DocumentTypeService } from "../../../services/document-type.service";
 
 @Component({
   selector: "app-add-document",
@@ -61,6 +62,17 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
   isSaving = false;
 
+  /*
+   * Document Types
+   */
+  documentTypes: any[] = [];
+
+  loadingDocumentTypes = false;
+  documentGroups: any[] = [];
+loadingDocumentGroups = false;
+filteredDocumentGroups: any[] = [];
+showGroupSuggestions = false;
+
   constructor(
     private fb: FormBuilder,
 
@@ -75,11 +87,14 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
 
     private documentService: DocumentService,
+
+    private documentTypeService: DocumentTypeService,
   ) {
     this.documentForm = this.fb.group({
       // =================================================
       // DOCUMENT GROUP NAME
       // =================================================
+
       groupName: [
         "",
         [
@@ -93,6 +108,7 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
       // DOCUMENT GROUP CODE
       // Automatically generated from groupName
       // =================================================
+
       groupCode: [
         {
           value: "",
@@ -103,6 +119,7 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
       // =================================================
       // DOCUMENT NAME
       // =================================================
+
       name: [
         "",
         [
@@ -116,6 +133,7 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
       // DOCUMENT CODE
       // Automatically generated from document name
       // =================================================
+
       documentCode: [
         {
           value: "",
@@ -124,17 +142,38 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
       ],
 
       // =================================================
-      // OTHER FIELDS
+      // DOCUMENT TYPE
       // =================================================
-      documentType: ["", [Validators.maxLength(100)]],
+
+      documentTypeId: [null, [Validators.required]],
+
+      // =================================================
+      // DESCRIPTION
+      // =================================================
 
       description: ["", [Validators.maxLength(1000)]],
 
+      // =================================================
+      // MANDATORY
+      // =================================================
+
       isMandatory: [false, Validators.required],
+
+      // =================================================
+      // ALLOWED FILE TYPES
+      // =================================================
 
       allowedFileTypes: ["", [Validators.maxLength(255)]],
 
+      // =================================================
+      // MAX FILE SIZE
+      // =================================================
+
       maxFileSize: [null, [Validators.min(1)]],
+
+      // =================================================
+      // STATUS
+      // =================================================
 
       status: [1, Validators.required],
     });
@@ -145,6 +184,12 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   // =====================================================
 
   ngOnInit(): void {
+    /*
+     * Load active Document Types
+     */
+      this.loadDocumentGroups();
+    this.loadDocumentTypes();
+
     /*
      * Check route ID.
      */
@@ -209,6 +254,128 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
       });
     });
   }
+  // =====================================================
+// LOAD EXISTING DOCUMENT GROUPS
+// =====================================================
+
+// =====================================================
+// LOAD EXISTING DOCUMENT GROUPS
+// =====================================================
+
+loadDocumentGroups(): void {
+  this.loadingDocumentGroups = true;
+
+  this.documentService.listUniqueGroupNames().subscribe({
+    next: (response: any) => {
+      this.loadingDocumentGroups = false;
+
+      if (response?.success) {
+        this.documentGroups = response.data || [];
+      } else {
+        this.documentGroups = response?.data || response || [];
+      }
+
+      // Initially show all groups
+      this.filteredDocumentGroups = this.documentGroups;
+
+      console.log("Document Groups:", this.documentGroups);
+    },
+
+    error: (err: any) => {
+      this.loadingDocumentGroups = false;
+
+      this.documentGroups = [];
+      this.filteredDocumentGroups = [];
+
+      console.error("Failed to load document groups:", err);
+
+      this.toastr.error(
+        err?.error?.message || "Failed to load document groups",
+        "Error"
+      );
+    }
+  });
+}
+// =====================================================
+// SEARCH DOCUMENT GROUPS
+// =====================================================
+
+onGroupInput(event: Event): void {
+  const input = event.target as HTMLInputElement;
+
+  const value = input.value.trim().toLowerCase();
+
+  this.showGroupSuggestions = true;
+
+  if (!value) {
+    this.filteredDocumentGroups = this.documentGroups;
+    return;
+  }
+
+  this.filteredDocumentGroups = this.documentGroups.filter(
+    (group) =>
+      group.groupName?.toLowerCase().includes(value) ||
+      group.groupCode?.toLowerCase().includes(value)
+  );
+}
+// =====================================================
+// SELECT EXISTING DOCUMENT GROUP
+// =====================================================
+
+selectDocumentGroup(group: any): void {
+  this.documentForm.patchValue({
+    groupName: group.groupName,
+    groupCode: group.groupCode
+  });
+
+  this.showGroupSuggestions = false;
+}
+// =====================================================
+// HIDE GROUP SUGGESTIONS
+// =====================================================
+
+hideGroupSuggestions(): void {
+  setTimeout(() => {
+    this.showGroupSuggestions = false;
+  }, 200);
+}
+  // =====================================================
+  // LOAD DOCUMENT TYPES
+  // =====================================================
+
+  loadDocumentTypes(): void {
+    this.loadingDocumentTypes = true;
+
+    this.documentTypeService.getActiveDocumentTypes().subscribe({
+      next: (response: any) => {
+        this.loadingDocumentTypes = false;
+
+        if (response?.success) {
+          this.documentTypes = response.data || [];
+        } else {
+          this.documentTypes = [];
+
+          this.toastr.error(
+            response?.message || "Failed to load document types",
+            "Error",
+          );
+        }
+      },
+
+      error: (err: any) => {
+        this.loadingDocumentTypes = false;
+
+        this.documentTypes = [];
+
+        console.error("Failed to load document types:", err);
+
+        this.toastr.error(
+          err?.error?.message || "Failed to load document types",
+          "Error",
+        );
+      },
+    });
+  }
 
   // =====================================================
   // GENERATE CODE
@@ -242,13 +409,30 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
           groupCode: documentData.groupCode || "",
 
-           name: documentData.documentName || "",
+          name: documentData.documentName || "",
 
           documentCode: documentData.documentCode || "",
 
-          documentType: documentData.documentType || "",
+          /*
+           * NEW
+           *
+           * Backend now returns:
+           *
+           * documentTypeId: 1
+           *
+           * and also:
+           *
+           * documentType: {
+           *   id: 1,
+           *   name: "Identity Proof"
+           * }
+           */
+          documentTypeId:
+            documentData.documentTypeId ??
+            documentData.documentType?.id ??
+            null,
 
-  description: documentData.documentDescription || "",
+          description: documentData.documentDescription || "",
 
           isMandatory: documentData.isMandatory ?? false,
 
@@ -325,11 +509,20 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
 
       groupCode: formValue.groupCode?.trim(),
 
-     documentName: formValue.name?.trim(),
+      documentName: formValue.name?.trim(),
 
       documentCode: formValue.documentCode?.trim(),
 
-      documentType: formValue.documentType?.trim() || null,
+      /*
+       * NEW
+       *
+       * Send Document Type ID
+       *
+       * Example:
+       *
+       * documentTypeId: 2
+       */
+      documentTypeId: Number(formValue.documentTypeId),
 
       documentDescription: formValue.description?.trim() || null,
 

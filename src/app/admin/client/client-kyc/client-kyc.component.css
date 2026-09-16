@@ -291,3 +291,77 @@
   }
 
 }
+/* =========================================================
+   FIX: Image uploader internal Bootstrap grid
+   ========================================================= */
+
+::ng-deep .aadhaar-uploader-wrapper lib-image-uploader-lib {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Library creates col-lg-3 / col-md-4 internally.
+   Override it so one document occupies the full uploader width. */
+::ng-deep .aadhaar-uploader-wrapper lib-image-uploader-lib .cdk-drop-list {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+::ng-deep .aadhaar-uploader-wrapper lib-image-uploader-lib .cdk-drop-list > .cdk-drag {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Actual upload card */
+::ng-deep .aadhaar-uploader-wrapper lib-image-uploader-lib .upload-slot {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* File input */
+::ng-deep .aadhaar-uploader-wrapper lib-image-uploader-lib .hidden-file-input {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+/* =========================================================
+   KYC IMAGE UPLOADER WIDTH FIX
+   ========================================================= */
+
+::ng-deep .modern-uploader-wrapper lib-image-uploader-lib {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Override library's:
+   col-6 col-md-4 col-lg-3 */
+::ng-deep .modern-uploader-wrapper lib-image-uploader-lib .cdk-drop-list {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+::ng-deep .modern-uploader-wrapper lib-image-uploader-lib .cdk-drop-list > .cdk-drag {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+::ng-deep .modern-uploader-wrapper lib-image-uploader-lib .upload-slot {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+::ng-deep .modern-uploader-wrapper lib-image-uploader-lib .hidden-file-input {
+  width: 100% !important;
+  max-width: 100% !important;
+}

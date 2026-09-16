@@ -83,4 +83,12 @@ export class DocumentService {
       { headers: this.getAuthHeaders() }
     );
   }
+    listUniqueGroupNames(): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/unique-group-names`,
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
 }

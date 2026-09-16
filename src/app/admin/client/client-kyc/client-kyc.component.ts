@@ -57,13 +57,10 @@ export class ClientKycComponent implements OnInit, OnDestroy {
     } | null;
   } = {
     PAN: null,
-
-    AADHAAR: null,
-
+    AADHAAR_FRONT: null,
+    AADHAAR_BACK: null,
     GST: null,
-
     TAN: null,
-
     INCORPORATION: null,
   };
 
@@ -74,8 +71,11 @@ export class ClientKycComponent implements OnInit, OnDestroy {
   @ViewChild("panUploaderHost")
   panUploaderHost?: ElementRef<HTMLElement>;
 
-  @ViewChild("aadhaarUploaderHost")
-  aadhaarUploaderHost?: ElementRef<HTMLElement>;
+  @ViewChild("aadhaarFrontUploaderHost")
+  aadhaarFrontUploaderHost?: ElementRef<HTMLElement>;
+
+  @ViewChild("aadhaarBackUploaderHost")
+  aadhaarBackUploaderHost?: ElementRef<HTMLElement>;
 
   @ViewChild("gstUploaderHost")
   gstUploaderHost?: ElementRef<HTMLElement>;
@@ -88,6 +88,14 @@ export class ClientKycComponent implements OnInit, OnDestroy {
 
   // Each KYC document allows only one file
   maxImages = 1;
+
+  // Aspect ratios are configured in HTML:
+  // PAN               -> 1.59 (landscape)
+  // AADHAAR FRONT     -> 1.8  (landscape)
+  // AADHAAR BACK      -> 1.8  (landscape)
+  // GST               -> 0.707 (A4 portrait)
+  // TAN               -> 0.707 (A4 portrait)
+  // INCORPORATION     -> 0.707 (A4 portrait)
 
   // =========================================================
   // IMAGE PREVIEW MODAL
@@ -113,7 +121,18 @@ export class ClientKycComponent implements OnInit, OnDestroy {
       }
     >(),
 
-    AADHAAR: new Map<
+    AADHAAR_FRONT: new Map<
+      number,
+      {
+        progress: number;
+        top: number;
+        left: number;
+        width: number;
+        height: number;
+      }
+    >(),
+
+    AADHAAR_BACK: new Map<
       number,
       {
         progress: number;
@@ -258,20 +277,20 @@ export class ClientKycComponent implements OnInit, OnDestroy {
   // =========================================================
 
   getKycDocumentTypes(): string[] {
-  const clientType = String(this.client?.clientType || "")
-    .trim()
-    .toLowerCase();
+    const clientType = String(this.client?.clientType || "")
+      .trim()
+      .toLowerCase();
 
-  if (clientType === "individual") {
-    return ["PAN", "AADHAAR"];
+    if (clientType === "individual") {
+      return ["PAN", "AADHAAR_FRONT", "AADHAAR_BACK"];
+    }
+
+    if (clientType === "business") {
+      return ["PAN", "GST", "TAN", "INCORPORATION"];
+    }
+
+    return [];
   }
-
-  if (clientType === "business") {
-    return ["PAN", "GST", "TAN", "INCORPORATION"];
-  }
-
-  return [];
-}
 
   // =========================================================
   // KYC LABEL
@@ -283,7 +302,9 @@ export class ClientKycComponent implements OnInit, OnDestroy {
     } = {
       PAN: "PAN Card",
 
-      AADHAAR: "Aadhaar Card",
+      AADHAAR_FRONT: "Aadhaar Card - Front",
+
+      AADHAAR_BACK: "Aadhaar Card - Back",
 
       GST: "GST Certificate",
 
@@ -730,8 +751,12 @@ export class ClientKycComponent implements OnInit, OnDestroy {
         wrapper = this.panUploaderHost;
         break;
 
-      case "AADHAAR":
-        wrapper = this.aadhaarUploaderHost;
+      case "AADHAAR_FRONT":
+        wrapper = this.aadhaarFrontUploaderHost;
+        break;
+
+      case "AADHAAR_BACK":
+        wrapper = this.aadhaarBackUploaderHost;
         break;
 
       case "GST":
@@ -788,81 +813,75 @@ export class ClientKycComponent implements OnInit, OnDestroy {
   // SAVE KYC
   // =========================================================
 
- async saveKyc(): Promise<void> {
+  async saveKyc(): Promise<void> {
+    if (!this.clientId) {
+      this.toastr.error("Client ID is required.");
+      return;
+    }
 
-  if (!this.clientId) {
-    this.toastr.error("Client ID is required.");
-    return;
-  }
+    if (this.isAnyKycUploading()) {
+      this.toastr.error("Please wait until all uploads are complete.");
+      return;
+    }
 
-  if (this.isAnyKycUploading()) {
-    this.toastr.error("Please wait until all uploads are complete.");
-    return;
-  }
+    const documentTypes = this.getKycDocumentTypes();
 
-  const documentTypes = this.getKycDocumentTypes();
+    console.log("========== SAVE KYC ==========");
+    console.log("Client:", this.client);
+    console.log("Client ID:", this.clientId);
+    console.log("Client Type:", this.client?.clientType);
+    console.log("Document Types:", documentTypes);
+    console.log("KYC Documents:", this.kycDocuments);
 
-  console.log("========== SAVE KYC ==========");
-  console.log("Client:", this.client);
-  console.log("Client ID:", this.clientId);
-  console.log("Client Type:", this.client?.clientType);
-  console.log("Document Types:", documentTypes);
-  console.log("KYC Documents:", this.kycDocuments);
+    if (!documentTypes.length) {
+      this.toastr.error(
+        `No KYC document types found for client type: ${
+          this.client?.clientType || "Unknown"
+        }`,
+      );
+      return;
+    }
 
-  if (!documentTypes.length) {
-    this.toastr.error(
-      `No KYC document types found for client type: ${
-        this.client?.clientType || "Unknown"
-      }`
+    const documentsToSave = documentTypes.filter(
+      (documentType) => !!this.kycDocuments[documentType]?.filePath,
     );
-    return;
-  }
 
-  const documentsToSave = documentTypes.filter(
-    (documentType) => !!this.kycDocuments[documentType]?.filePath
-  );
+    console.log("Documents To Save:", documentsToSave);
 
-  console.log("Documents To Save:", documentsToSave);
-
-  if (!documentsToSave.length) {
-    this.toastr.error("Please upload at least one KYC document.");
-    return;
-  }
-
-  try {
-    for (const documentType of documentsToSave) {
-      console.log("Calling saveKycDocument:", documentType);
-
-      await this.saveKycDocument(documentType);
+    if (!documentsToSave.length) {
+      this.toastr.error("Please upload at least one KYC document.");
+      return;
     }
 
-    for (const key of this.pendingDeleteKeys) {
-      try {
-        await this.uploadService.delete(key);
-      } catch (err) {
-        console.error(
-          "Failed to delete old KYC S3 file:",
-          key,
-          err
-        );
+    try {
+      for (const documentType of documentsToSave) {
+        console.log("Calling saveKycDocument:", documentType);
+
+        await this.saveKycDocument(documentType);
       }
+
+      for (const key of this.pendingDeleteKeys) {
+        try {
+          await this.uploadService.delete(key);
+        } catch (err) {
+          console.error("Failed to delete old KYC S3 file:", key, err);
+        }
+      }
+
+      this.pendingDeleteKeys = [];
+
+      this.toastr.success("KYC documents saved successfully.");
+
+      await this.loadClientKycDocuments();
+    } catch (err: any) {
+      console.error("Failed to save KYC:", err);
+
+      this.errorMessage =
+        err?.error?.message || "Failed to save KYC documents.";
+
+      this.toastr.error(this.errorMessage);
     }
-
-    this.pendingDeleteKeys = [];
-
-    this.toastr.success("KYC documents saved successfully.");
-
-    await this.loadClientKycDocuments();
-
-  } catch (err: any) {
-    console.error("Failed to save KYC:", err);
-
-    this.errorMessage =
-      err?.error?.message || "Failed to save KYC documents.";
-
-    this.toastr.error(this.errorMessage);
   }
-}
 
   // =========================================================
   // SAVE SINGLE KYC DOCUMENT
@@ -880,25 +899,22 @@ export class ClientKycComponent implements OnInit, OnDestroy {
     }
 
     const payload = {
+      id: document.id, // IMPORTANT FOR EDIT
       clientId: Number(this.clientId),
-
       documentType: documentType,
-
       fileName: document.fileName,
-
       filePath: document.filePath,
-
       fileType: document.fileType,
-
       fileSize: document.fileSize,
     };
+
+    console.log("Saving KYC document:", payload);
 
     await new Promise<void>((resolve, reject) => {
       this.clientService.uploadClientKycDocument(payload).subscribe({
         next: () => {
           resolve();
         },
-
         error: (err) => {
           reject(err);
         },
@@ -922,7 +938,9 @@ export class ClientKycComponent implements OnInit, OnDestroy {
         this.kycDocuments = {
           PAN: null,
 
-          AADHAAR: null,
+          AADHAAR_FRONT: null,
+
+          AADHAAR_BACK: null,
 
           GST: null,
 
@@ -984,7 +1002,8 @@ export class ClientKycComponent implements OnInit, OnDestroy {
   isAnyKycUploading(): boolean {
     return (
       this.uploadingSlots.PAN.size > 0 ||
-      this.uploadingSlots.AADHAAR.size > 0 ||
+      this.uploadingSlots.AADHAAR_FRONT.size > 0 ||
+      this.uploadingSlots.AADHAAR_BACK.size > 0 ||
       this.uploadingSlots.GST.size > 0 ||
       this.uploadingSlots.TAN.size > 0 ||
       this.uploadingSlots.INCORPORATION.size > 0

@@ -119,51 +119,94 @@
         <div class="row mb-3">
           <!-- Group Name -->
 
-          <div class="col-md-6 form-group">
-            <label for="groupName">
-              Group Name
+        <!-- Group Name -->
 
-              <img
-                src="assets/img/star.svg"
-                class="required-icon"
-                alt="required"
-              />
-            </label>
+<div class="col-md-6 form-group">
+  <label for="groupName">
+    Group Name
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="groupName"
-                formControlName="groupName"
-                class="form-controler"
-                placeholder="Enter document group name"
-              />
-            </div>
+    <img
+      src="assets/img/star.svg"
+      class="required-icon"
+      alt="required"
+    />
+  </label>
 
-            <div
-              class="text-danger mt-1"
-              style="font-size: 11px"
-              *ngIf="
-                documentForm.get('groupName')?.invalid &&
-                documentForm.get('groupName')?.touched
-              "
-            >
-              <div *ngIf="documentForm.get('groupName')?.errors?.['required']">
-                Group name is required.
-              </div>
+  <div class="group-input-container">
 
-              <div *ngIf="documentForm.get('groupName')?.errors?.['minlength']">
-                Group name must be at least 2 characters long.
-              </div>
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <input
+        type="text"
+        id="groupName"
+        formControlName="groupName"
+        class="form-controler"
+        placeholder="Enter document group name"
+        autocomplete="off"
+        (input)="onGroupInput($event)"
+        (focus)="showGroupSuggestions = true"
+        (blur)="hideGroupSuggestions()"
+      />
+    </div>
 
-              <div *ngIf="documentForm.get('groupName')?.errors?.['maxlength']">
-                Group name cannot exceed 150 characters.
-              </div>
-            </div>
-          </div>
+    <!-- Existing Groups -->
+    <div
+      class="group-dropdown"
+      *ngIf="
+        showGroupSuggestions &&
+        filteredDocumentGroups.length > 0
+      "
+    >
+      <div
+        class="group-option"
+        *ngFor="let group of filteredDocumentGroups"
+        (mousedown)="selectDocumentGroup(group)"
+      >
+        {{ group.groupName }}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Loading -->
+  <div
+    class="text-muted mt-1"
+    style="font-size: 11px"
+    *ngIf="loadingDocumentGroups"
+  >
+    Loading document groups...
+  </div>
+
+  <!-- Validation -->
+  <div
+    class="text-danger mt-1"
+    style="font-size: 11px"
+    *ngIf="
+      documentForm.get('groupName')?.invalid &&
+      documentForm.get('groupName')?.touched
+    "
+  >
+    <div
+      *ngIf="documentForm.get('groupName')?.errors?.['required']"
+    >
+      Group name is required.
+    </div>
+
+    <div
+      *ngIf="documentForm.get('groupName')?.errors?.['minlength']"
+    >
+      Group name must be at least 2 characters long.
+    </div>
+
+    <div
+      *ngIf="documentForm.get('groupName')?.errors?.['maxlength']"
+    >
+      Group name cannot exceed 150 characters.
+    </div>
+  </div>
+</div>
 
           <!-- Group Code -->
 
@@ -346,39 +389,80 @@
 
         <div class="row mb-3">
           <!-- Document Type -->
+<!-- Document Type -->
 
-          <div class="col-md-6 form-group">
-            <label for="documentType"> Document Type </label>
+<div class="col-md-6 form-group">
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <select
-                id="documentType"
-                formControlName="documentType"
-                class="form-controler"
-              >
-                <option value="">Select document type</option>
+  <label for="documentTypeId">
+    Document Type
 
-                <option value="Certificate">Certificate</option>
+    <img
+      src="assets/img/star.svg"
+      class="required-icon"
+      alt="required"
+    />
+  </label>
 
-                <option value="Return">Return</option>
+  <div
+    class="field-wrap"
+    style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+  >
 
-                <option value="Statement">Statement</option>
+    <select
+      id="documentTypeId"
+      formControlName="documentTypeId"
+      class="form-controler"
+    >
 
-                <option value="Invoice">Invoice</option>
+      <option [ngValue]="null">
+        Select document type
+      </option>
 
-                <option value="Identity Proof">Identity Proof</option>
+      <option
+        *ngFor="let type of documentTypes"
+        [ngValue]="type.id"
+      >
+        {{ type.name }}
+      </option>
 
-                <option value="Address Proof">Address Proof</option>
+    </select>
 
-                <option value="Financial Statement">Financial Statement</option>
+  </div>
 
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
+
+  <!-- Loading -->
+
+  <div
+    class="text-muted mt-1"
+    style="font-size: 11px"
+    *ngIf="loadingDocumentTypes"
+  >
+    Loading document types...
+  </div>
+
+
+  <!-- Validation -->
+
+  <div
+    class="text-danger mt-1"
+    style="font-size: 11px"
+    *ngIf="
+      documentForm.get('documentTypeId')?.invalid &&
+      documentForm.get('documentTypeId')?.touched
+    "
+  >
+
+    <div
+      *ngIf="
+        documentForm.get('documentTypeId')?.errors?.['required']
+      "
+    >
+      Document type is required.
+    </div>
+
+  </div>
+
+</div>
 
           <!-- Mandatory -->
 

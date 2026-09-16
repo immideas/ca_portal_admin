@@ -68,6 +68,39 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
       }
     ]
   },
+{
+  items: [
+    {
+      id: 'document-management',
+      label: 'Document Management',
+      icon: 'bi-file-earmark-text',
+      children: [
+        {
+          label: 'Manage Documents',
+          icon: '',
+          route: '/documents',
+          activeRoutes: [
+            '/documents',
+            '/add-document',
+            '/edit-document',
+            '/view-document'
+          ]
+        },
+        {
+          label: 'Manage Document Types',
+          icon: '',
+          route: '/document-types',
+          activeRoutes: [
+            '/document-types',
+            '/add-document-type',
+            '/edit-document-type',
+            '/view-document-type'
+          ]
+        }
+      ]
+    }
+  ]
+},
  {
     items: [
       {
@@ -322,29 +355,29 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
 
   // ================= DOCUMENT MANAGEMENT =================
 
-{
-  items: [
-    {
-      id: 'document-management',
-      label: 'Document Management',
-      icon: 'bi-file-earmark-text',
-      children: [
-        {
-          label: 'Manage Documents',
-          icon: '',
-          route: '/documents',
-          permission: 'manage_documents',
-          activeRoutes: [
-            '/documents',
-            '/add-document',
-            '/edit-document',
-            '/view-document'
-          ]
-        }
-      ]
-    }
-  ]
-},
+// {
+//   items: [
+//     {
+//       id: 'document-management',
+//       label: 'Document Management',
+//       icon: 'bi-file-earmark-text',
+//       children: [
+//         {
+//           label: 'Manage Documents',
+//           icon: '',
+//           route: '/documents',
+//           permission: 'manage_documents',
+//           activeRoutes: [
+//             '/documents',
+//             '/add-document',
+//             '/edit-document',
+//             '/view-document'
+//           ]
+//         }
+//       ]
+//     }
+//   ]
+// },
 
   {
     items: [
