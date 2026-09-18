@@ -101,19 +101,19 @@
           <table id="documentTable" class="data-table">
             <thead>
               <tr>
-                <th>Document Code</th>
+                <!-- <th>Document Code</th> -->
 
                 <th>Document Name</th>
 
                 <th>Group Name</th>
 
-                <th>Group Code</th>
+                <!-- <th>Group Code</th> -->
 
                 <th>Document Type</th>
 
-                <th>Mandatory</th>
+                <!-- <th>Mandatory</th> -->
 
-                <th>Allowed File Types</th>
+                <!-- <th>Allowed File Types</th> -->
 
                 <th>Status</th>
 
@@ -188,9 +188,9 @@
                 >
                   <!-- Document Code -->
 
-                  <td>
+                  <!-- <td>
                     {{ document.documentCode }}
-                  </td>
+                  </td> -->
 
                   <!-- Document Name -->
 
@@ -206,9 +206,9 @@
 
                   <!-- Group Code -->
 
-                  <td>
+                  <!-- <td>
                     {{ document.groupCode }}
-                  </td>
+                  </td> -->
 
                   <!-- Document Type -->
 
@@ -224,16 +224,16 @@
 
                   <!-- Mandatory -->
 
-                  <td>
+                  <!-- <td>
                     <span *ngIf="document.isMandatory"> Yes </span>
 
                     <span *ngIf="!document.isMandatory" class="text-muted">
                       No
                     </span>
-                  </td>
+                  </td> -->
 
                   <!-- Allowed File Types -->
-
+<!-- 
                   <td>
                     <span *ngIf="document.allowedFileTypes">
                       {{ document.allowedFileTypes }}
@@ -242,7 +242,7 @@
                     <span *ngIf="!document.allowedFileTypes" class="text-muted">
                       —
                     </span>
-                  </td>
+                  </td> -->
 
                   <!-- Status -->
 

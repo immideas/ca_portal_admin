@@ -498,7 +498,7 @@
 
         <div class="row mb-3">
           <div class="col-md-12 form-group">
-            <label for="description"> Description </label>
+            <label for="description"> Purpose </label>
 
             <div
               class="field-wrap"
@@ -602,7 +602,196 @@
         </div>
       </div>
     </article>
+    <!-- ===================================================== -->
+<!-- DOCUMENT PREVIEW -->
+<!-- ===================================================== -->
+<article class="card complaint-card mb-4">
+  <div class="section-title">
+    <div class="item-icon">
+      <img
+        src="assets/img/Information.svg"
+        alt="info"
+      />
+    </div>
 
+    <div class="header-content">
+      <span class="header-text">
+        Document Preview
+      </span>
+    </div>
+
+    <div class="required-group">
+      <span class="badge-required">
+        Optional
+      </span>
+    </div>
+  </div>
+
+  <div class="form-padding-wrap">
+
+    <div class="row mb-3">
+
+      <div class="col-md-4 form-group">
+
+        <!-- ============================= -->
+        <!-- LABEL -->
+        <!-- ============================= -->
+
+        <label class="upload-main-label">
+          Preview File
+          <span class="sub-label">
+            (PNG, JPG, WEBP, PDF)
+          </span>
+        </label>
+
+
+        <!-- ============================= -->
+        <!-- VIEW MODE -->
+        <!-- ============================= -->
+
+        <ng-container *ngIf="isViewMode; else previewUploadMode">
+
+          <!-- Existing Preview -->
+          <ng-container
+            *ngIf="
+              documentPreview?.previewUrl;
+              else noDocumentPreview
+            "
+          >
+
+            <!-- IMAGE PREVIEW -->
+            <div
+              *ngIf="
+                !isDocumentPreviewPdf();
+                else pdfPreview
+              "
+              class="document-preview-view"
+            >
+
+              <img
+                [src]="documentPreview?.previewUrl || ''"
+                [alt]="
+                  documentPreview?.fileName ||
+                  'Document Preview'
+                "
+                class="document-preview-image"
+              />
+
+            </div>
+
+
+            <!-- PDF PREVIEW -->
+            <ng-template #pdfPreview>
+
+              <div class="document-preview-pdf">
+
+                <div class="document-preview-pdf-icon">
+                  <i class="bi bi-file-earmark-pdf-fill"></i>
+                </div>
+
+                <div class="document-preview-pdf-name">
+                  {{
+                    documentPreview?.fileName ||
+                    "Document.pdf"
+                  }}
+                </div>
+
+                <a
+                  [href]="
+                    documentPreview?.previewUrl || ''
+                  "
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-save btn-active document-preview-pdf-view-btn"
+                >
+                  <i class="bi bi-eye"></i>
+                  <span>View PDF</span>
+                </a>
+
+              </div>
+
+            </ng-template>
+
+          </ng-container>
+
+
+          <!-- NO PREVIEW -->
+          <ng-template #noDocumentPreview>
+
+            <div class="no-preview-message">
+              No preview file available.
+            </div>
+
+          </ng-template>
+
+        </ng-container>
+
+
+        <!-- ============================= -->
+        <!-- ADD / EDIT MODE -->
+        <!-- ============================= -->
+
+        <ng-template #previewUploadMode>
+
+          <div
+            class="modern-uploader-wrapper document-preview-uploader-wrapper"
+            #documentPreviewUploaderHost
+          >
+
+            <lib-image-uploader-lib
+              [imageUrls]="getDocumentPreviewUrls()"
+              [maxImages]="maxPreviewImages"
+              [aspectRatio]="1"
+              [outputFormat]="'original'"
+              [layoutMode]="'grid'"
+
+              [allowDrag]="true"
+              [allowEdit]="true"
+              [allowDelete]="true"
+              [allowReplace]="true"
+
+              (imagesChange)="
+                handleDocumentPreviewImagesChange($event)
+              "
+
+              (imageUpload)="
+                onDocumentPreviewUpload($event)
+              "
+
+              (imageReplace)="
+                onDocumentPreviewReplace($event)
+              "
+
+              (imageDelete)="
+                onDocumentPreviewDelete()
+              "
+
+              (imageEdit)="
+                onDocumentPreviewEdit($event)
+              "
+            >
+            </lib-image-uploader-lib>
+
+          </div>
+
+
+          <!-- HELP TEXT -->
+          <div
+            class="text-muted mt-1"
+            style="font-size: 11px"
+          >
+            Upload an optional preview image or PDF for this
+            document.
+          </div>
+
+        </ng-template>
+
+      </div>
+
+    </div>
+
+  </div>
+</article>
     <!-- ===================================================== -->
     <!-- STATUS INFORMATION -->
     <!-- ===================================================== -->

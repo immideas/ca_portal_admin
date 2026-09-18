@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ElementRef,
+  ViewChild,
+} from "@angular/core";
 import { Router, ActivatedRoute, RouterModule } from "@angular/router";
 
 import {
@@ -25,6 +31,10 @@ import { ConfirmDialogComponent } from "../../../confirm-dialog/confirm-dialog.c
 import { DocumentService } from "../../../services/document.service";
 
 import { DocumentTypeService } from "../../../services/document-type.service";
+import { UploadService } from "../../../services/upload.service";
+import { UploadType } from "../../../shared/enums/uploadTypeEnums";
+
+import { ImageUploaderLibComponent } from "@swiftlyme/image-uploader";
 
 @Component({
   selector: "app-add-document",
@@ -35,15 +45,16 @@ import { DocumentTypeService } from "../../../services/document-type.service";
 
   standalone: true,
 
-  imports: [
-    CommonModule,
-    HttpClientModule,
-    RouterModule,
-    ReactiveFormsModule,
-    NgxUiLoaderModule,
-    ToastrModule,
-    MatDialogModule,
-  ],
+imports: [
+  CommonModule,
+  HttpClientModule,
+  RouterModule,
+  ReactiveFormsModule,
+  NgxUiLoaderModule,
+  ToastrModule,
+  MatDialogModule,
+  ImageUploaderLibComponent,
+],
 })
 export class AddDocumentComponent implements OnInit, OnDestroy {
   documentForm: FormGroup;
@@ -61,6 +72,28 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   originalData: any = null;
 
   isSaving = false;
+  // =========================================================
+// DOCUMENT PREVIEW
+// =========================================================
+
+@ViewChild("documentPreviewUploaderHost")
+documentPreviewUploaderHost?: ElementRef<HTMLElement>;
+
+maxPreviewImages = 1;
+
+documentPreview: {
+  fileName: string;
+  filePath: string;
+  fileType: string;
+  fileSize: number;
+  previewUrl: string;
+} | null = null;
+
+// S3 files uploaded during current Add/Edit session
+private newlyUploadedDocumentPreviewKeys: Set<string> = new Set<string>();
+
+// Existing S3 file which should be deleted only after DB update succeeds
+private pendingDeleteDocumentPreviewKeys: string[] = [];
 
   /*
    * Document Types
@@ -89,6 +122,7 @@ showGroupSuggestions = false;
     private documentService: DocumentService,
 
     private documentTypeService: DocumentTypeService,
+      private uploadService: UploadService,
   ) {
     this.documentForm = this.fb.group({
       // =================================================
@@ -397,12 +431,45 @@ hideGroupSuggestions(): void {
     this.ngxLoader.start();
 
     this.documentService.listDocumentById(id).subscribe({
-      next: (response: any) => {
+   next: async (response: any) => {
         this.ngxLoader.stop();
 
         const documentData = response?.data || response;
 
         this.originalData = documentData;
+        // =====================================================
+// LOAD EXISTING DOCUMENT PREVIEW
+// =====================================================
+
+this.documentPreview = null;
+
+if (documentData.documentPreview) {
+  let previewUrl = documentData.documentPreview;
+
+  try {
+    previewUrl = await this.uploadService.getPreviewUrl(
+      documentData.documentPreview,
+    );
+  } catch (err) {
+    console.error(
+      "Failed to generate document preview URL:",
+      err,
+    );
+  }
+
+  this.documentPreview = {
+    fileName:
+      documentData.documentPreview.split("/").pop() ||
+      "document-preview",
+    filePath: documentData.documentPreview,
+    fileType: this.getDocumentPreviewFileType(
+  documentData.documentPreview
+),
+    fileSize: 0,
+    previewUrl:
+      previewUrl || documentData.documentPreview,
+  };
+}
 
         this.documentForm.patchValue({
           groupName: documentData.groupName || "",
@@ -474,6 +541,273 @@ hideGroupSuggestions(): void {
       },
     });
   }
+  private getDocumentPreviewFileType(filePath: string): string {
+  const path = String(filePath || "")
+    .split("?")[0]
+    .toLowerCase();
+
+  if (path.endsWith(".pdf")) {
+    return "application/pdf";
+  }
+
+  if (path.endsWith(".png")) {
+    return "image/png";
+  }
+
+  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+    return "image/jpeg";
+  }
+
+  if (path.endsWith(".webp")) {
+    return "image/webp";
+  }
+
+  return "image/*";
+}
+
+isDocumentPreviewPdf(): boolean {
+  const fileType = String(
+    this.documentPreview?.fileType || ""
+  ).toLowerCase();
+
+  const filePath = String(
+    this.documentPreview?.filePath || ""
+  )
+    .split("?")[0]
+    .toLowerCase();
+
+  return (
+    fileType === "application/pdf" ||
+    filePath.endsWith(".pdf")
+  );
+}
+  // =========================================================
+// DOCUMENT PREVIEW HELPERS
+// =========================================================
+
+getDocumentPreviewUrls(): string[] {
+  if (!this.documentPreview?.previewUrl) {
+    return [];
+  }
+
+  return [this.documentPreview.previewUrl];
+}
+
+// =========================================================
+// DOCUMENT PREVIEW UPLOAD
+// =========================================================
+
+async onDocumentPreviewUpload(image: any): Promise<void> {
+  if (this.isViewMode || !image?.file) {
+    return;
+  }
+
+  try {
+    const result = await this.uploadService.upload(
+      image.file,
+      UploadType.DOCUMENT_PREVIEW,
+    );
+
+    image.key = result.key;
+
+    this.documentPreview = {
+      fileName: image.file.name,
+      filePath: result.key,
+      fileType: image.file.type || "",
+      fileSize: image.file.size,
+      previewUrl: result.previewUrl || result.key,
+    };
+
+    this.newlyUploadedDocumentPreviewKeys.add(result.key);
+
+    console.log("Document preview uploaded:", this.documentPreview);
+  } catch (err: any) {
+    console.error("Document preview S3 upload failed:", err);
+
+    this.toastr.error(
+      `Document preview upload failed: ${err?.message || err}`,
+      "Error",
+    );
+  }
+}
+
+// =========================================================
+// DOCUMENT PREVIEW REPLACE
+// =========================================================
+
+async onDocumentPreviewReplace(event: any): Promise<void> {
+  if (this.isViewMode || !event?.new?.file) {
+    return;
+  }
+
+  const oldPreview = this.documentPreview;
+  const oldKey = oldPreview?.filePath || "";
+
+  try {
+    // =====================================================
+    // UPLOAD NEW PREVIEW FIRST
+    // =====================================================
+
+    const result = await this.uploadService.upload(
+      event.new.file,
+      UploadType.DOCUMENT_PREVIEW,
+    );
+
+    event.new.key = result.key;
+
+    // =====================================================
+    // HANDLE OLD S3 FILE
+    // =====================================================
+
+    if (
+      oldKey &&
+      typeof oldKey === "string" &&
+      !oldKey.startsWith("http://") &&
+      !oldKey.startsWith("https://")
+    ) {
+      // Old file was uploaded during this session
+      if (this.newlyUploadedDocumentPreviewKeys.has(oldKey)) {
+        try {
+          await this.uploadService.delete(oldKey);
+
+          this.newlyUploadedDocumentPreviewKeys.delete(oldKey);
+        } catch (err) {
+          console.error(
+            "Failed to delete old document preview:",
+            err,
+          );
+        }
+      } else {
+        // Existing DB file
+        this.pendingDeleteDocumentPreviewKeys.push(oldKey);
+      }
+    }
+
+    // =====================================================
+    // STORE NEW PREVIEW
+    // =====================================================
+
+    this.documentPreview = {
+      fileName: event.new.file.name,
+      filePath: result.key,
+      fileType: event.new.file.type || "",
+      fileSize: event.new.file.size,
+      previewUrl: result.previewUrl || result.key,
+    };
+
+    this.newlyUploadedDocumentPreviewKeys.add(result.key);
+
+    console.log("Document preview replaced:", this.documentPreview);
+  } catch (err: any) {
+    console.error("Document preview replacement failed:", err);
+
+    this.toastr.error(
+      `Document preview replacement failed: ${
+        err?.message || err
+      }`,
+      "Error",
+    );
+  }
+}
+
+// =========================================================
+// DOCUMENT PREVIEW DELETE
+// =========================================================
+
+async onDocumentPreviewDelete(): Promise<void> {
+  const preview = this.documentPreview;
+
+  if (!preview) {
+    return;
+  }
+
+  const key = preview.filePath;
+
+  // Newly uploaded during current session
+  if (key && this.newlyUploadedDocumentPreviewKeys.has(key)) {
+    try {
+      await this.uploadService.delete(key);
+
+      this.newlyUploadedDocumentPreviewKeys.delete(key);
+    } catch (err) {
+      console.error(
+        "Failed to delete new document preview from S3:",
+        err,
+      );
+    }
+  }
+
+  // Existing DB preview
+  else if (key) {
+    if (this.isEditMode && this.documentId) {
+      try {
+        await this.deleteExistingDocumentPreview();
+      } catch (err) {
+        console.error(
+          "Failed to delete existing document preview:",
+          err,
+        );
+      }
+    }
+  }
+
+  this.documentPreview = null;
+}
+
+// =========================================================
+// DELETE EXISTING DOCUMENT PREVIEW
+// =========================================================
+
+private async deleteExistingDocumentPreview(): Promise<void> {
+  if (!this.documentId) {
+    return;
+  }
+
+  // IMPORTANT:
+  // We should NOT directly delete the DB document here.
+  // Only remove the preview field.
+
+  await new Promise<void>((resolve, reject) => {
+    this.documentService
+      .updateDocument({
+        id: this.documentId,
+        documentPreview: null,
+      })
+      .subscribe({
+        next: () => resolve(),
+        error: (err) => reject(err),
+      });
+  });
+}
+
+// =========================================================
+// IMAGE CHANGE
+// =========================================================
+
+handleDocumentPreviewImagesChange(images: any[]): void {
+  /*
+   * Same safety behavior used by KYC.
+   *
+   * Image uploader can sometimes emit an empty/stale
+   * imagesChange event.
+   */
+
+  if (!images) {
+    return;
+  }
+
+  if (this.documentPreview && images.length === 0) {
+    return;
+  }
+}
+
+// =========================================================
+// IMAGE EDIT
+// =========================================================
+
+onDocumentPreviewEdit(image: any): void {
+  console.log("Document preview edited:", image);
+}
 
   // =====================================================
   // SAVE DOCUMENT
@@ -513,15 +847,7 @@ hideGroupSuggestions(): void {
 
       documentCode: formValue.documentCode?.trim(),
 
-      /*
-       * NEW
-       *
-       * Send Document Type ID
-       *
-       * Example:
-       *
-       * documentTypeId: 2
-       */
+    
       documentTypeId: Number(formValue.documentTypeId),
 
       documentDescription: formValue.description?.trim() || null,
@@ -536,6 +862,8 @@ hideGroupSuggestions(): void {
           : null,
 
       status: formValue.status,
+        documentPreview:
+    this.documentPreview?.filePath || null,
     };
 
     // =================================================
@@ -546,15 +874,37 @@ hideGroupSuggestions(): void {
       payload.id = this.documentId;
 
       this.documentService.updateDocument(payload).subscribe({
-        next: () => {
-          this.ngxLoader.stop();
+       next: async () => {
+  // =====================================================
+  // DELETE OLD DOCUMENT PREVIEW FROM S3
+  // ONLY AFTER DB UPDATE SUCCESS
+  // =====================================================
 
-          this.isSaving = false;
+  for (const key of this.pendingDeleteDocumentPreviewKeys) {
+    try {
+      await this.uploadService.delete(key);
+    } catch (err) {
+      console.error(
+        "Failed to delete old document preview from S3:",
+        key,
+        err,
+      );
+    }
+  }
 
-          this.toastr.success("Document updated successfully", "Success");
+  this.pendingDeleteDocumentPreviewKeys = [];
 
-          this.router.navigate(["/documents"]);
-        },
+  this.ngxLoader.stop();
+
+  this.isSaving = false;
+
+  this.toastr.success(
+    "Document updated successfully",
+    "Success",
+  );
+
+  this.router.navigate(["/documents"]);
+},
 
         error: (err: any) => {
           this.ngxLoader.stop();

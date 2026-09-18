@@ -70,9 +70,11 @@ export class S3HelperService {
       }
 
       // Validate file type
-      if (!this.isValidImageType(file)) {
-        throw new Error('Invalid file type. Only images are allowed.');
-      }
+     if (!this.isValidFileType(file)) {
+  throw new Error(
+    'Invalid file type. Only images and PDF files are allowed.'
+  );
+}
 
       // Generate unique file name
       const fileName = this.generateFileName(file, customFileName);
@@ -234,17 +236,23 @@ export class S3HelperService {
     }
   }
 
-  private isValidImageType(file: File): boolean {
-    const validTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'image/svg+xml',
-    ];
-    return validTypes.includes(file.type);
-  }
+private isValidFileType(file: File): boolean {
+  const validImageTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+  ];
+
+  const validFileTypes = [
+    ...validImageTypes,
+    'application/pdf',
+  ];
+
+  return validFileTypes.includes(file.type);
+}
 
   private generateFileName(file: File, customName?: string): string {
     if (customName) {

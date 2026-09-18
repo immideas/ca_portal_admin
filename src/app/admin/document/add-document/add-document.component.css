@@ -46,3 +46,106 @@
 .group-option:hover {
   background: #f5f5f5;
 }
+/* =========================================
+   DOCUMENT PREVIEW UPLOADER
+========================================= */
+
+::ng-deep .document-preview-uploader-wrapper lib-image-uploader-lib {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+::ng-deep
+  .document-preview-uploader-wrapper
+  lib-image-uploader-lib
+  .cdk-drop-list {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+::ng-deep
+  .document-preview-uploader-wrapper
+  lib-image-uploader-lib
+  .cdk-drop-list
+  > .cdk-drag {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+::ng-deep
+  .document-preview-uploader-wrapper
+  lib-image-uploader-lib
+  .upload-slot {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+::ng-deep
+  .document-preview-uploader-wrapper
+  lib-image-uploader-lib
+  .hidden-file-input {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+/* =========================================
+   DOCUMENT PREVIEW - VIEW MODE
+========================================= */
+
+.document-preview-view {
+  width: 100%;
+  min-height: 350px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8f9fb;
+
+  border: 1px solid #d9dfe8;
+  border-radius: 8px;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+.document-preview-image {
+  display: block;
+
+  width: 100%;
+  max-width: 100%;
+
+  max-height: 500px;
+
+  object-fit: contain;
+
+  border-radius: 6px;
+}
+
+.no-preview-message {
+  width: 100%;
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8f9fb;
+
+  border: 1px dashed #d9dfe8;
+  border-radius: 8px;
+
+  color: #8a94a6;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+}

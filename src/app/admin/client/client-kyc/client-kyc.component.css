@@ -365,3 +365,7 @@
   width: 100% !important;
   max-width: 100% !important;
 }
+.business-kyc-upload-label {
+  min-height: 42px;
+  display: block;
+}

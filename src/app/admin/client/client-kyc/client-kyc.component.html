@@ -230,86 +230,83 @@
 
         <!-- TAX INFORMATION -->
 
-        <div class="row mb-3">
+ <div class="row mb-3">
 
-          <!-- PAN -->
+  <!-- PAN -->
+  <div class="col-md-6 form-group">
 
-          <div class="col-md-4 form-group">
+    <label for="pan">
+      PAN
+    </label>
 
-            <label for="pan">
-              PAN
-            </label>
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <input
+        type="text"
+        id="pan"
+        class="form-controler"
+        [value]="client?.pan || ''"
+        readonly
+      />
+    </div>
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="pan"
-                class="form-controler"
-                [value]="client?.pan || ''"
-                readonly
-              />
-            </div>
-
-          </div>
-
-
-          <!-- GSTIN -->
-
-          <div
-            class="col-md-4 form-group"
-            *ngIf="client?.clientType === 'Business'"
-          >
-
-            <label for="gstin">
-              GSTIN
-            </label>
-
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="gstin"
-                class="form-controler"
-                [value]="client?.gstin || ''"
-                readonly
-              />
-            </div>
-
-          </div>
+  </div>
 
 
-          <!-- TAN -->
+  <!-- TAN -->
+  <div
+    class="col-md-6 form-group"
+    *ngIf="client?.clientType === 'Business'"
+  >
 
-          <div
-            class="col-md-4 form-group"
-            *ngIf="client?.clientType === 'Business'"
-          >
+    <label for="tan">
+      TAN
+    </label>
 
-            <label for="tan">
-              TAN
-            </label>
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <input
+        type="text"
+        id="tan"
+        class="form-controler"
+        [value]="client?.tan || ''"
+        readonly
+      />
+    </div>
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="tan"
-                class="form-controler"
-                [value]="client?.tan || ''"
-                readonly
-              />
-            </div>
+  </div>
 
-          </div>
 
-        </div>
+  <!-- GSTIN -->
+  <div
+    class="col-md-12 form-group"
+    *ngIf="client?.clientType === 'Business'"
+  >
+
+    <label for="gstin">
+      GSTIN
+    </label>
+
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <input
+        type="text"
+        id="gstin"
+        class="form-controler"
+        [value]="client?.gstin || ''"
+        readonly
+      />
+    </div>
+
+  </div>
+
+</div>
 
       </div>
 
@@ -559,9 +556,9 @@
 
           <!-- TAN -->
           <div class="col-md-4 form-group">
-            <label class="upload-main-label">
+          <label class="upload-main-label business-kyc-upload-label">
               TAN Certificate
-              <span class="sub-label">(PNG, JPG, WEBP)</span>
+              <span class="sub-label">(PNG, JPG, JPEG, WEBP, PDF)</span>
             </label>
 
             <div class="modern-uploader-wrapper" #tanUploaderHost>
@@ -600,9 +597,9 @@
 
           <!-- INCORPORATION -->
           <div class="col-md-4 form-group">
-            <label class="upload-main-label">
+          <label class="upload-main-label business-kyc-upload-label">
               Incorporation Certificate
-              <span class="sub-label">(PNG, JPG, WEBP)</span>
+              <span class="sub-label">(PNG, JPG, JPEG, WEBP, PDF)</span>
             </label>
 
             <div class="modern-uploader-wrapper" #incorporationUploaderHost>
@@ -641,9 +638,9 @@
 
           <!-- GST -->
           <div class="col-md-4 form-group">
-            <label class="upload-main-label">
+           <label class="upload-main-label business-kyc-upload-label">
               GST Certificate
-              <span class="sub-label">(PNG, JPG, WEBP)</span>
+              <span class="sub-label">(PNG, JPG, JPEG, WEBP, PDF)</span>
             </label>
 
             <div class="modern-uploader-wrapper" #gstUploaderHost>
