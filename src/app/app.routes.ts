@@ -54,12 +54,19 @@ import { ClientGroupListComponent } from "./admin/client-group/client-group-list
 import { AddClientComponent } from "./admin/client/add-client/add-client.component";
 import { ClientListComponent } from "./admin/client/client-list/client-list.component";
 import { ClientKycComponent } from "./admin/client/client-kyc/client-kyc.component";
+import { AddClientServicesComponent } from "./admin/client/add-client-services/add-client-services.component";
 // ================= DOCUMENT =================
 import { DocumentListComponent } from "./admin/document/document-list/document-list.component";
 import { AddDocumentComponent } from "./admin/document/add-document/add-document.component";
 // ================= DOCUMENT TYPE =================
 import { DocumentTypeListComponent } from "./super-admin/document-type/document-type-list/document-type-list.component";
 import { AddDocumentTypeComponent } from "./super-admin/document-type/add-document-type/add-document-type.component";
+// ================= SERVICE CATEGORY =================
+import { ManageServiceCategoryComponent } from "./super-admin/services/manage-service-category/manage-service-category.component";
+import { AddServiceCategoryComponent } from "./super-admin/services/add-service-category/add-service-category.component";
+// ================= SERVICE =================
+import { ManageServiceComponent } from "./super-admin/services/manage-service/manage-service.component";
+import { AddServiceComponent } from "./super-admin/services/add-service/add-service.component";
 // ================= CATEGORY =================
 
 import { ManageCategoryComponent } from "./product/category/manage-category/manage-category.component";
@@ -400,149 +407,158 @@ export const routes: Routes = [
       },
       // ---- Client Management ----
 
-{
-  path: "clients",
-  component: ClientListComponent,
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard
-  ],
-},
+      {
+        path: "clients",
+        component: ClientListComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "add-client",
-  component: AddClientComponent,
-  canDeactivate: [CanDeactivateGuard],
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard
-  ],
-},
+      {
+        path: "add-client",
+        component: AddClientComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "edit-client/:id",
-  component: AddClientComponent,
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard
-  ],
-},
+      {
+        path: "edit-client/:id",
+        component: AddClientComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "view-client/:id",
-  component: AddClientComponent,
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard
-  ],
-},
-{
-  path: "client-kyc/:id",
-  component: ClientKycComponent,
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard
-  ],
-},
+      {
+        path: "view-client/:id",
+        component: AddClientComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+      {
+        path: "client-kyc/:id",
+        component: ClientKycComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+      {
+        path: "add-client-services/:clientId",
+        component: AddClientServicesComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+
+      {
+        path: "view-client-services/:id",
+        component: AddClientServicesComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
       // ---- User Management ----
-    {
-  path: "manage-users",
-  component: ManageAdminUsersComponent,
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard,
-  ],
-},
-// ---- Document Management ----
+      {
+        path: "manage-users",
+        component: ManageAdminUsersComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+      // ---- Service Category Management (Super Admin Only) ----
 
-// {
-//   path: "documents",
-//   component: DocumentListComponent,
-//   canActivate: [
-//     AdminAuthGuard,
-//     paymentStatusGuard
-//   ],
-// },
+      {
+        path: "service-categories",
+        component: ManageServiceCategoryComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-// {
-//   path: "add-document",
-//   component: AddDocumentComponent,
-//   canDeactivate: [CanDeactivateGuard],
-//   canActivate: [
-//     AdminAuthGuard,
-//     paymentStatusGuard
-//   ],
-// },
+      {
+        path: "add-service-category",
+        component: AddServiceCategoryComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-// {
-//   path: "edit-document/:id",
-//   component: AddDocumentComponent,
-//   canActivate: [
-//     AdminAuthGuard,
-//     paymentStatusGuard
-//   ],
-// },
+      {
+        path: "edit-service-category/:id",
+        component: AddServiceCategoryComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-// {
-//   path: "view-document/:id",
-//   component: AddDocumentComponent,
-//   canActivate: [
-//     AdminAuthGuard,
-//     paymentStatusGuard
-//   ],
-// },
-// ---- Document Type Management (Super Admin Only) ----
+      {
+        path: "view-service-category/:id",
+        component: AddServiceCategoryComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+      // ---- Service Management (Super Admin Only) ----
 
-{
-  path: "document-types",
-  component: DocumentTypeListComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "services",
+        component: ManageServiceComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "add-document-type",
-  component: AddDocumentTypeComponent,
-  canDeactivate: [CanDeactivateGuard],
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "add-service",
+        component: AddServiceComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "edit-document-type/:id",
-  component: AddDocumentTypeComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "edit-service/:id",
+        component: AddServiceComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "view-document-type/:id",
-  component: AddDocumentTypeComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
-// ---- Document Management (Super Admin Only) ----
+      {
+        path: "view-service/:id",
+        component: AddServiceComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "documents",
-  component: DocumentListComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      // ---- Document Type Management (Super Admin Only) ----
 
-{
-  path: "add-document",
-  component: AddDocumentComponent,
-  canDeactivate: [CanDeactivateGuard],
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "document-types",
+        component: DocumentTypeListComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "edit-document/:id",
-  component: AddDocumentComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "add-document-type",
+        component: AddDocumentTypeComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "view-document/:id",
-  component: AddDocumentComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "edit-document-type/:id",
+        component: AddDocumentTypeComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+
+      {
+        path: "view-document-type/:id",
+        component: AddDocumentTypeComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+      // ---- Document Management (Super Admin Only) ----
+
+      {
+        path: "documents",
+        component: DocumentListComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+
+      {
+        path: "add-document",
+        component: AddDocumentComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [SuperAdminAuthGuard],
+      },
+
+      {
+        path: "edit-document/:id",
+        component: AddDocumentComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+
+      {
+        path: "view-document/:id",
+        component: AddDocumentComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
       {
         path: "add-users",

@@ -1,0 +1,298 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{ isViewMode ? "View Client Services" : "Manage Client Services" }}
+          </h4>
+
+          <p>Assign services to client</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEADER ACTIONS -->
+
+    <div class="header-actions">
+      <!-- VIEW -->
+
+      <ng-container *ngIf="isViewMode; else editMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <!-- ADD / EDIT -->
+
+      <ng-template #editMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="clientServiceForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active':
+              clientServiceForm.valid && selectedServiceCount > 0 && !isSaving,
+          }"
+          [disabled]="
+            clientServiceForm.invalid || selectedServiceCount === 0 || isSaving
+          "
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+
+          <span> Save Services </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    [formGroup]="clientServiceForm"
+    id="clientServiceForm"
+    (ngSubmit)="saveClientService()"
+    class="form-padding-wrap"
+  >
+    <!-- =================================================== -->
+    <!-- CLIENT INFORMATION -->
+    <!-- =================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Client Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="clientId">
+              Client
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="clientId"
+                formControlName="clientId"
+                class="form-controler"
+                [disabled]="isViewMode || !!clientId"
+                (change)="onClientChange()"
+              >
+                <option [ngValue]="null" disabled>Select client</option>
+
+                <option *ngFor="let client of clients" [ngValue]="client.id">
+                  {{ client.clientName }}
+
+                  <ng-container *ngIf="client.fileNo">
+                    ({{ client.fileNo }})
+                  </ng-container>
+                </option>
+              </select>
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                clientServiceForm.get('clientId')?.invalid &&
+                clientServiceForm.get('clientId')?.touched
+              "
+            >
+              Client is required.
+            </div>
+          </div>
+        </div>
+
+        <!-- SELECTED CLIENT SUMMARY -->
+
+        <div class="client-summary" *ngIf="selectedClient">
+          <div class="client-summary-item">
+            <span class="summary-label"> Client Name </span>
+
+            <span class="summary-value">
+              {{ selectedClient.clientName || "—" }}
+            </span>
+          </div>
+
+          <div class="client-summary-item">
+            <span class="summary-label"> File No </span>
+
+            <span class="summary-value">
+              {{ selectedClient.fileNo || "—" }}
+            </span>
+          </div>
+
+          <div class="client-summary-item">
+            <span class="summary-label"> PAN </span>
+
+            <span class="summary-value">
+              {{ selectedClient.pan || "—" }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- =================================================== -->
+    <!-- SERVICES -->
+    <!-- =================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="services" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Services </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            {{ selectedServiceCount }}
+            Selected
+          </span>
+        </div>
+      </div>
+
+      <!-- ================================================= -->
+      <!-- SERVICE GROUPS -->
+      <!-- ================================================= -->
+
+      <div class="service-groups">
+        <div class="service-group" *ngFor="let group of serviceGroups">
+          <!-- GROUP HEADER -->
+
+          <div class="service-group-header">
+            <div class="service-group-title">
+              <input
+                type="checkbox"
+                class="service-group-checkbox"
+                [checked]="isCategorySelected(group)"
+                [disabled]="isViewMode"
+                (change)="toggleCategory(group, $event)"
+              />
+
+              <h5>
+                {{ group.name }}
+              </h5>
+            </div>
+
+            <div class="service-count">
+              {{ group.services.length }}
+              services
+            </div>
+          </div>
+
+          <!-- ================================================= -->
+          <!-- SERVICE GRID -->
+          <!-- ================================================= -->
+
+          <div class="service-grid">
+            <div class="service-item" *ngFor="let service of group.services">
+              <label
+                class="service-checkbox-row"
+                [class.selected]="isServiceSelected(service.id)"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="isServiceSelected(service.id)"
+                  [disabled]="isViewMode"
+                  (change)="toggleService(service.id, $event)"
+                />
+
+                <span class="service-content">
+                  <span class="service-name">
+                    {{ service.serviceName }}
+                  </span>
+
+                  <span class="service-description">
+                    {{ service.description || "No description available." }}
+                  </span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- NO SERVICES -->
+
+        <div class="no-services" *ngIf="!serviceGroups.length">
+          <i class="bi bi-inbox"></i>
+
+          <p>No active services available.</p>
+        </div>
+      </div>
+    </article>
+  </form>
+</main>
+
+<!-- BACK TO TOP -->
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

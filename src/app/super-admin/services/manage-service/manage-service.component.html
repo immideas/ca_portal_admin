@@ -1,0 +1,245 @@
+<main id="main" class="main">
+  <section class="section">
+    <div class="container-fluid py-4">
+      <!-- Page Header -->
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1>Services</h1>
+
+          <p>Manage services</p>
+        </div>
+
+        <div class="page-header-actions">
+          <button class="btn-primary tour-add-service" (click)="addService()">
+            + Add Service
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="data-table-wrapper">
+        <!-- Toolbar -->
+        <div class="page-top-toolbar">
+          <div class="toolbar-left">
+            <label class="entries-label">
+              Show
+
+              <span class="entries-select-wrap">
+                <div class="entries-select-box">
+                  <span class="entries-number">
+                    {{ pageSize }}
+                  </span>
+
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path
+                      d="M3 4.5L6 7.5L9 4.5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <select
+                  class="entries-select-native"
+                  [value]="pageSize"
+                  (change)="onPageSizeChange($event)"
+                >
+                  <option *ngFor="let s of [10, 25, 50, 100]" [value]="s">
+                    {{ s }}
+                  </option>
+                </select>
+              </span>
+
+              entries
+            </label>
+          </div>
+
+          <!-- Search -->
+          <div class="toolbar-right">
+            <div class="search-input-wrap">
+              <span class="search-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle
+                    cx="6"
+                    cy="6"
+                    r="4.5"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+
+                  <path
+                    d="M9.5 9.5L12 12"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+
+              <input
+                class="search-input tour-search"
+                type="text"
+                placeholder="Search services"
+                [(ngModel)]="search"
+                (input)="onSearchChange()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="data-table-scroll tour-table">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Service Name</th>
+
+                <!-- <th>Service Code</th> -->
+
+                
+
+                <th>Frequency</th>
+
+                <th>Billing Amount</th>
+
+                <th>Status</th>
+
+                <th class="col-action">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- Loading -->
+              <ng-container *ngIf="loading">
+                <tr *ngFor="let r of [1, 2, 3, 4, 5]" class="sk-list-row">
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td class="col-action">
+                    <div
+                      class="sk sk-cell sk-cell--xs"
+                      style="margin: 0 auto"
+                    ></div>
+                  </td>
+                </tr>
+              </ng-container>
+
+              <!-- Empty -->
+              <tr *ngIf="!loading && services.length === 0">
+                <td colspan="7" class="text-center py-5">
+                  <div class="text-muted">No services found.</div>
+                </td>
+              </tr>
+
+              <!-- Data -->
+              <tr
+                *ngFor="let service of services; let i = index"
+                [ngClass]="{
+                  'disabled-row': service.status === 0,
+                }"
+                (click)="viewService(service.id)"
+                style="cursor: pointer"
+              >
+
+                <!-- Category -->
+                <td>
+                  {{ service.category?.name || service.categoryName || "—" }}
+                </td>
+                <!-- Service Name -->
+                <td>
+                  {{ service.serviceName }}
+                </td>
+
+                <!-- Service Code -->
+                <!-- <td>
+                  {{ service.serviceCode || "—" }}
+                </td> -->
+
+              
+
+                <!-- Frequency -->
+                <td>
+                  {{ service.frequency || "—" }}
+                </td>
+
+                <!-- Billing Amount -->
+                <td>
+                  {{
+                    service.billingAmount !== null &&
+                    service.billingAmount !== undefined
+                      ? "₹" + service.billingAmount
+                      : "—"
+                  }}
+                </td>
+
+                <!-- Status -->
+                <td (click)="$event.stopPropagation()">
+                  <app-status-toggle
+                    [checked]="service.status === 1"
+                    (toggled)="onStatusToggle(service, $event)"
+                  >
+                  </app-status-toggle>
+                </td>
+
+                <!-- Actions -->
+                <td class="col-action" (click)="$event.stopPropagation()">
+                  <app-three-dots-button
+                    [class.tour-actions]="i === 0"
+                    [active]="activeMenuId === service.id"
+                    (menuClick)="openMenu(service, $event)"
+                  >
+                  </app-three-dots-button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <app-pagination-footer
+          [totalItems]="totalItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          itemLabel="services"
+          (pageChange)="onPageChange($event)"
+        >
+        </app-pagination-footer>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Action Popup -->
+<app-popup-menu
+  *ngIf="menuPopupPosition"
+  title="Actions"
+  [items]="actionItems"
+  [position]="menuPopupPosition"
+  (itemClick)="onMenuItemClick($event)"
+  (closeClick)="closeMenu()"
+>
+</app-popup-menu>

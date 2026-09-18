@@ -1,0 +1,603 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Service"
+                : isEditMode
+                  ? "Edit Service"
+                  : "Add Service"
+            }}
+          </h4>
+
+          <p>Service details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="serviceForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': serviceForm.valid,
+          }"
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+
+          <span>
+            {{ isEditMode ? "Update" : "Save" }}
+          </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <!-- Main Form -->
+  <form [formGroup]="serviceForm" id="serviceForm" (ngSubmit)="saveService()">
+    <!-- ================= SERVICE INFORMATION CARD ================= -->
+    <article class="card complaint-card">
+      <!-- Section Header -->
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Service Details </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required-star"
+            />
+          </span>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Form Content -->
+      <div class="form-padding-wrap">
+        <!-- Service Category -->
+        <div class="row mb-3">
+          <div class="col-md-6 form-group">
+            <label for="serviceCategory">
+              Service Category
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="serviceCategory"
+                formControlName="categoryId"
+                class="form-controler"
+                [disabled]="isViewMode"
+              >
+                <option value="">Select service category</option>
+
+                <option
+                  *ngFor="let category of serviceCategories"
+                  [ngValue]="category.id"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('categoryId')?.invalid &&
+                serviceForm.get('categoryId')?.touched
+              "
+            >
+              Service category is required.
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="col-md-6 form-group">
+            <label for="serviceStatus"> Status </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="serviceStatus"
+                formControlName="status"
+                class="form-controler"
+                [disabled]="isViewMode"
+              >
+                <option [ngValue]="1">Active</option>
+
+                <option [ngValue]="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Name + Service Code -->
+        <div class="row mb-3">
+          <!-- Service Name -->
+          <div class="col-md-6 form-group">
+            <label for="serviceName">
+              Service Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="serviceName"
+                type="text"
+                formControlName="serviceName"
+                class="form-controler"
+                maxlength="100"
+                placeholder="Enter service name"
+                [readonly]="isViewMode"
+                (keypress)="allowServiceNameCharacters($event)"
+              />
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('serviceName')?.invalid &&
+                serviceForm.get('serviceName')?.touched
+              "
+            >
+              <div *ngIf="serviceForm.get('serviceName')?.errors?.['required']">
+                Service name is required.
+              </div>
+
+              <div
+                *ngIf="serviceForm.get('serviceName')?.errors?.['minlength']"
+              >
+                Service name must be at least 2 characters long.
+              </div>
+
+              <div
+                *ngIf="serviceForm.get('serviceName')?.errors?.['maxlength']"
+              >
+                Service name cannot exceed 100 characters.
+              </div>
+            </div>
+          </div>
+
+          <!-- Service Code -->
+          <div class="col-md-6 form-group">
+            <label for="serviceCode">
+              Service Code
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="serviceCode"
+                type="text"
+                formControlName="serviceCode"
+                class="form-controler"
+                maxlength="50"
+                placeholder="Auto-generated"
+                readonly
+              />
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('serviceCode')?.invalid &&
+                serviceForm.get('serviceCode')?.touched
+              "
+            >
+              <div *ngIf="serviceForm.get('serviceCode')?.errors?.['required']">
+                Service code is required.
+              </div>
+
+              <div
+                *ngIf="serviceForm.get('serviceCode')?.errors?.['minlength']"
+              >
+                Service code must be at least 2 characters long.
+              </div>
+
+              <div
+                *ngIf="serviceForm.get('serviceCode')?.errors?.['maxlength']"
+              >
+                Service code cannot exceed 50 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Frequency + Default Due Days -->
+        <div class="row mb-3">
+          <!-- Frequency -->
+          <div class="col-md-6 form-group">
+            <label for="frequency">
+              Frequency
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="frequency"
+                formControlName="frequency"
+                class="form-controler"
+                [disabled]="isViewMode"
+              >
+                <option value="One Time">One Time</option>
+
+                <option value="Monthly">Monthly</option>
+
+                <option value="Quarterly">Quarterly</option>
+
+                <option value="Half Yearly">Half Yearly</option>
+
+                <option value="Yearly">Yearly</option>
+              </select>
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('frequency')?.invalid &&
+                serviceForm.get('frequency')?.touched
+              "
+            >
+              Frequency is required.
+            </div>
+          </div>
+
+          <!-- Default Due Days -->
+          <div class="col-md-6 form-group">
+            <label for="defaultDueDays">
+              Default Due Days
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="defaultDueDays"
+                type="number"
+                formControlName="defaultDueDays"
+                class="form-controler"
+                min="0"
+                max="365"
+                placeholder="Enter default due days"
+                [readonly]="isViewMode"
+                (keypress)="allowOnlyNumbers($event)"
+              />
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('defaultDueDays')?.invalid &&
+                serviceForm.get('defaultDueDays')?.touched
+              "
+            >
+              <div
+                *ngIf="serviceForm.get('defaultDueDays')?.errors?.['required']"
+              >
+                Default due days is required.
+              </div>
+
+              <div *ngIf="serviceForm.get('defaultDueDays')?.errors?.['min']">
+                Due days cannot be negative.
+              </div>
+
+              <div *ngIf="serviceForm.get('defaultDueDays')?.errors?.['max']">
+                Due days cannot exceed 365.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Amount -->
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="billingAmount">
+              Billing Amount
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="billingAmount"
+                type="number"
+                formControlName="billingAmount"
+                class="form-controler"
+                min="0"
+                step="0.01"
+                placeholder="Enter billing amount"
+                [readonly]="isViewMode"
+                (keypress)="allowDecimalNumbers($event)"
+              />
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('billingAmount')?.invalid &&
+                serviceForm.get('billingAmount')?.touched
+              "
+            >
+              <div
+                *ngIf="serviceForm.get('billingAmount')?.errors?.['required']"
+              >
+                Billing amount is required.
+              </div>
+
+              <div *ngIf="serviceForm.get('billingAmount')?.errors?.['min']">
+                Billing amount cannot be negative.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="serviceDescription"> Description </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <textarea
+                id="serviceDescription"
+                formControlName="description"
+                class="form-controler"
+                rows="4"
+                maxlength="500"
+                placeholder="Enter service description"
+                [readonly]="isViewMode"
+              ></textarea>
+            </div>
+
+            <!-- Validation -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                serviceForm.get('description')?.invalid &&
+                serviceForm.get('description')?.touched
+              "
+            >
+              <div
+                *ngIf="serviceForm.get('description')?.errors?.['maxlength']"
+              >
+                Description cannot exceed 500 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= DOCUMENT GROUP INFORMATION CARD ================= -->
+    <article class="card complaint-card document-groups-card">
+      <!-- Section Header -->
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="document group info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Document Group Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required-star"
+            />
+          </span>
+        </div>
+      </div>
+
+      <!-- Document Group Content -->
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label> Document Groups </label>
+
+            <div class="document-groups-dropdown">
+              <!-- Collapsed Header -->
+              <button
+                type="button"
+                class="document-groups-header"
+                [disabled]="isViewMode"
+                (click)="toggleDocumentGroups()"
+              >
+              <span class="document-groups-placeholder">
+
+  <!-- ADD / EDIT MODE -->
+  <ng-container *ngIf="!isViewMode">
+
+    <ng-container *ngIf="selectedDocumentGroups.length === 0">
+      Select document groups
+    </ng-container>
+
+    <ng-container *ngIf="selectedDocumentGroups.length > 0">
+      {{ selectedDocumentGroups.length }} document group(s)
+      selected
+    </ng-container>
+
+  </ng-container>
+
+
+  <!-- VIEW MODE -->
+  <ng-container *ngIf="isViewMode">
+
+    <ng-container *ngIf="selectedDocumentGroups.length > 0">
+      {{ getSelectedDocumentGroupNames() }}
+    </ng-container>
+
+    <ng-container *ngIf="selectedDocumentGroups.length === 0">
+      No document groups selected
+    </ng-container>
+
+  </ng-container>
+
+</span>
+
+                <i
+                  class="bi"
+                  [ngClass]="
+                    isDocumentGroupsOpen ? 'bi-chevron-up' : 'bi-chevron-down'
+                  "
+                ></i>
+              </button>
+
+              <!-- Expandable List -->
+              <div class="document-groups-list" *ngIf="isDocumentGroupsOpen">
+                <div
+                  class="document-group-item"
+                  *ngFor="let group of documentGroups"
+                >
+                  <label class="document-group-label">
+                    <input
+                      type="checkbox"
+                      [value]="group.groupCode"
+                      [checked]="
+                        selectedDocumentGroups.includes(group.groupCode)
+                      "
+                      [disabled]="isViewMode"
+                      (change)="onDocumentGroupChange($event, group.groupCode)"
+                    />
+                    <span>
+                      {{ group.groupName }}
+                    </span>
+                  </label>
+                </div>
+
+                <div
+                  class="no-document-groups"
+                  *ngIf="documentGroups.length === 0"
+                >
+                  No document groups available.
+                </div>
+              </div>
+            </div>
+
+            <small class="text-muted">
+              Select the document groups required for this service.
+            </small>
+          </div>
+        </div>
+      </div>
+    </article>
+  </form>
+</main>

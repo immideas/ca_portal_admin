@@ -1,0 +1,229 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- Header -->
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Service Category"
+                : isEditMode
+                  ? "Edit Service Category"
+                  : "Add Service Category"
+            }}
+          </h4>
+
+          <p>Service category details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="serviceCategoryForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': serviceCategoryForm.valid,
+          }"
+        >
+          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+
+          <span>
+            {{ isEditMode ? "Update" : "Save" }}
+          </span>
+        </button>
+      </ng-template>
+    </div>
+  </header>
+
+  <!-- Main Card -->
+  <article class="card complaint-card">
+    <!-- Section Header -->
+    <div class="section-title">
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+
+      <div class="header-content">
+        <span class="header-text"> Service Category Details </span>
+      </div>
+
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+        </span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="alert alert-danger mx-4 mt-3">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Form -->
+    <form
+      [formGroup]="serviceCategoryForm"
+      id="serviceCategoryForm"
+      (ngSubmit)="saveServiceCategory()"
+      class="form-padding-wrap"
+    >
+      <!-- Service Category Name -->
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label for="serviceCategoryName">
+            Service Category Name
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <input
+              id="serviceCategoryName"
+              type="text"
+              formControlName="name"
+              class="form-controler"
+              maxlength="100"
+              placeholder="Enter service category name"
+              [readonly]="isViewMode"
+              (keypress)="allowOnlyAlphabets($event)"
+            />
+          </div>
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              serviceCategoryForm.get('name')?.invalid &&
+              serviceCategoryForm.get('name')?.touched
+            "
+          >
+            <div *ngIf="serviceCategoryForm.get('name')?.errors?.['required']">
+              Service category name is required.
+            </div>
+
+            <div *ngIf="serviceCategoryForm.get('name')?.errors?.['minlength']">
+              Service category name must be at least 2 characters long.
+            </div>
+
+            <div *ngIf="serviceCategoryForm.get('name')?.errors?.['maxlength']">
+              Service category name cannot exceed 100 characters.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="row mb-3">
+        <div class="col-md-12 form-group">
+          <label for="serviceCategoryDescription"> Description </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <textarea
+              id="serviceCategoryDescription"
+              formControlName="description"
+              class="form-controler"
+              rows="4"
+              maxlength="500"
+              placeholder="Enter service category description"
+              [readonly]="isViewMode"
+            ></textarea>
+          </div>
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              serviceCategoryForm.get('description')?.invalid &&
+              serviceCategoryForm.get('description')?.touched
+            "
+          >
+            <div
+              *ngIf="
+                serviceCategoryForm.get('description')?.errors?.['maxlength']
+              "
+            >
+              Description cannot exceed 500 characters.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="row mb-3">
+        <div class="col-md-6 form-group">
+          <label for="serviceCategoryStatus"> Status </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+          >
+            <select
+              id="serviceCategoryStatus"
+              formControlName="status"
+              class="form-controler"
+              [disabled]="isViewMode"
+            >
+              <option [ngValue]="1">Active</option>
+
+              <option [ngValue]="0">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+  </article>
+</main>

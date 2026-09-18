@@ -152,11 +152,14 @@ export class ClientListComponent implements OnInit, OnDestroy {
 
       label: "Edit",
     });
-      items.push({
-    id: "manage-kyc",
-    label: "Manage KYC",
-  });
-
+    items.push({
+      id: "manage-kyc",
+      label: "Manage KYC",
+    });
+    items.push({
+      id: "manage-services",
+      label: "Manage Services",
+    });
 
     // ---------------------------------------------------------
     // ENABLE / DISABLE
@@ -434,9 +437,12 @@ export class ClientListComponent implements OnInit, OnDestroy {
 
         break;
 
-          case "manage-kyc":
-    this.manageKyc(id);
-    break;
+      case "manage-kyc":
+        this.manageKyc(id);
+        break;
+      case "manage-services":
+        this.manageServices(id);
+        break;
       // -----------------------------------------------------
       // DISABLE
       // -----------------------------------------------------
@@ -485,11 +491,11 @@ export class ClientListComponent implements OnInit, OnDestroy {
     });
   }
   manageKyc(id: string | number): void {
-  this.router.navigate([
-    "/client-kyc",
-    id
-  ]);
-}
+    this.router.navigate(["/client-kyc", id]);
+  }
+  manageServices(id: string | number): void {
+    this.router.navigate(["/add-client-services", id]);
+  }
 
   // =========================================================
   // DISABLE CLIENT

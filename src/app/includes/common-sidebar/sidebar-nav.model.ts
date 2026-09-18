@@ -101,6 +101,41 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
     }
   ]
 },
+// ================= SERVICE MANAGEMENT =================
+// ================= SERVICE MANAGEMENT =================
+{
+  items: [
+    {
+      id: 'service-management',
+      label: 'Service Management',
+      icon: 'bi-briefcase',
+      children: [
+        {
+          label: 'Manage Service Categories',
+          icon: '',
+          route: '/service-categories',
+          activeRoutes: [
+            '/service-categories',
+            '/add-service-category',
+            '/edit-service-category',
+            '/view-service-category'
+          ]
+        },
+        {
+          label: 'Manage Services',
+          icon: '',
+          route: '/services',
+          activeRoutes: [
+            '/services',
+            '/add-service',
+            '/edit-service',
+            '/view-service'
+          ]
+        }
+      ]
+    }
+  ]
+},
  {
     items: [
       {

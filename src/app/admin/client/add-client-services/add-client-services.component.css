@@ -1,0 +1,253 @@
+/* =========================================================
+   CLIENT SUMMARY
+   ========================================================= */
+
+.client-summary {
+  display: flex;
+  gap: 40px;
+  padding: 16px 18px;
+  margin-top: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.client-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.summary-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+
+/* =========================================================
+   SERVICE GROUP
+   ========================================================= */
+
+.service-groups {
+  padding: 0;
+}
+
+.service-group {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.service-group:last-child {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   SERVICE GROUP HEADER
+   ========================================================= */
+
+.service-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 70px;
+
+  padding: 0 28px;
+
+  background: #f8f9fa;
+
+  border-left: 4px solid #5b3df5;
+}
+
+.service-group-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.service-group-title h5 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  color: #172033;
+}
+
+.service-group-checkbox {
+  width: 20px;
+  height: 20px;
+
+  cursor: pointer;
+}
+
+.service-count {
+  font-size: 14px;
+  color: #64748b;
+}
+
+
+/* =========================================================
+   SERVICE GRID
+   ========================================================= */
+
+.service-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  column-gap: 45px;
+  row-gap: 28px;
+
+  padding: 28px 30px 32px;
+}
+
+
+/* =========================================================
+   SERVICE ITEM
+   ========================================================= */
+
+.service-item {
+  min-width: 0;
+}
+
+.service-checkbox-row {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+.service-checkbox-row input {
+  flex: 0 0 auto;
+
+  width: 20px;
+  height: 20px;
+
+  margin-top: 2px;
+
+  cursor: pointer;
+}
+
+.service-checkbox-row input:disabled {
+  cursor: default;
+}
+
+
+/* =========================================================
+   SERVICE CONTENT
+   ========================================================= */
+
+.service-content {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+}
+
+.service-name {
+  display: block;
+
+  font-size: 16px;
+
+  line-height: 1.3;
+
+  font-weight: 500;
+
+  color: #17345f;
+}
+
+.service-description {
+  display: block;
+
+  font-size: 14px;
+
+  line-height: 1.45;
+
+  color: #64748b;
+}
+
+
+/* =========================================================
+   SELECTED
+   ========================================================= */
+
+.service-checkbox-row.selected
+  .service-name {
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   NO SERVICES
+   ========================================================= */
+
+.no-services {
+  text-align: center;
+
+  padding: 60px 20px;
+
+  color: #64748b;
+}
+
+.no-services i {
+  display: block;
+
+  font-size: 35px;
+
+  margin-bottom: 10px;
+}
+
+.no-services p {
+  margin: 0;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+  .service-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .service-grid {
+    grid-template-columns: 1fr;
+
+    padding: 20px;
+  }
+
+  .service-group-header {
+    padding: 0 20px;
+  }
+
+  .client-summary {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+}

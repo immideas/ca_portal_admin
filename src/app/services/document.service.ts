@@ -91,4 +91,13 @@ export class DocumentService {
       }
     );
   }
+  getDocumentGroups(): Observable<any> {
+  return this.http.post<any>(
+    `${this.apiUrl}/groups`,
+    {},
+    {
+      headers: this.getAuthHeaders()
+    }
+  );
+}
 }
