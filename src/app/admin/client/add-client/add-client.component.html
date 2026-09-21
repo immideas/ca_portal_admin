@@ -1,9 +1,9 @@
-<main id="main" class="complaint-wrapper">
+<main id="main" class="complaint-wrapper"  [class.embedded-wrapper]="embedded">
   <ngx-ui-loader></ngx-ui-loader>
 
   <!-- ================= HEADER ================= -->
 
-  <header class="top-header">
+ <header class="top-header" *ngIf="!embedded">
     <div class="header-left">
       <button
         type="button"

@@ -413,6 +413,31 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
 //     }
 //   ]
 // },
+// ================= DOCUMENT REQUEST MANAGEMENT =================
+
+{
+  items: [
+    {
+      id: 'document-request-management',
+      label: 'Document Request Management',
+      icon: 'bi-file-earmark-text',
+      children: [
+        {
+          label: 'Manage Document Requests',
+          icon: '',
+          route: '/document-requests',
+          permission: 'manage_document_requests',
+          activeRoutes: [
+            '/document-requests',
+            '/add-document-request',
+            '/edit-document-request',
+            '/view-document-request'
+          ]
+        }
+      ]
+    }
+  ]
+},
 
   {
     items: [

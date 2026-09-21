@@ -4,8 +4,8 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
-export class ServiceService {
-  private base = `${environment.apiUrl}/services`;
+export class DocumentRequestService {
+  private base = `${environment.apiUrl}/document-requests`;
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -34,44 +34,6 @@ export class ServiceService {
     return this.http.post(
       `${this.base}/get`,
       { id },
-      { headers: this.getHeaders() }
-    );
-  }
-getDocumentGroups(serviceId: number | string): Observable<any> {
-  return this.http.post(
-    `${this.base}/document-groups`,
-    { serviceId },
-    { headers: this.getHeaders() }
-  );
-}
-  update(payload: any): Observable<any> {
-    return this.http.post(
-      `${this.base}/update`,
-      payload,
-      { headers: this.getHeaders() }
-    );
-  }
-
-  delete(id: string | number): Observable<any> {
-    return this.http.post(
-      `${this.base}/delete`,
-      { id },
-      { headers: this.getHeaders() }
-    );
-  }
-
-  enable(id: string | number): Observable<any> {
-    return this.http.post(
-      `${this.base}/enable`,
-      { id },
-      { headers: this.getHeaders() }
-    );
-  }
-
-  getActiveServices(): Observable<any> {
-    return this.http.post(
-      `${this.base}/active`,
-      {},
       { headers: this.getHeaders() }
     );
   }

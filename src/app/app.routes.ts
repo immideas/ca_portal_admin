@@ -55,9 +55,13 @@ import { AddClientComponent } from "./admin/client/add-client/add-client.compone
 import { ClientListComponent } from "./admin/client/client-list/client-list.component";
 import { ClientKycComponent } from "./admin/client/client-kyc/client-kyc.component";
 import { AddClientServicesComponent } from "./admin/client/add-client-services/add-client-services.component";
+import { ClientViewComponent } from "./admin/client/client-view/client-view.component";
 // ================= DOCUMENT =================
 import { DocumentListComponent } from "./admin/document/document-list/document-list.component";
 import { AddDocumentComponent } from "./admin/document/add-document/add-document.component";
+// ================= DOCUMENT REQUEST =================
+import { DocumentRequestListComponent } from "./admin/document-request/document-request-list/document-request-list.component";
+import { AddDocumentRequestComponent } from "./admin/document-request/add-document-request/add-document-request.component";
 // ================= DOCUMENT TYPE =================
 import { DocumentTypeListComponent } from "./super-admin/document-type/document-type-list/document-type-list.component";
 import { AddDocumentTypeComponent } from "./super-admin/document-type/add-document-type/add-document-type.component";
@@ -428,7 +432,7 @@ export const routes: Routes = [
 
       {
         path: "view-client/:id",
-        component: AddClientComponent,
+        component: ClientViewComponent,
         canActivate: [AdminAuthGuard, paymentStatusGuard],
       },
       {
@@ -438,6 +442,12 @@ export const routes: Routes = [
       },
       {
         path: "add-client-services/:clientId",
+        component: AddClientServicesComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+      {
+        path: "edit-client-services/:clientId",
         component: AddClientServicesComponent,
         canDeactivate: [CanDeactivateGuard],
         canActivate: [AdminAuthGuard, paymentStatusGuard],
@@ -559,7 +569,32 @@ export const routes: Routes = [
         component: AddDocumentComponent,
         canActivate: [SuperAdminAuthGuard],
       },
+// ---- Document Request Management ----
 
+{
+  path: "document-requests",
+  component: DocumentRequestListComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
+
+{
+  path: "add-document-request",
+  component: AddDocumentRequestComponent,
+  canDeactivate: [CanDeactivateGuard],
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
+
+{
+  path: "edit-document-request/:id",
+  component: AddDocumentRequestComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
+
+{
+  path: "view-document-request/:id",
+  component: AddDocumentRequestComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
       {
         path: "add-users",
         component: AddSubAdminComponent,

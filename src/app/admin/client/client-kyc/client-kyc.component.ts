@@ -4,6 +4,7 @@ import {
   OnDestroy,
   ElementRef,
   ViewChild,
+  Input,
 } from "@angular/core";
 
 import { CommonModule } from "@angular/common";
@@ -33,6 +34,10 @@ export class ClientKycComponent implements OnInit, OnDestroy {
   // =========================================================
   // CLIENT
   // =========================================================
+
+  @Input() clientIdInput: number | null = null;
+@Input() isViewMode = false;
+@Input() embedded = false;
 
   clientId: string | null = null;
 
@@ -214,23 +219,29 @@ export class ClientKycComponent implements OnInit, OnDestroy {
   // INIT
   // =========================================================
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      this.clientId = params.get("id");
+ ngOnInit(): void {
+  this.route.paramMap.subscribe((params) => {
+    const routeClientId = params.get("id");
 
-      if (!this.clientId) {
-        this.toastr.error("Client ID is required.");
+    if (this.clientIdInput) {
+      this.clientId = String(this.clientIdInput);
+    } else {
+      this.clientId = routeClientId;
+    }
 
-        this.cancel();
+    if (!this.clientId) {
+      this.toastr.error("Client ID is required.");
 
-        return;
-      }
+      this.cancel();
 
-      this.loadClient();
+      return;
+    }
 
-      this.loadClientKycDocuments();
-    });
-  }
+    this.loadClient();
+
+    this.loadClientKycDocuments();
+  });
+}
 
   // =========================================================
   // DESTROY

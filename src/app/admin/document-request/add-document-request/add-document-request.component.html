@@ -1,0 +1,598 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+<header class="top-header">
+  <div class="header-left">
+    <button
+      type="button"
+      class="back-btn"
+      (click)="cancel()"
+      aria-label="Go back"
+    >
+      <img src="assets/img/back-icon.svg" alt="back" />
+    </button>
+
+    <div class="divider"></div>
+
+    <div class="title-box">
+      <div class="title-icon">
+        <img
+          src="assets/img/Plus.svg"
+          alt="document request"
+        />
+      </div>
+
+      <div class="title-text">
+        <h4>
+          {{
+            isViewMode
+              ? "View Document Request"
+              : isEditMode
+                ? "Edit Document Request"
+                : "New Document Request"
+          }}
+        </h4>
+
+        <p>
+          {{
+            isViewMode
+              ? "View document request details"
+              : isEditMode
+                ? "Edit document request"
+                : "Create a document request for client"
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER ACTIONS -->
+  <div class="header-actions">
+
+    <!-- Cancel / Back -->
+    <button
+      type="button"
+      class="btn-cancel"
+      (click)="cancel()"
+    >
+      {{ isViewMode ? "Back" : "Cancel" }}
+    </button>
+
+    <!-- Save / Update -->
+    <button
+      *ngIf="!isViewMode"
+      type="submit"
+      form="documentRequestForm"
+      class="btn-save"
+      [ngClass]="{
+        'btn-active': documentRequestForm.valid && !isSaving
+      }"
+      [disabled]="documentRequestForm.invalid || isSaving"
+    >
+      <img
+        class="save-icon"
+        src="assets/img/Group-Save.svg"
+        alt="save"
+      />
+
+      <span>
+        {{ isEditMode ? "Update Request" : "Create Request" }}
+      </span>
+    </button>
+
+  </div>
+</header>
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    [formGroup]="documentRequestForm"
+    id="documentRequestForm"
+    (ngSubmit)="saveDocumentRequest()"
+    class="form-padding-wrap"
+  >
+    <!-- ===================================================== -->
+    <!-- REQUEST INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Request Information </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- Task Name -->
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="taskName">
+              Task Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="taskName"
+                formControlName="taskName"
+                class="form-controler"
+                placeholder="Enter task name"
+                autocomplete="off"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentRequestForm.get('taskName')?.invalid &&
+                documentRequestForm.get('taskName')?.touched
+              "
+            >
+              <div
+                *ngIf="
+                  documentRequestForm.get('taskName')?.errors?.['required']
+                "
+              >
+                Task name is required.
+              </div>
+
+              <div
+                *ngIf="
+                  documentRequestForm.get('taskName')?.errors?.['minlength']
+                "
+              >
+                Task name must be at least 2 characters long.
+              </div>
+
+              <div
+                *ngIf="
+                  documentRequestForm.get('taskName')?.errors?.['maxlength']
+                "
+              >
+                Task name cannot exceed 255 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Client + Service -->
+
+        <div class="row mb-3">
+          <!-- CLIENT -->
+
+          <div class="col-md-6 form-group">
+            <label for="clientId">
+              Client
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="clientId"
+                formControlName="clientId"
+                class="form-controler"
+                (change)="onClientChange()"
+              >
+                <option [ngValue]="null">Select client</option>
+
+                <option *ngFor="let client of clients" [ngValue]="client.id">
+                  {{ client.clientName || client.name || client.companyName }}
+                </option>
+              </select>
+            </div>
+
+            <div
+              class="text-muted mt-1"
+              style="font-size: 11px"
+              *ngIf="loadingClients"
+            >
+              Loading clients...
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentRequestForm.get('clientId')?.invalid &&
+                documentRequestForm.get('clientId')?.touched
+              "
+            >
+              Client is required.
+            </div>
+          </div>
+
+          <!-- SERVICE -->
+
+          <div class="col-md-6 form-group">
+            <label for="serviceId">
+              Service
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="serviceId"
+                formControlName="serviceId"
+                class="form-controler"
+                (change)="onServiceChange()"
+              >
+                <option [ngValue]="null">Select service</option>
+
+                <option
+                  *ngFor="let service of services"
+                  [ngValue]="service.serviceId"
+                >
+                  {{
+                    service.serviceName ||
+                      service.service?.serviceName ||
+                      service.name
+                  }}
+                </option>
+              </select>
+            </div>
+
+            <div
+              class="text-muted mt-1"
+              style="font-size: 11px"
+              *ngIf="loadingServices"
+            >
+              Loading assigned services...
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentRequestForm.get('serviceId')?.invalid &&
+                documentRequestForm.get('serviceId')?.touched
+              "
+            >
+              Service is required.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- ASSIGNMENT INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Assignment Information </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- ASSIGNED STAFF -->
+
+          <div class="col-md-6 form-group">
+            <label for="assignedTo">
+              Assigned Staff
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="assignedTo"
+                formControlName="assignedTo"
+                class="form-controler"
+              >
+                <option [ngValue]="null">Select assigned staff</option>
+
+                <option *ngFor="let user of staff" [ngValue]="user.id">
+                  {{ user.name || user.userName || user.fullName }}
+                </option>
+              </select>
+            </div>
+
+            <div
+              class="text-muted mt-1"
+              style="font-size: 11px"
+              *ngIf="loadingStaff"
+            >
+              Loading staff...
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentRequestForm.get('assignedTo')?.invalid &&
+                documentRequestForm.get('assignedTo')?.touched
+              "
+            >
+              Assigned staff is required.
+            </div>
+          </div>
+
+          <!-- REVIEWER -->
+
+          <div class="col-md-6 form-group">
+            <label for="reviewerId"> Reviewer </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="reviewerId"
+                formControlName="reviewerId"
+                class="form-controler"
+              >
+                <option [ngValue]="null">Select reviewer</option>
+
+                <option *ngFor="let user of reviewers" [ngValue]="user.id">
+                  {{ user.name || user.userName || user.fullName }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- REQUEST DETAILS -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Request Details </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <!-- PRIORITY -->
+
+          <div class="col-md-4 form-group">
+            <label for="priority"> Priority </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="priority"
+                formControlName="priority"
+                class="form-controler"
+              >
+                <option [ngValue]="'LOW'">Low</option>
+
+                <option [ngValue]="'MEDIUM'">Medium</option>
+
+                <option [ngValue]="'HIGH'">High</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PERIOD -->
+
+          <div class="col-md-4 form-group">
+            <label for="period"> Period </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="text"
+                id="period"
+                formControlName="period"
+                class="form-controler"
+                placeholder="e.g. May 2026"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <!-- DUE DATE -->
+
+          <div class="col-md-4 form-group">
+            <label for="dueDate"> Due Date </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="date"
+                id="dueDate"
+                formControlName="dueDate"
+                class="form-controler"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- DOCUMENTS REQUIRED -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Documents Required </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required"> Required </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- DOCUMENT ACTIONS -->
+
+        <div
+          class="d-flex justify-content-end gap-2 mb-3"
+          *ngIf="documents.length > 0"
+        >
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="selectAllDocuments()"
+          >
+            Select All
+          </button>
+
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="clearAllDocuments()"
+          >
+            Clear
+          </button>
+        </div>
+
+        <!-- LOADING -->
+
+        <div
+          class="text-muted"
+          style="font-size: 12px"
+          *ngIf="loadingDocuments"
+        >
+          Loading documents...
+        </div>
+
+        <!-- DOCUMENT LIST -->
+
+        <div
+          class="document-request-list"
+          *ngIf="!loadingDocuments && documents.length > 0"
+        >
+          <div class="document-request-item" *ngFor="let document of documents">
+            <label class="document-checkbox">
+              <input
+                type="checkbox"
+                [checked]="isDocumentSelected(document.id)"
+                (change)="toggleDocument(document.id)"
+              />
+
+              <span class="document-checkbox-label">
+                <span class="document-name">
+                  {{ document.documentName || document.name }}
+                </span>
+
+                <span
+                  class="document-description"
+                  *ngIf="document.documentDescription || document.description"
+                >
+                  {{ document.documentDescription || document.description }}
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- EMPTY STATE -->
+
+        <div
+          class="no-documents-view"
+          *ngIf="!loadingDocuments && documents.length === 0"
+        >
+          <i class="bi bi-file-earmark-text"></i>
+
+          <span> Select a service to view required documents. </span>
+        </div>
+
+        <!-- SELECTED COUNT -->
+
+        <div
+          class="document-selected-count"
+          *ngIf="selectedDocumentIds.length > 0"
+        >
+          {{ selectedDocumentIds.length }}
+          document(s) selected
+        </div>
+      </div>
+    </article>
+  </form>
+</main>
+
+<!-- ===================================================== -->
+<!-- BACK TO TOP -->
+<!-- ===================================================== -->
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

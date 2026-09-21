@@ -1,11 +1,11 @@
-<main id="main" class="complaint-wrapper">
+<main id="main" class="complaint-wrapper"  [class.embedded-wrapper]="embedded">
   <ngx-ui-loader></ngx-ui-loader>
 
   <!-- ===================================================== -->
   <!-- HEADER -->
   <!-- ===================================================== -->
 
-  <header class="top-header">
+  <header class="top-header" *ngIf="!embedded">
     <div class="header-left">
       <button
         type="button"
@@ -63,13 +63,21 @@
           class="btn-save"
           [ngClass]="{
             'btn-active':
-              clientServiceForm.valid && selectedServiceCount > 0 && !isSaving,
+              clientServiceForm.valid &&
+              selectedServiceCount > 0 &&
+              !isSaving
           }"
           [disabled]="
-            clientServiceForm.invalid || selectedServiceCount === 0 || isSaving
+            clientServiceForm.invalid ||
+            selectedServiceCount === 0 ||
+            isSaving
           "
         >
-          <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+          <img
+            class="save-icon"
+            src="assets/img/Group-Save.svg"
+            alt="save"
+          />
 
           <span> Save Services </span>
         </button>
@@ -89,9 +97,14 @@
   >
     <!-- =================================================== -->
     <!-- CLIENT INFORMATION -->
+    <!-- Hide when embedded because Client View already knows
+         which client is being displayed -->
     <!-- =================================================== -->
 
-    <article class="card complaint-card mb-4">
+    <article
+      class="card complaint-card mb-4"
+      *ngIf="!embedded"
+    >
       <div class="section-title">
         <div class="item-icon">
           <img src="assets/img/Information.svg" alt="info" />
@@ -138,9 +151,14 @@
                 [disabled]="isViewMode || !!clientId"
                 (change)="onClientChange()"
               >
-                <option [ngValue]="null" disabled>Select client</option>
+                <option [ngValue]="null" disabled>
+                  Select client
+                </option>
 
-                <option *ngFor="let client of clients" [ngValue]="client.id">
+                <option
+                  *ngFor="let client of clients"
+                  [ngValue]="client.id"
+                >
                   {{ client.clientName }}
 
                   <ng-container *ngIf="client.fileNo">
@@ -165,9 +183,14 @@
 
         <!-- SELECTED CLIENT SUMMARY -->
 
-        <div class="client-summary" *ngIf="selectedClient">
+        <div
+          class="client-summary"
+          *ngIf="selectedClient"
+        >
           <div class="client-summary-item">
-            <span class="summary-label"> Client Name </span>
+            <span class="summary-label">
+              Client Name
+            </span>
 
             <span class="summary-value">
               {{ selectedClient.clientName || "—" }}
@@ -175,7 +198,9 @@
           </div>
 
           <div class="client-summary-item">
-            <span class="summary-label"> File No </span>
+            <span class="summary-label">
+              File No
+            </span>
 
             <span class="summary-value">
               {{ selectedClient.fileNo || "—" }}
@@ -183,7 +208,9 @@
           </div>
 
           <div class="client-summary-item">
-            <span class="summary-label"> PAN </span>
+            <span class="summary-label">
+              PAN
+            </span>
 
             <span class="summary-value">
               {{ selectedClient.pan || "—" }}
@@ -200,11 +227,16 @@
     <article class="card complaint-card mb-4">
       <div class="section-title">
         <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="services" />
+          <img
+            src="assets/img/Information.svg"
+            alt="services"
+          />
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Services </span>
+          <span class="header-text">
+            Services
+          </span>
         </div>
 
         <div class="required-group">
@@ -220,7 +252,10 @@
       <!-- ================================================= -->
 
       <div class="service-groups">
-        <div class="service-group" *ngFor="let group of serviceGroups">
+        <div
+          class="service-group"
+          *ngFor="let group of serviceGroups"
+        >
           <!-- GROUP HEADER -->
 
           <div class="service-group-header">
@@ -249,7 +284,10 @@
           <!-- ================================================= -->
 
           <div class="service-grid">
-            <div class="service-item" *ngFor="let service of group.services">
+            <div
+              class="service-item"
+              *ngFor="let service of group.services"
+            >
               <label
                 class="service-checkbox-row"
                 [class.selected]="isServiceSelected(service.id)"
@@ -267,7 +305,10 @@
                   </span>
 
                   <span class="service-description">
-                    {{ service.description || "No description available." }}
+                    {{
+                      service.description ||
+                      "No description available."
+                    }}
                   </span>
                 </span>
               </label>
@@ -277,10 +318,15 @@
 
         <!-- NO SERVICES -->
 
-        <div class="no-services" *ngIf="!serviceGroups.length">
+        <div
+          class="no-services"
+          *ngIf="!serviceGroups.length"
+        >
           <i class="bi bi-inbox"></i>
 
-          <p>No active services available.</p>
+          <p>
+            No active services available.
+          </p>
         </div>
       </div>
     </article>

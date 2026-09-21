@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, Input, OnInit, OnDestroy } from "@angular/core";
 import {
   FormBuilder,
   FormGroup,
@@ -58,7 +58,9 @@ export class AddClientServicesComponent implements OnInit, OnDestroy {
   // ADD / VIEW MODE
   // =====================================================
 
-  isViewMode = false;
+  @Input() isViewMode = false;
+  @Input() embedded = false;
+  @Input() clientIdInput: number | null = null;
   isEditMode = false;
 
   // =====================================================
@@ -124,47 +126,170 @@ export class AddClientServicesComponent implements OnInit, OnDestroy {
   // INIT
   // =====================================================
 
-  ngOnInit(): void {
-    this.loadClients();
+ngOnInit(): void {
 
-    this.loadServices();
+  // =====================================================
+  // LOAD BASIC DATA
+  // =====================================================
 
-    this.route.paramMap.subscribe((params) => {
-      this.clientId = params.get("clientId");
+  this.loadClients();
+  this.loadServices();
 
-      this.clientServiceId = params.get("id");
 
-      // -------------------------------------------------
-      // ADD MODE
-      // -------------------------------------------------
+  // =====================================================
+  // GET CLIENT ID FROM ROUTE / PARENT
+  // =====================================================
 
-      if (this.clientId) {
-        this.clientServiceForm.patchValue({
-          clientId: Number(this.clientId),
-        });
+  this.route.paramMap.subscribe((params) => {
 
-        this.loadSelectedClient(Number(this.clientId));
-      }
+    const routeClientId = params.get("clientId");
 
-      // -------------------------------------------------
-      // VIEW MODE
-      // -------------------------------------------------
+    /*
+     * Client View
+     *
+     * Example:
+     * clientIdInput = 2
+     */
+    if (this.clientIdInput) {
 
-      if (this.clientServiceId) {
-        this.isEditMode = true;
+      this.clientId = String(this.clientIdInput);
 
-        this.fetchClientServiceData(this.clientServiceId);
-      }
-    });
+    } else {
 
-    this.route.queryParamMap.subscribe((queryParams) => {
-      this.isViewMode = queryParams.get("viewMode") === "true";
+      /*
+       * Direct Add/Edit page
+       *
+       * Example:
+       * /add-client-services/2
+       * /edit-client-services/2
+       */
+      this.clientId = routeClientId;
+    }
 
-      if (this.isViewMode) {
-        this.clientServiceForm.disable();
-      }
-    });
-  }
+
+    // =================================================
+    // CLIENT ID AVAILABLE
+    // =================================================
+
+    if (this.clientId) {
+
+      const clientId = Number(this.clientId);
+
+      /*
+       * Patch client ID into form
+       */
+      this.clientServiceForm.patchValue({
+        clientId: clientId,
+      });
+
+      /*
+       * Load client information
+       */
+      this.loadSelectedClient(clientId);
+
+      /*
+       * IMPORTANT:
+       *
+       * Load ALL services assigned to this client.
+       *
+       * This is required for both:
+       *
+       * Client View
+       * Edit Client Services
+       */
+      this.loadAssignedServicesForClient(clientId);
+    }
+
+  });
+
+
+  // =====================================================
+  // DETECT ADD / EDIT ROUTE
+  // =====================================================
+
+  this.route.url.subscribe((segments) => {
+
+    const currentPath = segments
+      .map(segment => segment.path)
+      .join("/");
+
+    console.log(
+      "Current services route:",
+      currentPath
+    );
+
+
+    /*
+     * EDIT
+     *
+     * /edit-client-services/2
+     */
+    if (currentPath.startsWith("edit-client-services")) {
+
+      this.isEditMode = true;
+
+      console.log(
+        "Client Services: EDIT MODE"
+      );
+
+    }
+
+    /*
+     * ADD
+     *
+     * /add-client-services/2
+     */
+    else if (
+      currentPath.startsWith("add-client-services")
+    ) {
+
+      this.isEditMode = false;
+
+      console.log(
+        "Client Services: ADD MODE"
+      );
+
+    }
+
+  });
+
+
+  // =====================================================
+  // VIEW MODE
+  // =====================================================
+
+  this.route.queryParamMap.subscribe((queryParams) => {
+
+    const queryViewMode =
+      queryParams.get("viewMode") === "true";
+
+
+    /*
+     * When component is embedded inside
+     * ClientViewComponent,
+     * parent controls view mode.
+     */
+    if (this.clientIdInput) {
+
+      this.isViewMode = true;
+
+    } else {
+
+      this.isViewMode = queryViewMode;
+    }
+
+
+    /*
+     * Disable form in View Mode
+     */
+    if (this.isViewMode) {
+
+      this.clientServiceForm.disable();
+    }
+
+  });
+
+}
 
   // =====================================================
   // LOAD CLIENTS
@@ -398,6 +523,47 @@ export class AddClientServicesComponent implements OnInit, OnDestroy {
     });
   }
 
+  // =====================================================
+  // LOAD ALL ASSIGNED SERVICES FOR CLIENT VIEW
+  // =====================================================
+
+  loadAssignedServicesForClient(clientId: number): void {
+    this.ngxLoader.start();
+
+    this.clientServiceService.getClientServices(clientId).subscribe({
+      next: (response: any) => {
+        this.ngxLoader.stop();
+
+        if (!response?.success) {
+          return;
+        }
+
+        const assignments = response.data || [];
+
+        // Select all services assigned to this client
+        this.selectedServiceIds = new Set(
+          assignments.map((item: any) => Number(item.serviceId)),
+        );
+
+        console.log("Assigned services:", assignments);
+        console.log(
+          "Selected service IDs:",
+          Array.from(this.selectedServiceIds),
+        );
+      },
+
+      error: (err: any) => {
+        this.ngxLoader.stop();
+
+        console.error("Failed to fetch assigned client services:", err);
+
+        this.toastr.error(
+          err?.error?.message || "Failed to fetch assigned services",
+          "Error",
+        );
+      },
+    });
+  }
   // =====================================================
   // SAVE SERVICES
   // =====================================================

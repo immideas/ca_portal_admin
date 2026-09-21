@@ -1,0 +1,509 @@
+<main id="main" class="main">
+  <section class="section">
+    <div class="container-fluid py-4">
+
+      <!-- ================= PAGE HEADER ================= -->
+
+      <div class="page-header-row">
+
+        <div class="page-header">
+          <h1>Document Requests</h1>
+
+          <p>
+            View and manage all document requests
+          </p>
+        </div>
+
+        <div class="page-header-actions">
+
+          <button
+            class="btn-primary"
+            (click)="addDocumentRequest()"
+          >
+            <i class="bi bi-plus-lg"></i>
+
+            New Document Request
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= DATA TABLE ================= -->
+
+      <div class="data-table-wrapper">
+
+        <!-- ================= TOP TOOLBAR ================= -->
+
+        <div class="page-top-toolbar">
+
+          <div class="toolbar-left">
+
+            <label class="entries-label">
+
+              Show
+
+              <span class="entries-select-wrap">
+
+                <div class="entries-select-box">
+
+                  <span class="entries-number">
+                    {{ pageSize }}
+                  </span>
+
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                  >
+                    <path
+                      d="M3 4.5L6 7.5L9 4.5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+
+                </div>
+
+                <select
+                  class="entries-select-native"
+                  [value]="pageSize"
+                  (change)="onPageSizeChange($event)"
+                >
+
+                  <option
+                    *ngFor="let s of [10, 25, 50, 100]"
+                    [value]="s"
+                  >
+                    {{ s }}
+                  </option>
+
+                </select>
+
+              </span>
+
+              entries
+
+            </label>
+
+          </div>
+
+
+          <!-- ================= SEARCH ================= -->
+
+          <div class="toolbar-right">
+
+            <div class="search-input-wrap">
+
+              <span class="search-icon">
+
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                >
+
+                  <circle
+                    cx="6"
+                    cy="6"
+                    r="4.5"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+
+                  <path
+                    d="M9.5 9.5L12 12"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+
+                </svg>
+
+              </span>
+
+              <input
+                class="search-input"
+                type="text"
+                placeholder="Search..."
+                [(ngModel)]="search"
+                (input)="onSearchChange()"
+              />
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= TABLE ================= -->
+
+        <div class="data-table-scroll">
+
+          <table
+            id="documentRequestTable"
+            class="data-table"
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Request Code
+                </th>
+
+                <th>
+                  Task Name
+                </th>
+
+                <th>
+                  Client
+                </th>
+
+                <th>
+                  Service
+                </th>
+
+                <!-- <th>
+                  Assigned Staff
+                </th> -->
+
+                <!-- <th>
+                  Reviewer
+                </th> -->
+
+                <th>
+                  Priority
+                </th>
+
+                <th>
+                  Period
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th class="col-action">
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+              <!-- ================= LOADING SKELETON ================= -->
+
+              <ng-container *ngIf="loading">
+
+                <tr
+                  *ngFor="let r of [1, 2, 3, 4, 5]"
+                  class="sk-list-row"
+                >
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--lg"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk sk-cell sk-cell--sm"></div>
+                  </td>
+
+                  <td class="col-action">
+
+                    <div
+                      class="sk sk-cell sk-cell--xs"
+                      style="margin: 0 auto"
+                    ></div>
+
+                  </td>
+
+                </tr>
+
+              </ng-container>
+
+
+              <!-- ================= NO DATA ================= -->
+
+              <tr
+                *ngIf="
+                  !loading &&
+                  filteredDocumentRequests.length === 0
+                "
+              >
+
+                <td
+                  colspan="10"
+                  class="text-center py-5"
+                >
+
+                  <div class="text-muted">
+                    No document requests found.
+                  </div>
+
+                </td>
+
+              </tr>
+
+
+              <!-- ================= DOCUMENT REQUESTS ================= -->
+
+              <ng-container *ngIf="!loading">
+
+                <tr
+                  *ngFor="
+                    let request of filteredDocumentRequests;
+                    let i = index
+                  "
+                  (click)="viewDocumentRequest(request.id)"
+                  style="cursor: pointer"
+                >
+
+
+                  <!-- ================= REQUEST CODE ================= -->
+
+                  <td>
+
+                    {{ request.requestCode || "—" }}
+
+                  </td>
+
+
+                  <!-- ================= TASK NAME ================= -->
+
+                  <td>
+
+                    {{ request.taskName || "—" }}
+
+                  </td>
+
+
+                  <!-- ================= CLIENT ================= -->
+
+                  <td>
+
+                    {{
+                      request.client?.clientName ||
+                      request.clientName ||
+                      request.client?.name ||
+                      "—"
+                    }}
+
+                  </td>
+
+
+                  <!-- ================= SERVICE ================= -->
+
+                  <td>
+
+                    {{
+                      request.service?.serviceName ||
+                      request.serviceName ||
+                      request.service?.name ||
+                      "—"
+                    }}
+
+                  </td>
+
+
+                  <!-- ================= ASSIGNED STAFF ================= -->
+
+                  <!-- <td>
+
+                    {{
+                      request.assignedUser?.name ||
+                      request.assignedUser?.userName ||
+                      request.assignedUser?.fullName ||
+                      request.assignedToName ||
+                      "—"
+                    }}
+
+                  </td> -->
+
+
+                  <!-- ================= REVIEWER ================= -->
+
+                  <!-- <td>
+
+                    {{
+                      request.reviewer?.name ||
+                      request.reviewer?.userName ||
+                      request.reviewer?.fullName ||
+                      request.reviewerName ||
+                      "—"
+                    }}
+
+                  </td> -->
+
+
+                  <!-- ================= PRIORITY ================= -->
+
+                  <td>
+
+                    <span
+                      *ngIf="request.priority"
+                    >
+                      {{ request.priority }}
+                    </span>
+
+                    <span
+                      *ngIf="!request.priority"
+                      class="text-muted"
+                    >
+                      —
+                    </span>
+
+                  </td>
+
+
+                  <!-- ================= PERIOD ================= -->
+
+                  <td>
+
+                    {{
+                      request.period || "—"
+                    }}
+
+                  </td>
+
+
+                  <!-- ================= STATUS ================= -->
+
+                  <td>
+
+                    <span
+                      class="request-status"
+                      [ngClass]="{
+                        'status-requested':
+                          request.status === 'REQUESTED',
+
+                        'status-partially-uploaded':
+                          request.status === 'PARTIALLY_UPLOADED',
+
+                        'status-uploaded':
+                          request.status === 'UPLOADED',
+
+                        'status-under-verification':
+                          request.status === 'UNDER_VERIFICATION',
+
+                        'status-completed':
+                          request.status === 'COMPLETED',
+
+                        'status-cancelled':
+                          request.status === 'CANCELLED'
+                      }"
+                    >
+
+                      {{
+                        request.status || "REQUESTED"
+                      }}
+
+                    </span>
+
+                  </td>
+
+
+                  <!-- ================= ACTIONS ================= -->
+
+                  <td
+                    class="col-action"
+                    (click)="$event.stopPropagation()"
+                  >
+
+                    <app-three-dots-button
+                      [active]="
+                        activeMenuId === request.id
+                      "
+                      (menuClick)="
+                        openMenu(request, $event)
+                      "
+                    >
+                    </app-three-dots-button>
+
+                  </td>
+
+                </tr>
+
+              </ng-container>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <!-- ================= PAGINATION ================= -->
+
+        <app-pagination-footer
+          *ngIf="totalItems > 0"
+          [totalItems]="totalItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          itemLabel="document requests"
+          (pageChange)="onPageChange($event)"
+        >
+        </app-pagination-footer>
+
+      </div>
+
+    </div>
+  </section>
+</main>
+
+
+<!-- ================= POPUP MENU ================= -->
+
+<app-popup-menu
+  *ngIf="menuPopupPosition"
+
+  title="Actions"
+
+  [items]="actionItems"
+
+  [position]="menuPopupPosition"
+
+  (itemClick)="onMenuItemClick($event)"
+
+  (closeClick)="closeMenu()"
+>
+</app-popup-menu>

@@ -1,0 +1,87 @@
+/* =========================================================
+   DOCUMENT REQUEST
+   ========================================================= */
+
+.document-request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.document-request-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.document-request-item:hover {
+  border-color: #cbd5e1;
+}
+
+.document-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.document-checkbox input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.document-checkbox-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.document-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.document-description {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.no-documents-view {
+  width: 100%;
+  min-height: 150px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+
+  background: #f8fafc;
+  color: #94a3b8;
+
+  font-size: 13px;
+  text-align: center;
+}
+
+.no-documents-view i {
+  font-size: 30px;
+  margin-bottom: 8px;
+  color: #94a3b8;
+}
+
+.document-selected-count {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}

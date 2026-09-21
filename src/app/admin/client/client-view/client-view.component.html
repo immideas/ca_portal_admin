@@ -1,0 +1,214 @@
+<main id="main" class="complaint-wrapper">
+
+  <!-- ================= HEADER ================= -->
+
+  <header class="top-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-btn"
+        (click)="goBack()"
+        aria-label="Go back"
+      >
+        <img
+          src="assets/img/back-icon.svg"
+          alt="view"
+        />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+
+        <div class="title-icon">
+          <img
+            src="assets/img/Plus.svg"
+            alt="view"
+          />
+        </div>
+
+        <div class="title-text">
+
+          <h4>
+            View Client
+          </h4>
+
+          <p>
+            Client details
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= TABS ================= -->
+
+  <div class="client-tabs">
+
+    <button
+      type="button"
+      [class.active]="activeTab === 'basic'"
+      (click)="setTab('basic')"
+    >
+      Basic Details
+    </button>
+
+    <button
+      type="button"
+      [class.active]="activeTab === 'kyc'"
+      (click)="setTab('kyc')"
+    >
+      KYC Details
+    </button>
+
+    <button
+      type="button"
+      [class.active]="activeTab === 'services'"
+      (click)="setTab('services')"
+    >
+      Services
+    </button>
+
+  </div>
+
+
+  <!-- ================= TAB CONTENT ================= -->
+
+  <div class="client-tab-content">
+
+
+    <!-- =====================================================
+         BASIC DETAILS
+         ===================================================== -->
+
+    <div *ngIf="activeTab === 'basic'">
+
+      <!-- TAB HEADER -->
+
+      <div class="tab-action-row">
+
+        <h5>
+         
+        </h5>
+
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="editBasicDetails()"
+        >
+
+          <i class="bi bi-pencil-square"></i>
+
+          <span>
+            Edit
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- BASIC DETAILS COMPONENT -->
+
+      <app-add-client
+        [clientIdInput]="clientId"
+        [isViewMode]="true"
+        [embedded]="true">
+      </app-add-client>
+
+    </div>
+
+
+    <!-- =====================================================
+         KYC DETAILS
+         ===================================================== -->
+
+    <div *ngIf="activeTab === 'kyc'">
+
+      <!-- TAB HEADER -->
+
+      <div class="tab-action-row">
+
+        <h5>
+        
+        </h5>
+
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="editKyc()"
+        >
+
+          <i class="bi bi-pencil-square"></i>
+
+          <span>
+            Edit
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- KYC COMPONENT -->
+
+      <app-client-kyc
+        [clientIdInput]="clientId"
+        [isViewMode]="true"
+        [embedded]="true">
+      </app-client-kyc>
+
+    </div>
+
+
+    <!-- =====================================================
+         SERVICES
+         ===================================================== -->
+
+    <div *ngIf="activeTab === 'services'">
+
+      <!-- TAB HEADER -->
+
+      <div class="tab-action-row">
+
+        <h5>
+         
+        </h5>
+
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="editServices()"
+        >
+
+          <i class="bi bi-pencil-square"></i>
+
+          <span>
+            Edit
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- SERVICES COMPONENT -->
+
+      <app-add-client-services
+        [clientIdInput]="clientId"
+        [isViewMode]="true"
+        [embedded]="true">
+      </app-add-client-services>
+
+    </div>
+
+  </div>
+
+</main>

@@ -1,0 +1,9 @@
+/* ================================
+   Embedded mode inside Client View
+   ================================ */
+
+.complaint-wrapper.embedded-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  min-height: auto !important;
+}
