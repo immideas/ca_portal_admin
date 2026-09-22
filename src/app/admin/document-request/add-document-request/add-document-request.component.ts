@@ -1,14 +1,17 @@
-import { Component, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import {
-  ActivatedRoute,
-  Router,
-  RouterModule,
-} from "@angular/router";
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
@@ -25,7 +28,17 @@ import {
   ToastrService,
 } from "ngx-toastr";
 
-import { forkJoin } from "rxjs";
+import {
+  forkJoin,
+  Observable,
+} from "rxjs";
+
+import {
+  MatDialog,
+  MatDialogModule,
+} from "@angular/material/dialog";
+
+import { ConfirmDialogComponent } from "../../../confirm-dialog/confirm-dialog.component";
 
 import { ClientService } from "../../../services/client.service";
 import { ClientServiceService } from "../../../services/client-service.service";
@@ -42,15 +55,18 @@ import { ServiceService } from "../../../services/service.service";
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    FormsModule,
     HttpClientModule,
     NgxUiLoaderModule,
     ToastrModule,
+    MatDialogModule,
   ],
 
   templateUrl: "./add-document-request.component.html",
   styleUrl: "./add-document-request.component.css",
 })
 export class AddDocumentRequestComponent implements OnInit {
+
   documentRequestForm: FormGroup;
 
   submitted = false;
@@ -79,6 +95,28 @@ export class AddDocumentRequestComponent implements OnInit {
   services: any[] = [];
   loadingServices = false;
 
+  /*
+   * SERVICE MULTI-SELECT DROPDOWN (search + open state)
+   */
+  isServiceDropdownOpen = false;
+  serviceSearchText = "";
+
+  /*
+   * Reference to the dropdown trigger element, used to
+   * compute where the panel should float on screen.
+   */
+  @ViewChild("serviceTrigger")
+  serviceTriggerRef?: ElementRef<HTMLElement>;
+
+  /*
+   * Inline styles (position: fixed + top/left/width) applied
+   * to the dropdown panel. Computed from serviceTriggerRef's
+   * real bounding box so the panel always renders above/over
+   * everything else, instead of being clipped by a parent
+   * card's overflow: hidden.
+   */
+  servicePanelStyle: Record<string, string> = {};
+
   // =====================================================
   // STAFF
   // =====================================================
@@ -92,14 +130,93 @@ export class AddDocumentRequestComponent implements OnInit {
   // DOCUMENTS
   // =====================================================
 
-  documents: any[] = [];
+  /*
+   * requiredDocuments
+   * -----------------
+   * Documents configured for selected service(s).
+   *
+   * Example:
+   * ITR Service
+   *  - PAN
+   *  - Form 16
+   *  - Bank Statement
+   *
+   * These documents are automatically selected.
+   *
+   * NOTE ON DUPLICATES:
+   * If two selected services both require "Aadhaar", the
+   * document master still returns one row per service, but
+   * loadSelectedServiceDocuments() below de-duplicates by
+   * document.id using a Map, so "Aadhaar" appears exactly
+   * once here regardless of how many services need it.
+   */
+
+  requiredDocuments: any[] = [];
+
+  /*
+   * additionalDocuments
+   * --------------------
+   * Complete document master list excluding documents
+   * already present in requiredDocuments (matched by id),
+   * so a document already required never appears twice
+   * (once under Required, once under Additional).
+   *
+   * Example:
+   *
+   * PAN
+   * Form 16
+   * Bank Statement
+   * ------------------
+   * Aadhaar
+   * Passport
+   * Address Proof
+   * Salary Slip
+   */
+
+  additionalDocuments: any[] = [];
+
+  /*
+   * Search text used to filter the Additional Documents list.
+   */
+  additionalDocSearchText = "";
+
+  /*
+   * Combined selected document IDs.
+   *
+   * Required + Additional
+   */
   selectedDocumentIds: number[] = [];
 
+  /*
+   * Kept for compatibility with existing HTML/code.
+   */
+  documents: any[] = [];
+
   loadingDocuments = false;
+  loadingAdditionalDocuments = false;
+
+  // =====================================================
+  // MULTI SERVICE SELECTION
+  // =====================================================
+
+  selectedServices: any[] = [];
+
+  selectedServiceIds: number[] = [];
 
   // =====================================================
   // SELECTED CLIENT SERVICE
   // =====================================================
+
+  /*
+   * Primary service.
+   *
+   * Kept because existing backend requires:
+   *
+   * clientServiceId
+   * serviceId
+   *
+   * requestServices contains all selected services.
+   */
 
   selectedClientServiceId: number | null = null;
 
@@ -108,17 +225,23 @@ export class AddDocumentRequestComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
 
+    private elementRef: ElementRef,
+
     private ngxLoader: NgxUiLoaderService,
     private toastr: ToastrService,
+
+    private dialog: MatDialog,
 
     private clientService: ClientService,
     private clientServiceService: ClientServiceService,
     private documentService: DocumentService,
     private documentRequestService: DocumentRequestService,
     private userService: UserService,
-    private serviceService: ServiceService
+    private serviceService: ServiceService,
   ) {
+
     this.documentRequestForm = this.fb.group({
+
       // =================================================
       // REQUEST INFORMATION
       // =================================================
@@ -132,27 +255,54 @@ export class AddDocumentRequestComponent implements OnInit {
         ],
       ],
 
-      clientId: [null, Validators.required],
+      clientId: [
+        null,
+        Validators.required,
+      ],
 
-      serviceId: [null, Validators.required],
+      /*
+       * Primary service.
+       *
+       * Multiple services are actually stored in:
+       * selectedServices / requestServices
+       */
+      serviceId: [
+        null,
+        Validators.required,
+      ],
 
       // =================================================
       // ASSIGNMENT
       // =================================================
 
-      assignedTo: [null, Validators.required],
+      assignedTo: [
+        null,
+        Validators.required,
+      ],
 
-      reviewerId: [null],
+      reviewerId: [
+        null,
+      ],
 
       // =================================================
       // REQUEST DETAILS
       // =================================================
 
-      priority: ["MEDIUM", Validators.required],
+      priority: [
+        "MEDIUM",
+        Validators.required,
+      ],
 
-      period: ["", [Validators.maxLength(100)]],
+      period: [
+        "",
+        [
+          Validators.maxLength(100),
+        ],
+      ],
 
-      dueDate: [null],
+      dueDate: [
+        null,
+      ],
     });
   }
 
@@ -160,64 +310,84 @@ export class AddDocumentRequestComponent implements OnInit {
   // INIT
   // =====================================================
 
- ngOnInit(): void {
-  this.loadClients();
-  this.loadUsers();
+  ngOnInit(): void {
 
-  this.route.paramMap.subscribe((params) => {
-    const id = params.get("id");
+    this.loadClients();
 
-    console.log("ROUTE ID:", id);
+    this.loadUsers();
 
-    const url = this.router.url;
+    // =================================================
+    // ROUTE ID -> EDIT MODE
+    // =================================================
 
-    if (url.includes("/view-document-request/")) {
-      this.isViewMode = true;
-      this.isEditMode = false;
-    } else if (url.includes("/edit-document-request/")) {
-      this.isViewMode = false;
-      this.isEditMode = true;
-    } else {
-      this.isViewMode = false;
-      this.isEditMode = false;
-    }
+    this.route.paramMap.subscribe((params) => {
 
-    this.route.queryParamMap.subscribe((queryParams) => {
-      if (queryParams.get("viewMode") === "true") {
-        this.isViewMode = true;
-        this.isEditMode = false;
-      }
-
-      this.applyViewMode();
+      const id = params.get("id");
 
       if (id) {
+
         const numericId = Number(id);
 
-        if (Number.isInteger(numericId) && numericId > 0) {
-          this.documentRequestId = numericId;
+        if (
+          Number.isInteger(numericId) &&
+          numericId > 0
+        ) {
 
-          console.log(
-            "CALLING LOAD DOCUMENT REQUEST:",
-            numericId
-          );
+          this.isEditMode = true;
+
+          this.documentRequestId = numericId;
 
           this.loadDocumentRequest(numericId);
         }
       }
     });
-  });
-}
+
+    // =================================================
+    // QUERY PARAM -> VIEW MODE
+    // =================================================
+
+    this.route.queryParamMap.subscribe((queryParams) => {
+
+      this.isViewMode =
+        queryParams.get("viewMode") === "true";
+
+      this.applyViewMode();
+    });
+  }
 
   // =====================================================
   // APPLY VIEW MODE
   // =====================================================
 
   private applyViewMode(): void {
+
     if (this.isViewMode) {
+
       this.documentRequestForm.disable();
+
     } else {
+
       this.documentRequestForm.enable();
     }
+  }
+
+  // =====================================================
+  // ENABLE EDIT MODE
+  // =====================================================
+
+  enableEditMode(): void {
+
+    this.isViewMode = false;
+
+    this.documentRequestForm.enable();
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        viewMode: null,
+      },
+      queryParamsHandling: "merge",
+    });
   }
 
   // =====================================================
@@ -225,142 +395,303 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   loadDocumentRequest(id: number): void {
-  console.log("========== DOCUMENT REQUEST LOAD ==========");
-  console.log("Request ID:", id);
 
-  this.ngxLoader.start();
+    this.ngxLoader.start();
 
-  this.documentRequestService.getById(id).subscribe({
-    next: (response: any) => {
-      this.ngxLoader.stop();
+    this.documentRequestService.getById(id).subscribe({
 
-      console.log("API RESPONSE:", response);
+      next: (response: any) => {
 
-      if (!response?.success) {
-        console.error("API returned success=false:", response);
-        return;
-      }
+        this.ngxLoader.stop();
 
-     const request = response.data.documentRequest;
-
-      console.log("REQUEST DATA:", request);
-
-      if (!request) {
-        console.error("response.data is empty");
-        return;
-      }
-
-      // PATCH FORM
-      this.documentRequestForm.patchValue({
-        taskName: request.taskName ?? "",
-        clientId: request.clientId ?? null,
-        serviceId: request.serviceId ?? null,
-        assignedTo: request.assignedTo ?? null,
-        reviewerId: request.reviewerId ?? null,
-        priority: request.priority ?? "MEDIUM",
-        period: request.period ?? "",
-        dueDate: request.dueDate ?? null,
-      });
-
-      console.log(
-        "FORM VALUE AFTER PATCH:",
-        this.documentRequestForm.getRawValue()
-      );
-
-      // Client service
-      this.selectedClientServiceId =
-        request.clientServiceId
-          ? Number(request.clientServiceId)
-          : null;
-
-      // Load services belonging to client
-      if (request.clientId) {
-        this.loadClientServices(Number(request.clientId));
-      }
-
-      // Load documents belonging to service
-      if (request.serviceId) {
-        this.loadServiceDocuments(Number(request.serviceId));
-      }
-
-      // Required documents
-      const requestItems =
-        Array.isArray(request.items)
-          ? request.items
-          : Array.isArray(request.documentRequestItems)
-            ? request.documentRequestItems
-            : [];
-
-      this.selectedDocumentIds = requestItems
-        .map((item: any) => Number(item.documentId))
-        .filter(
-          (documentId: number) =>
-            Number.isInteger(documentId) && documentId > 0
+        console.log(
+          "DOCUMENT REQUEST RAW RESPONSE:",
+          response
         );
 
-      // Finally apply view mode
-      this.applyViewMode();
-    },
+        if (!response?.success) {
 
-    error: (error: any) => {
-      this.ngxLoader.stop();
+          console.error(
+            "API returned success=false:",
+            response
+          );
 
-      console.error(
-        "DOCUMENT REQUEST GET API ERROR:",
-        error
-      );
-    },
-  });
-}
+          return;
+        }
+
+        // =================================================
+        // GET REQUEST
+        // =================================================
+
+        const request =
+          response?.data?.documentRequest ||
+          (
+            Array.isArray(response?.data)
+              ? response.data[0]
+              : null
+          );
+
+        if (!request) {
+
+          console.error(
+            "Document request data not found:",
+            response
+          );
+
+          return;
+        }
+
+        console.log(
+          "EDIT REQUEST:",
+          request
+        );
+
+        // =================================================
+        // GET DOCUMENT REQUEST ITEMS
+        // =================================================
+
+        const requestItems =
+          Array.isArray(response?.data?.items)
+            ? response.data.items
+            : Array.isArray(request?.items)
+              ? request.items
+              : Array.isArray(request?.documentRequestItems)
+                ? request.documentRequestItems
+                : Array.isArray(response?.data)
+                  ? response.data[0]?.items || []
+                  : [];
+
+        console.log(
+          "REQUEST ITEMS:",
+          requestItems
+        );
+
+        // =================================================
+        // PATCH FORM
+        // =================================================
+
+        this.documentRequestForm.patchValue({
+
+          taskName:
+            request.taskName ?? "",
+
+          clientId:
+            request.clientId ?? null,
+
+          serviceId:
+            request.serviceId ?? null,
+
+          assignedTo:
+            request.assignedTo ?? null,
+
+          reviewerId:
+            request.reviewerId ?? null,
+
+          priority:
+            request.priority ?? "MEDIUM",
+
+          period:
+            request.period ?? "",
+
+          dueDate:
+            request.dueDate ?? null,
+        });
+
+        // =================================================
+        // LOAD SAVED REQUEST SERVICES
+        // =================================================
+
+        let savedRequestServices: any[] = [];
+
+        if (
+          Array.isArray(
+            request.requestServices
+          )
+        ) {
+
+          savedRequestServices =
+            request.requestServices;
+
+        } else if (
+          typeof request.requestServices === "string"
+        ) {
+
+          try {
+
+            const parsed =
+              JSON.parse(
+                request.requestServices
+              );
+
+            savedRequestServices =
+              Array.isArray(parsed)
+                ? parsed
+                : [];
+
+          } catch {
+
+            savedRequestServices = [];
+          }
+        }
+
+        // =================================================
+        // OLD RECORD SUPPORT
+        // =================================================
+
+        if (
+          savedRequestServices.length === 0 &&
+          request.serviceId
+        ) {
+
+          savedRequestServices = [
+            {
+              clientServiceId:
+                Number(request.clientServiceId),
+
+              serviceId:
+                Number(request.serviceId),
+            },
+          ];
+        }
+
+        // =================================================
+        // SAVE TEMP SELECTED SERVICE IDS
+        // =================================================
+
+        this.selectedServiceIds =
+          savedRequestServices
+            .map(
+              (item: any) =>
+                Number(item.serviceId)
+            )
+            .filter(
+              (id: number) =>
+                Number.isInteger(id) &&
+                id > 0
+            );
+
+        // =================================================
+        // SELECTED CLIENT SERVICE
+        // =================================================
+
+        this.selectedClientServiceId =
+          request.clientServiceId
+            ? Number(request.clientServiceId)
+            : savedRequestServices.length > 0
+              ? Number(
+                  savedRequestServices[0]
+                    .clientServiceId
+                )
+              : null;
+
+        // =================================================
+        // SELECTED DOCUMENTS
+        // =================================================
+
+        this.selectedDocumentIds =
+          requestItems
+            .map(
+              (item: any) =>
+                Number(item.documentId)
+            )
+            .filter(
+              (documentId: number) =>
+                Number.isInteger(documentId) &&
+                documentId > 0
+            );
+
+        this.selectedDocumentIds =
+          Array.from(
+            new Set(
+              this.selectedDocumentIds
+            )
+          );
+
+        console.log(
+          "PATCHED DOCUMENT IDS:",
+          this.selectedDocumentIds
+        );
+
+        // =================================================
+        // LOAD CLIENT SERVICES
+        // =================================================
+
+        if (request.clientId) {
+
+          this.loadClientServices(
+            Number(request.clientId)
+          );
+        }
+
+        this.applyViewMode();
+      },
+
+      error: (error: any) => {
+
+        this.ngxLoader.stop();
+
+        console.error(
+          "DOCUMENT REQUEST GET API ERROR:",
+          error
+        );
+
+        this.toastr.error(
+          error?.error?.message ||
+            "Failed to fetch document request",
+          "Error"
+        );
+      },
+    });
+  }
 
   // =====================================================
   // LOAD CLIENTS
   // =====================================================
 
   loadClients(): void {
+
     this.loadingClients = true;
 
-    this.clientService
-      .listAllClients({})
-      .subscribe({
-        next: (response: any) => {
-          this.loadingClients = false;
+    this.clientService.listAllClients({}).subscribe({
 
-          console.log(
-            "Clients response:",
-            response
-          );
+      next: (response: any) => {
 
-          if (response?.success) {
-            this.clients =
-              Array.isArray(response.data)
-                ? response.data
-                : [];
-          } else {
-            this.clients =
-              Array.isArray(response?.data)
-                ? response.data
-                : Array.isArray(response)
+        this.loadingClients = false;
+
+        if (response?.success) {
+
+          this.clients =
+            Array.isArray(response.data)
+              ? response.data
+              : [];
+
+        } else {
+
+          this.clients =
+            Array.isArray(response?.data)
+              ? response.data
+              : Array.isArray(response)
                 ? response
                 : [];
-          }
-        },
+        }
+      },
 
-        error: (err: any) => {
-          this.loadingClients = false;
+      error: (err: any) => {
 
-          console.error(
-            "Failed to load clients:",
-            err
-          );
+        this.loadingClients = false;
 
-          this.toastr.error(
-            err?.error?.message ||
-              "Failed to load clients",
-            "Error"
-          );
-        },
-      });
+        console.error(
+          "Failed to load clients:",
+          err
+        );
+
+        this.toastr.error(
+          err?.error?.message ||
+            "Failed to load clients",
+          "Error"
+        );
+      },
+    });
   }
 
   // =====================================================
@@ -368,62 +699,55 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   loadUsers(): void {
+
     this.loadingStaff = true;
 
-    this.userService
-      .getAllUsers({})
-      .subscribe({
-        next: (response: any) => {
-          this.loadingStaff = false;
+    this.userService.getAllUsers({}).subscribe({
 
-          console.log(
-            "Users response:",
-            response
-          );
+      next: (response: any) => {
 
-          let users: any[] = [];
+        this.loadingStaff = false;
 
-          if (response?.success) {
-            users = Array.isArray(response.data)
+        let users: any[] = [];
+
+        if (response?.success) {
+
+          users =
+            Array.isArray(response.data)
               ? response.data
               : [];
-          } else {
-            users = Array.isArray(response?.data)
+
+        } else {
+
+          users =
+            Array.isArray(response?.data)
               ? response.data
               : Array.isArray(response)
-              ? response
-              : [];
-          }
+                ? response
+                : [];
+        }
 
-          this.staff = users;
-          this.reviewers = users;
+        this.staff = users;
 
-          console.log(
-            "Staff:",
-            this.staff
-          );
+        this.reviewers = users;
+      },
 
-          console.log(
-            "Reviewers:",
-            this.reviewers
-          );
-        },
+      error: (err: any) => {
 
-        error: (err: any) => {
-          this.loadingStaff = false;
+        this.loadingStaff = false;
 
-          console.error(
-            "Failed to load users:",
-            err
-          );
+        console.error(
+          "Failed to load users:",
+          err
+        );
 
-          this.toastr.error(
-            err?.error?.message ||
-              "Failed to load staff",
-            "Error"
-          );
-        },
-      });
+        this.toastr.error(
+          err?.error?.message ||
+            "Failed to load staff",
+          "Error"
+        );
+      },
+    });
   }
 
   // =====================================================
@@ -431,30 +755,52 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   onClientChange(): void {
-    /*
-     * Do nothing in View mode.
-     */
 
     if (this.isViewMode) {
       return;
     }
 
     const clientId =
-      this.documentRequestForm.get(
-        "clientId"
-      )?.value;
+      this.documentRequestForm
+        .get("clientId")
+        ?.value;
 
-    // Clear previous service
+    // =================================================
+    // CLEAR SERVICE
+    // =================================================
+
     this.documentRequestForm.patchValue({
       serviceId: null,
     });
 
-    // Clear selected client service
     this.selectedClientServiceId = null;
 
-    // Clear previous data
+    // =================================================
+    // CLEAR SERVICES
+    // =================================================
+
     this.services = [];
+
+    this.selectedServices = [];
+
+    this.selectedServiceIds = [];
+
+    this.serviceSearchText = "";
+
+    this.isServiceDropdownOpen = false;
+
+    // =================================================
+    // CLEAR DOCUMENTS
+    // =================================================
+
     this.documents = [];
+
+    this.requiredDocuments = [];
+
+    this.additionalDocuments = [];
+
+    this.additionalDocSearchText = "";
+
     this.selectedDocumentIds = [];
 
     if (!clientId) {
@@ -473,20 +819,19 @@ export class AddDocumentRequestComponent implements OnInit {
   loadClientServices(
     clientId: number
   ): void {
+
     this.loadingServices = true;
 
     this.clientServiceService
       .getClientServices(clientId)
       .subscribe({
+
         next: (response: any) => {
+
           this.loadingServices = false;
 
-          console.log(
-            "Client services response:",
-            response
-          );
-
           if (!response?.success) {
+
             this.services = [];
 
             this.toastr.error(
@@ -503,28 +848,37 @@ export class AddDocumentRequestComponent implements OnInit {
               ? response.data
               : [];
 
-          /*
-           * Keep complete client-service assignment.
-           *
-           * We need:
-           *
-           * assignment.id
-           * assignment.serviceId
-           * assignment.serviceName /
-           * assignment.service.serviceName
-           *
-           * when creating Document Request.
-           */
-
           this.services = assignments;
 
-          console.log(
-            "Assigned services:",
-            this.services
-          );
+          // =================================================
+          // EDIT MODE
+          // =================================================
+
+          if (
+            this.isEditMode &&
+            this.selectedServiceIds.length > 0
+          ) {
+
+            this.selectedServices =
+              this.selectedServiceIds
+                .map(
+                  (serviceId: number) =>
+                    this.services.find(
+                      (item: any) =>
+                        Number(item.serviceId) ===
+                        Number(serviceId)
+                    )
+                )
+                .filter(Boolean);
+
+            this.syncPrimaryService();
+
+            this.loadSelectedServiceDocuments();
+          }
         },
 
         error: (err: any) => {
+
           this.loadingServices = false;
 
           console.error(
@@ -542,62 +896,379 @@ export class AddDocumentRequestComponent implements OnInit {
   }
 
   // =====================================================
-  // SERVICE CHANGE
+  // SERVICE MULTI-SELECT DROPDOWN
   // =====================================================
 
-  onServiceChange(): void {
+  /*
+   * Services filtered by the search box inside the dropdown
+   * panel. Matches against whichever name field is present.
+   */
+  get filteredServices(): any[] {
+
+    const query =
+      this.serviceSearchText
+        .trim()
+        .toLowerCase();
+
+    if (!query) {
+      return this.services;
+    }
+
+    return this.services.filter(
+      (service: any) => {
+
+        const name =
+          String(
+            service.serviceName ||
+              service.service?.serviceName ||
+              service.name ||
+              ""
+          ).toLowerCase();
+
+        return name.includes(query);
+      }
+    );
+  }
+
+  toggleServiceDropdown(): void {
+
+    if (
+      this.isViewMode ||
+      !this.documentRequestForm.get("clientId")?.value
+    ) {
+      return;
+    }
+
+    const opening =
+      !this.isServiceDropdownOpen;
+
+    if (opening) {
+
+      /*
+       * Compute position BEFORE flipping the flag, so the
+       * panel never renders (even for a single frame) at
+       * the wrong spot.
+       */
+      this.positionServicePanel();
+
+      this.serviceSearchText = "";
+    }
+
+    this.isServiceDropdownOpen = opening;
+  }
+
+  closeServiceDropdown(): void {
+
+    this.isServiceDropdownOpen = false;
+  }
+
+  /*
+   * Reads the trigger's current on-screen position and
+   * turns it into fixed-position coordinates for the panel.
+   * Using position: fixed (viewport-relative) instead of
+   * position: absolute (ancestor-relative) is what lets the
+   * dropdown escape a parent card's overflow: hidden instead
+   * of being clipped at the card's edge.
+   */
+  private positionServicePanel(): void {
+
+    const triggerEl =
+      this.serviceTriggerRef?.nativeElement;
+
+    if (!triggerEl) {
+      return;
+    }
+
+    const rect =
+      triggerEl.getBoundingClientRect();
+
+    const gap = 6;
+
     /*
-     * Do nothing in View mode.
+     * Flip the panel above the trigger if there isn't
+     * enough room below it in the viewport.
      */
+    const estimatedPanelHeight = 300;
+
+    const spaceBelow =
+      window.innerHeight - rect.bottom;
+
+    const openUpwards =
+      spaceBelow < estimatedPanelHeight &&
+      rect.top > spaceBelow;
+
+    this.servicePanelStyle = openUpwards
+      ? {
+          position: "fixed",
+          left: `${rect.left}px`,
+          width: `${rect.width}px`,
+          bottom: `${window.innerHeight - rect.top + gap}px`,
+        }
+      : {
+          position: "fixed",
+          left: `${rect.left}px`,
+          width: `${rect.width}px`,
+          top: `${rect.bottom + gap}px`,
+        };
+  }
+
+  /*
+   * Keep the panel glued to the trigger while the page
+   * scrolls or the window resizes, instead of drifting away
+   * from the field it belongs to.
+   */
+  @HostListener("window:scroll")
+  @HostListener("window:resize")
+  onWindowScrollOrResize(): void {
+
+    if (this.isServiceDropdownOpen) {
+
+      this.positionServicePanel();
+    }
+  }
+
+  clearAllServices(): void {
 
     if (this.isViewMode) {
       return;
     }
 
+    this.selectedServices = [];
+
+    this.selectedServiceIds = [];
+
+    this.syncPrimaryService();
+
+    this.loadSelectedServiceDocuments();
+  }
+
+  /*
+   * Closes the service dropdown when the user clicks
+   * anywhere outside of this component (e.g. another
+   * field, or the page background).
+   */
+  @HostListener("document:click", ["$event"])
+  onDocumentClick(event: MouseEvent): void {
+
+    if (!this.isServiceDropdownOpen) {
+      return;
+    }
+
+    const clickedInside =
+      this.elementRef.nativeElement.contains(
+        event.target
+      );
+
+    if (!clickedInside) {
+
+      this.isServiceDropdownOpen = false;
+    }
+  }
+
+  // =====================================================
+  // SERVICE SELECTION
+  // =====================================================
+
+  isServiceSelected(
+    serviceId: number
+  ): boolean {
+
+    return this.selectedServiceIds.includes(
+      Number(serviceId)
+    );
+  }
+
+  // =====================================================
+  // SELECT / UNSELECT SERVICE
+  // =====================================================
+
+  toggleService(
+    assignment: any
+  ): void {
+
+    if (
+      this.isViewMode ||
+      !assignment
+    ) {
+      return;
+    }
+
     const serviceId =
-      this.documentRequestForm.get(
-        "serviceId"
-      )?.value;
+      Number(assignment.serviceId);
 
-    // Clear old documents
-    this.documents = [];
-    this.selectedDocumentIds = [];
+    const clientServiceId =
+      Number(assignment.id);
 
-    // Clear old client service
-    this.selectedClientServiceId = null;
+    if (
+      !Number.isInteger(serviceId) ||
+      serviceId <= 0
+    ) {
+      return;
+    }
 
-    if (!serviceId) {
+    const index =
+      this.selectedServiceIds.indexOf(
+        serviceId
+      );
+
+    // =================================================
+    // REMOVE SERVICE
+    // =================================================
+
+    if (index >= 0) {
+
+      this.selectedServiceIds =
+        this.selectedServiceIds.filter(
+          (id) =>
+            id !== serviceId
+        );
+
+      this.selectedServices =
+        this.selectedServices.filter(
+          (item: any) =>
+            Number(item.serviceId) !==
+            serviceId
+        );
+
+    }
+
+    // =================================================
+    // ADD SERVICE
+    // =================================================
+
+    else {
+
+      this.selectedServiceIds.push(
+        serviceId
+      );
+
+      this.selectedServices.push({
+
+        ...assignment,
+
+        serviceId,
+
+        id: clientServiceId,
+      });
+    }
+
+    // =================================================
+    // PRIMARY SERVICE
+    // =================================================
+
+    this.syncPrimaryService();
+
+    // =================================================
+    // LOAD REQUIRED DOCUMENTS
+    // =================================================
+
+    this.loadSelectedServiceDocuments();
+  }
+
+  // =====================================================
+  // REMOVE SELECTED SERVICE
+  // =====================================================
+
+  removeSelectedService(
+    serviceId: number
+  ): void {
+
+    if (this.isViewMode) {
       return;
     }
 
     const numericServiceId =
       Number(serviceId);
 
-    if (
-      !Number.isInteger(
-        numericServiceId
-      ) ||
-      numericServiceId <= 0
-    ) {
-      console.error(
-        "Invalid service ID:",
-        serviceId
+    this.selectedServiceIds =
+      this.selectedServiceIds.filter(
+        (id) =>
+          id !== numericServiceId
       );
+
+    this.selectedServices =
+      this.selectedServices.filter(
+        (item: any) =>
+          Number(item.serviceId) !==
+          numericServiceId
+      );
+
+    this.syncPrimaryService();
+
+    this.loadSelectedServiceDocuments();
+  }
+
+  // =====================================================
+  // PRIMARY SERVICE
+  // =====================================================
+
+  private syncPrimaryService(): void {
+
+    const primaryService =
+      this.selectedServices[0];
+
+    if (!primaryService) {
+
+      this.selectedClientServiceId =
+        null;
+
+      this.documentRequestForm.patchValue({
+        serviceId: null,
+      });
 
       return;
     }
 
-    /*
-     * Find selected client-service assignment.
-     *
-     * IMPORTANT:
-     *
-     * assignment.id
-     *     = clientServiceId
-     *
-     * assignment.serviceId
-     *     = actual serviceId
-     */
+    this.selectedClientServiceId =
+      Number(
+        primaryService.id
+      );
+
+    this.documentRequestForm.patchValue({
+      serviceId:
+        Number(
+          primaryService.serviceId
+        ),
+    });
+  }
+
+  // =====================================================
+  // OLD SINGLE SERVICE SUPPORT
+  // =====================================================
+
+  onServiceChange(): void {
+
+    if (this.isViewMode) {
+      return;
+    }
+
+    const serviceId =
+      this.documentRequestForm
+        .get("serviceId")
+        ?.value;
+
+    if (!serviceId) {
+
+      this.selectedServices = [];
+
+      this.selectedServiceIds = [];
+
+      this.selectedClientServiceId =
+        null;
+
+      this.requiredDocuments = [];
+
+      this.documents = [];
+
+      this.additionalDocuments = [];
+
+      this.selectedDocumentIds = [];
+
+      return;
+    }
+
+    const numericServiceId =
+      Number(serviceId);
 
     const selectedAssignment =
       this.services.find(
@@ -607,10 +1278,6 @@ export class AddDocumentRequestComponent implements OnInit {
       );
 
     if (!selectedAssignment) {
-      console.error(
-        "Selected service is not assigned to this client:",
-        numericServiceId
-      );
 
       this.toastr.error(
         "Selected service is not assigned to this client.",
@@ -620,328 +1287,560 @@ export class AddDocumentRequestComponent implements OnInit {
       return;
     }
 
+    this.selectedServices =
+      [selectedAssignment];
+
+    this.selectedServiceIds =
+      [numericServiceId];
+
     this.selectedClientServiceId =
-      Number(selectedAssignment.id);
+      Number(
+        selectedAssignment.id
+      );
 
-    console.log(
-      "Selected client service ID:",
-      this.selectedClientServiceId
-    );
+    this.loadSelectedServiceDocuments();
+  }
 
-    console.log(
-      "Selected service ID:",
-      numericServiceId
-    );
+  // =====================================================
+  // LOAD REQUIRED DOCUMENTS
+  // =====================================================
 
-    console.log(
-      "Selected assignment:",
-      selectedAssignment
-    );
+  private loadSelectedServiceDocuments(): void {
 
-    // Load documents belonging to this service
-    this.loadServiceDocuments(
-      numericServiceId
+    this.loadingDocuments = true;
+
+    this.requiredDocuments = [];
+
+    this.documents = [];
+
+    if (
+      this.selectedServiceIds.length === 0
+    ) {
+
+      this.loadingDocuments = false;
+
+      this.additionalDocuments = [];
+
+      return;
+    }
+
+    // =================================================
+    // LOAD DOCUMENT GROUPS FOR ALL SELECTED SERVICES
+    // =================================================
+
+    const documentRequests =
+      this.selectedServiceIds.map(
+        (serviceId) =>
+          this.getServiceDocuments(
+            serviceId
+          )
+      );
+
+    forkJoin(documentRequests).subscribe({
+
+      next: (
+        results: any[][]
+      ) => {
+
+        const allRequiredDocuments =
+          results.flat();
+
+        // =================================================
+        // REMOVE DUPLICATES
+        //
+        // Two (or more) selected services can both require
+        // the same document (e.g. "Aadhaar"). We key this
+        // Map by document.id, so whichever service listed
+        // it first "wins" and it only appears once in
+        // requiredDocuments below.
+        // =================================================
+
+        const uniqueRequiredDocuments =
+          Array.from(
+
+            new Map(
+
+              allRequiredDocuments.map(
+                (document: any) => [
+
+                  Number(document.id),
+
+                  document,
+                ]
+              )
+
+            ).values()
+
+          );
+
+        // =================================================
+        // SORT
+        // =================================================
+
+        uniqueRequiredDocuments.sort(
+          (
+            a: any,
+            b: any
+          ) => {
+
+            const mandatoryA =
+              a.isMandatory
+                ? 1
+                : 0;
+
+            const mandatoryB =
+              b.isMandatory
+                ? 1
+                : 0;
+
+            if (
+              mandatoryA !==
+              mandatoryB
+            ) {
+
+              return (
+                mandatoryB -
+                mandatoryA
+              );
+            }
+
+            return String(
+              a.documentName || ""
+            ).localeCompare(
+              String(
+                b.documentName || ""
+              )
+            );
+          }
+        );
+
+        // =================================================
+        // REQUIRED DOCUMENTS
+        // =================================================
+
+        this.requiredDocuments =
+          uniqueRequiredDocuments;
+
+        /*
+         * Keep compatibility with existing HTML
+         * which may use "documents".
+         */
+        this.documents =
+          uniqueRequiredDocuments;
+
+        // =================================================
+        // REQUIRED DOCUMENT IDS
+        // =================================================
+
+        const requiredIds =
+          uniqueRequiredDocuments
+            .map(
+              (document: any) =>
+                Number(document.id)
+            )
+            .filter(
+              (id: number) =>
+                Number.isInteger(id) &&
+                id > 0
+            );
+
+        // =================================================
+        // AUTOMATICALLY SELECT REQUIRED DOCUMENTS
+        // =================================================
+
+        this.selectedDocumentIds =
+          Array.from(
+
+            new Set(
+
+              [
+                ...this.selectedDocumentIds,
+
+                ...requiredIds,
+              ]
+
+            )
+          );
+
+        // =================================================
+        // CLEAN IDS
+        // =================================================
+
+        this.selectedDocumentIds =
+          Array.from(
+
+            new Set(
+
+              this.selectedDocumentIds
+                .map(Number)
+                .filter(
+                  (id) =>
+                    Number.isInteger(id) &&
+                    id > 0
+                )
+
+            )
+          );
+
+        this.loadingDocuments =
+          false;
+
+        // =================================================
+        // LOAD ALL ADDITIONAL DOCUMENTS
+        // =================================================
+
+        this.loadAdditionalDocuments();
+      },
+
+      error: (err: any) => {
+
+        this.loadingDocuments =
+          false;
+
+        console.error(
+          "Failed to load required documents:",
+          err
+        );
+
+        this.toastr.error(
+          err?.error?.message ||
+            "Failed to load required documents",
+          "Error"
+        );
+      },
+    });
+  }
+
+  // =====================================================
+  // GET DOCUMENTS FOR ONE SERVICE
+  // =====================================================
+
+  private getServiceDocuments(
+    serviceId: number
+  ): Observable<any[]> {
+
+    return new Observable(
+      (subscriber) => {
+
+        this.serviceService
+          .getDocumentGroups(serviceId)
+          .subscribe({
+
+            next: (
+              serviceResponse: any
+            ) => {
+
+              if (
+                !serviceResponse?.success ||
+                !serviceResponse?.data
+              ) {
+
+                subscriber.next([]);
+
+                subscriber.complete();
+
+                return;
+              }
+
+              const service =
+                serviceResponse.data;
+
+              // =================================================
+              // SERVICE DOCUMENT GROUPS
+              // =================================================
+
+              const documentGroups:
+                string[] =
+                Array.isArray(
+                  service.documentGroups
+                )
+                  ? service.documentGroups
+                      .filter(
+                        (
+                          groupCode: any
+                        ) =>
+                          typeof groupCode ===
+                            "string" &&
+                          groupCode.trim()
+                      )
+                      .map(
+                        (
+                          groupCode: string
+                        ) =>
+                          groupCode
+                            .trim()
+                            .toUpperCase()
+                      )
+                  : [];
+
+              const uniqueGroupCodes =
+                Array.from(
+                  new Set(
+                    documentGroups
+                  )
+                );
+
+              if (
+                uniqueGroupCodes.length ===
+                0
+              ) {
+
+                subscriber.next([]);
+
+                subscriber.complete();
+
+                return;
+              }
+
+              // =================================================
+              // LOAD DOCUMENTS FOR GROUPS
+              // =================================================
+
+              const requests =
+                uniqueGroupCodes.map(
+                  (
+                    groupCode: string
+                  ) =>
+                    this.documentService
+                      .getDocumentsByGroup(
+                        groupCode
+                      )
+                );
+
+              forkJoin(requests).subscribe({
+
+                next: (
+                  responses: any[]
+                ) => {
+
+                  const documents =
+                    responses.flatMap(
+                      (
+                        response: any
+                      ) =>
+                        response?.success &&
+                        Array.isArray(
+                          response.data
+                        )
+                          ? response.data
+                          : []
+                    );
+
+                  subscriber.next(
+                    documents
+                  );
+
+                  subscriber.complete();
+                },
+
+                error: (
+                  error: any
+                ) =>
+                  subscriber.error(
+                    error
+                  ),
+              });
+            },
+
+            error: (
+              error: any
+            ) =>
+              subscriber.error(
+                error
+              ),
+          });
+      }
     );
   }
 
   // =====================================================
-  // LOAD SERVICE DOCUMENTS
+  // LOAD ALL DOCUMENT MASTER LIST
+  // =====================================================
+
+// =====================================================
+// LOAD ALL DOCUMENT MASTER LIST
+// =====================================================
+
+private loadAdditionalDocuments(): void {
+  this.loadingAdditionalDocuments = true;
+  this.additionalDocSearchText = "";
+
+  this.documentService.getAllDocumentMaster().subscribe({
+    next: (response: any) => {
+
+      console.log(
+        "ALL DOCUMENT MASTER RESPONSE:",
+        response
+      );
+
+      this.loadingAdditionalDocuments = false;
+
+      const allDocuments =
+        Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+      console.log(
+        "ALL DOCUMENT MASTER COUNT:",
+        allDocuments.length
+      );
+
+      console.log(
+        "ALL DOCUMENT MASTER IDS:",
+        allDocuments.map(
+          (document: any) => document.id
+        )
+      );
+
+      // =================================================
+      // REQUIRED DOCUMENT IDS
+      // =================================================
+
+      const requiredIds = new Set(
+        this.requiredDocuments
+          .map(
+            (document: any) =>
+              Number(document.id)
+          )
+          .filter(
+            (id: number) =>
+              Number.isInteger(id) &&
+              id > 0
+          )
+      );
+
+      console.log(
+        "REQUIRED DOCUMENT COUNT:",
+        this.requiredDocuments.length
+      );
+
+      console.log(
+        "REQUIRED DOCUMENT IDS:",
+        Array.from(requiredIds)
+      );
+
+      // =================================================
+      // ADDITIONAL DOCUMENTS
+      // =================================================
+
+      const seenAdditionalIds =
+        new Set<number>();
+
+      this.additionalDocuments =
+        allDocuments
+          .filter((document: any) => {
+
+            const documentId =
+              Number(document?.id);
+
+            // Invalid document ID
+            if (
+              !Number.isInteger(documentId) ||
+              documentId <= 0
+            ) {
+              return false;
+            }
+
+            // Already required
+            if (
+              requiredIds.has(documentId)
+            ) {
+              return false;
+            }
+
+            // Duplicate
+            if (
+              seenAdditionalIds.has(
+                documentId
+              )
+            ) {
+              return false;
+            }
+
+            seenAdditionalIds.add(
+              documentId
+            );
+
+            return true;
+          })
+          .sort(
+            (
+              a: any,
+              b: any
+            ) =>
+              String(
+                a.documentName || ""
+              ).localeCompare(
+                String(
+                  b.documentName || ""
+                )
+              )
+          );
+
+      console.log(
+        "FINAL ADDITIONAL DOCUMENT COUNT:",
+        this.additionalDocuments.length
+      );
+
+      console.log(
+        "FINAL ADDITIONAL DOCUMENTS:",
+        this.additionalDocuments
+      );
+    },
+
+    error: (err: any) => {
+
+      this.loadingAdditionalDocuments = false;
+
+      this.additionalDocuments = [];
+
+      console.error(
+        "FAILED TO LOAD ALL DOCUMENT MASTER:",
+        err
+      );
+
+      this.toastr.error(
+        err?.error?.message ||
+          "Failed to load additional documents",
+        "Error"
+      );
+    }
+  });
+}
+  // =====================================================
+  // BACKWARD COMPATIBLE SERVICE DOCUMENT METHOD
   // =====================================================
 
   loadServiceDocuments(
     serviceId: number
   ): void {
-    this.loadingDocuments = true;
 
-    this.documents = [];
-    this.selectedDocumentIds =
-      this.selectedDocumentIds || [];
+    if (!serviceId) {
+      return;
+    }
 
-    console.log(
-      "Loading documents for service:",
-      serviceId
-    );
+    const assignment =
+      this.services.find(
+        (item: any) =>
+          Number(item.serviceId) ===
+          Number(serviceId)
+      );
 
-    /*
-     * STEP 1:
-     *
-     * Get service document groups.
-     *
-     * We intentionally use:
-     *
-     * /services/document-groups
-     *
-     * instead of getById(),
-     * because getById() is restricted
-     * to Super Admin.
-     */
+    if (assignment) {
 
-    this.serviceService
-      .getDocumentGroups(serviceId)
-      .subscribe({
-        next: (serviceResponse: any) => {
-          console.log(
-            "Service document groups response:",
-            serviceResponse
-          );
+      this.selectedServices =
+        [assignment];
 
-          if (
-            !serviceResponse?.success ||
-            !serviceResponse?.data
-          ) {
-            this.loadingDocuments = false;
+      this.selectedServiceIds =
+        [Number(serviceId)];
 
-            this.toastr.error(
-              serviceResponse?.message ||
-                "Failed to load service details",
-              "Error"
-            );
+      this.selectedClientServiceId =
+        Number(
+          assignment.id
+        );
+    }
 
-            return;
-          }
-
-          const service =
-            serviceResponse.data;
-
-          /*
-           * STEP 2:
-           *
-           * Get document groups.
-           *
-           * Example:
-           *
-           * ["ITR_SAL"]
-           *
-           * Or multiple:
-           *
-           * ["ITR_SAL", "ITR_CG"]
-           */
-
-          const documentGroups: string[] =
-            Array.isArray(
-              service.documentGroups
-            )
-              ? service.documentGroups
-                  .filter(
-                    (groupCode: any) =>
-                      typeof groupCode ===
-                        "string" &&
-                      groupCode.trim()
-                  )
-                  .map(
-                    (groupCode: string) =>
-                      groupCode
-                        .trim()
-                        .toUpperCase()
-                  )
-              : [];
-
-          /*
-           * Remove duplicate group codes.
-           */
-
-          const uniqueGroupCodes =
-            Array.from(
-              new Set(documentGroups)
-            );
-
-          console.log(
-            "Document groups for service:",
-            uniqueGroupCodes
-          );
-
-          if (
-            uniqueGroupCodes.length === 0
-          ) {
-            this.loadingDocuments = false;
-
-            console.log(
-              "No document groups mapped to this service."
-            );
-
-            return;
-          }
-
-          /*
-           * STEP 3:
-           *
-           * Call existing:
-           *
-           * /documents/group
-           *
-           * for every group.
-           */
-
-          const documentRequests =
-            uniqueGroupCodes.map(
-              (groupCode: string) =>
-                this.documentService
-                  .getDocumentsByGroup(
-                    groupCode
-                  )
-            );
-
-          /*
-           * forkJoin waits until ALL group
-           * requests finish.
-           *
-           * This supports services having:
-           *
-           * 1 group
-           * 2 groups
-           * 3 groups
-           * etc.
-           */
-
-          forkJoin(
-            documentRequests
-          ).subscribe({
-            next: (
-              responses: any[]
-            ) => {
-              console.log(
-                "Documents by group responses:",
-                responses
-              );
-
-              /*
-               * STEP 4:
-               *
-               * Extract documents from
-               * every response.
-               */
-
-              const allDocuments: any[] =
-                responses.flatMap(
-                  (response: any) => {
-                    if (
-                      response?.success &&
-                      Array.isArray(
-                        response.data
-                      )
-                    ) {
-                      return response.data;
-                    }
-
-                    return [];
-                  }
-                );
-
-              /*
-               * STEP 5:
-               *
-               * Remove duplicate documents.
-               *
-               * This is useful if a document
-               * appears in more than one
-               * mapped group.
-               */
-
-              const uniqueDocuments =
-                Array.from(
-                  new Map(
-                    allDocuments.map(
-                      (document: any) => [
-                        Number(
-                          document.id
-                        ),
-                        document,
-                      ]
-                    )
-                  ).values()
-                );
-
-              /*
-               * Optional sorting:
-               *
-               * Mandatory documents first,
-               * then document name.
-               */
-
-              uniqueDocuments.sort(
-                (a: any, b: any) => {
-                  const mandatoryA =
-                    a.isMandatory
-                      ? 1
-                      : 0;
-
-                  const mandatoryB =
-                    b.isMandatory
-                      ? 1
-                      : 0;
-
-                  if (
-                    mandatoryA !==
-                    mandatoryB
-                  ) {
-                    return (
-                      mandatoryB -
-                      mandatoryA
-                    );
-                  }
-
-                  return String(
-                    a.documentName ||
-                      ""
-                  ).localeCompare(
-                    String(
-                      b.documentName ||
-                        ""
-                    )
-                  );
-                }
-              );
-
-              this.documents =
-                uniqueDocuments;
-
-              this.loadingDocuments =
-                false;
-
-              console.log(
-                "Final documents for selected service:",
-                this.documents
-              );
-
-              console.log(
-                "Total documents:",
-                this.documents.length
-              );
-            },
-
-            error: (err: any) => {
-              this.loadingDocuments =
-                false;
-
-              console.error(
-                "Failed to load documents by group:",
-                err
-              );
-
-              this.toastr.error(
-                err?.error?.message ||
-                  "Failed to load required documents",
-                "Error"
-              );
-            },
-          });
-        },
-
-        error: (err: any) => {
-          this.loadingDocuments = false;
-
-          console.error(
-            "Failed to load service details:",
-            err
-          );
-
-          this.toastr.error(
-            err?.error?.message ||
-              "Failed to load service details",
-            "Error"
-          );
-        },
-      });
+    this.loadSelectedServiceDocuments();
   }
 
   // =====================================================
@@ -951,68 +1850,229 @@ export class AddDocumentRequestComponent implements OnInit {
   isDocumentSelected(
     documentId: number
   ): boolean {
+
     return this.selectedDocumentIds.includes(
       Number(documentId)
     );
   }
 
+  // =====================================================
+  // CHECK REQUIRED DOCUMENT
+  // =====================================================
+
+  isRequiredDocument(
+    documentId: number
+  ): boolean {
+
+    return this.requiredDocuments.some(
+      (
+        document: any
+      ) =>
+        Number(
+          document.id
+        ) ===
+        Number(
+          documentId
+        )
+    );
+  }
+
+  // =====================================================
+  // ADDITIONAL DOCUMENTS: SEARCH FILTER
+  // =====================================================
+
+  get filteredAdditionalDocuments(): any[] {
+
+    const query =
+      this.additionalDocSearchText
+        .trim()
+        .toLowerCase();
+
+    if (!query) {
+      return this.additionalDocuments;
+    }
+
+    return this.additionalDocuments.filter(
+      (document: any) => {
+
+        const name =
+          String(
+            document.documentName ||
+              document.name ||
+              ""
+          ).toLowerCase();
+
+        const description =
+          String(
+            document.documentDescription ||
+              document.description ||
+              ""
+          ).toLowerCase();
+
+        return (
+          name.includes(query) ||
+          description.includes(query)
+        );
+      }
+    );
+  }
+
+  // =====================================================
+  // TOGGLE DOCUMENT
+  // =====================================================
+
   toggleDocument(
     documentId: number
   ): void {
-    /*
-     * Don't allow changing documents
-     * in View mode.
-     */
 
     if (this.isViewMode) {
       return;
     }
 
-    documentId = Number(documentId);
+    const numericDocumentId =
+      Number(documentId);
+
+    if (
+      !Number.isInteger(
+        numericDocumentId
+      ) ||
+      numericDocumentId <= 0
+    ) {
+      return;
+    }
+
+    // =================================================
+    // REQUIRED DOCUMENT
+    // =================================================
+
+    if (
+      this.isRequiredDocument(
+        numericDocumentId
+      )
+    ) {
+
+      /*
+       * Required documents are automatically
+       * included in the request.
+       *
+       * We don't allow removing them.
+       */
+      return;
+    }
+
+    // =================================================
+    // ADDITIONAL DOCUMENT
+    // =================================================
 
     if (
       this.selectedDocumentIds.includes(
-        documentId
+        numericDocumentId
       )
     ) {
+
       this.selectedDocumentIds =
         this.selectedDocumentIds.filter(
-          (id) =>
-            id !== documentId
+          (
+            id
+          ) =>
+            id !==
+            numericDocumentId
         );
+
     } else {
+
       this.selectedDocumentIds.push(
-        documentId
+        numericDocumentId
       );
     }
   }
 
   // =====================================================
-  // SELECT ALL
+  // SELECT ALL DOCUMENTS
   // =====================================================
 
   selectAllDocuments(): void {
+
     if (this.isViewMode) {
       return;
     }
 
+    /*
+     * Select all applies to the currently visible
+     * (search-filtered) additional documents plus
+     * everything already required, so a narrowed
+     * search doesn't accidentally drop selections
+     * made before the search was typed.
+     */
+
+    const allVisibleDocumentIds = [
+
+      ...this.requiredDocuments,
+
+      ...this.filteredAdditionalDocuments,
+
+    ].map(
+      (
+        document: any
+      ) =>
+        Number(
+          document.id
+        )
+    );
+
     this.selectedDocumentIds =
-      this.documents.map(
-        (document: any) =>
-          Number(document.id)
+      Array.from(
+
+        new Set(
+
+          [
+            ...this.selectedDocumentIds,
+
+            ...allVisibleDocumentIds,
+          ].filter(
+            (
+              id
+            ) =>
+              Number.isInteger(
+                id
+              ) &&
+              id > 0
+          )
+
+        )
       );
   }
 
   // =====================================================
-  // CLEAR ALL
+  // CLEAR ADDITIONAL DOCUMENTS
   // =====================================================
 
   clearAllDocuments(): void {
+
     if (this.isViewMode) {
       return;
     }
 
-    this.selectedDocumentIds = [];
+    /*
+     * Required documents must remain selected.
+     */
+
+    const requiredIds =
+      this.requiredDocuments.map(
+        (
+          document: any
+        ) =>
+          Number(
+            document.id
+          )
+      );
+
+    this.selectedDocumentIds =
+      Array.from(
+        new Set(
+          requiredIds
+        )
+      );
   }
 
   // =====================================================
@@ -1020,9 +2080,6 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   saveDocumentRequest(): void {
-    /*
-     * View mode should never submit.
-     */
 
     if (this.isViewMode) {
       return;
@@ -1030,9 +2087,14 @@ export class AddDocumentRequestComponent implements OnInit {
 
     this.submitted = true;
 
+    // =================================================
+    // FORM VALIDATION
+    // =================================================
+
     if (
       this.documentRequestForm.invalid
     ) {
+
       this.documentRequestForm.markAllAsTouched();
 
       this.toastr.error(
@@ -1043,21 +2105,32 @@ export class AddDocumentRequestComponent implements OnInit {
       return;
     }
 
+    // =================================================
+    // SERVICE VALIDATION
+    // =================================================
+
     if (
-      !this.selectedClientServiceId
+      !this.selectedClientServiceId ||
+      this.selectedServices.length === 0
     ) {
+
       this.toastr.error(
-        "Please select a valid service assigned to this client.",
+        "Please select at least one service assigned to this client.",
         "Error"
       );
 
       return;
     }
 
+    // =================================================
+    // DOCUMENT VALIDATION
+    // =================================================
+
     if (
       this.selectedDocumentIds.length ===
       0
     ) {
+
       this.toastr.error(
         "Please select at least one document.",
         "Error"
@@ -1067,25 +2140,105 @@ export class AddDocumentRequestComponent implements OnInit {
     }
 
     const formValue =
-      this.documentRequestForm.getRawValue();
+      this.documentRequestForm
+        .getRawValue();
 
-    const payload = {
+    // =================================================
+    // NORMALIZE SERVICES
+    // =================================================
+
+    const normalizedRequestServices =
+      this.selectedServices
+
+        .map(
+          (
+            item: any
+          ) => ({
+
+            clientServiceId:
+              Number(
+                item.id
+              ),
+
+            serviceId:
+              Number(
+                item.serviceId
+              ),
+          })
+        )
+
+        .filter(
+          (
+            item: any
+          ) =>
+
+            Number.isInteger(
+              item.clientServiceId
+            ) &&
+
+            item.clientServiceId >
+              0 &&
+
+            Number.isInteger(
+              item.serviceId
+            ) &&
+
+            item.serviceId >
+              0
+        );
+
+    if (
+      normalizedRequestServices.length ===
+      0
+    ) {
+
+      this.toastr.error(
+        "Please select at least one service assigned to this client.",
+        "Error"
+      );
+
+      return;
+    }
+
+    // =================================================
+    // PAYLOAD
+    // =================================================
+
+    const payload: any = {
+
       taskName:
         formValue.taskName?.trim(),
 
       clientId:
-        Number(formValue.clientId),
+        Number(
+          formValue.clientId
+        ),
 
+      /*
+       * Primary service.
+       *
+       * Kept for old backend compatibility.
+       */
       clientServiceId:
         Number(
           this.selectedClientServiceId
         ),
 
       serviceId:
-        Number(formValue.serviceId),
+        Number(
+          formValue.serviceId
+        ),
+
+      /*
+       * ALL selected services.
+       */
+      requestServices:
+        normalizedRequestServices,
 
       assignedTo:
-        Number(formValue.assignedTo),
+        Number(
+          formValue.assignedTo
+        ),
 
       reviewerId:
         formValue.reviewerId
@@ -1102,39 +2255,137 @@ export class AddDocumentRequestComponent implements OnInit {
         null,
 
       dueDate:
-        formValue.dueDate || null,
+        formValue.dueDate ||
+        null,
 
+      /*
+       * Required + Additional documents.
+       */
       documentIds:
-        this.selectedDocumentIds,
+        Array.from(
+          new Set(
+            this.selectedDocumentIds
+              .map(Number)
+              .filter(
+                (
+                  id
+                ) =>
+                  Number.isInteger(
+                    id
+                  ) &&
+                  id > 0
+              )
+          )
+        ),
     };
 
     console.log(
-      "Create Document Request payload:",
+      "DOCUMENT REQUEST PAYLOAD:",
       payload
     );
+
+    // =================================================
+    // SAVE
+    // =================================================
 
     this.isSaving = true;
 
     this.ngxLoader.start();
 
-    /*
-     * Keep existing create logic unchanged.
-     */
+    // =================================================
+    // UPDATE
+    // =================================================
+
+    if (
+      this.isEditMode &&
+      this.documentRequestId
+    ) {
+
+      payload.id =
+        this.documentRequestId;
+
+      this.documentRequestService
+        .update(payload)
+        .subscribe({
+
+          next: (
+            response: any
+          ) => {
+
+            this.ngxLoader.stop();
+
+            this.isSaving = false;
+
+            if (
+              !response?.success
+            ) {
+
+              this.toastr.error(
+                response?.message ||
+                  "Failed to update document request",
+                "Error"
+              );
+
+              return;
+            }
+
+            this.toastr.success(
+              response?.message ||
+                "Document request updated successfully",
+              "Success"
+            );
+
+            this.submitted = true;
+
+            this.router.navigate([
+              "/document-requests",
+            ]);
+          },
+
+          error: (
+            err: any
+          ) => {
+
+            this.ngxLoader.stop();
+
+            this.isSaving = false;
+
+            console.error(
+              "Update document request failed:",
+              err
+            );
+
+            this.toastr.error(
+              err?.error?.message ||
+                "Failed to update document request",
+              "Error"
+            );
+          },
+        });
+
+      return;
+    }
+
+    // =================================================
+    // CREATE
+    // =================================================
 
     this.documentRequestService
       .create(payload)
       .subscribe({
-        next: (response: any) => {
+
+        next: (
+          response: any
+        ) => {
+
           this.ngxLoader.stop();
 
           this.isSaving = false;
 
-          console.log(
-            "Create Document Request response:",
-            response
-          );
+          if (
+            !response?.success
+          ) {
 
-          if (!response?.success) {
             this.toastr.error(
               response?.message ||
                 "Failed to create document request",
@@ -1157,7 +2408,10 @@ export class AddDocumentRequestComponent implements OnInit {
           ]);
         },
 
-        error: (err: any) => {
+        error: (
+          err: any
+        ) => {
+
           this.ngxLoader.stop();
 
           this.isSaving = false;
@@ -1181,8 +2435,44 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   cancel(): void {
+
     this.router.navigate([
       "/document-requests",
     ]);
+  }
+
+  // =====================================================
+  // CAN DEACTIVATE
+  // =====================================================
+
+  canDeactivate():
+    Observable<boolean> |
+    Promise<boolean> |
+    boolean {
+
+    if (
+      this.documentRequestForm.dirty &&
+      !this.submitted &&
+      !this.isViewMode
+    ) {
+
+      const dialogRef =
+        this.dialog.open(
+          ConfirmDialogComponent,
+          {
+            width: "550px",
+            disableClose: true,
+
+            data: {
+              message:
+                "You have unsaved changes. Do you really want to leave?",
+            },
+          }
+        );
+
+      return dialogRef.afterClosed();
+    }
+
+    return true;
   }
 }

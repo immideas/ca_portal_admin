@@ -5,17 +5,31 @@
 .client-tabs {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   width: 100%;
-  height: 45px;
+  height: 54px;
 
   margin: 0;
-  padding: 0 14px;
+  padding: 0 24px 0 14px;
 
   background: #eef3ff;
 
   border-top: 1px solid #dfe6f3;
   border-bottom: 1px solid #dfe6f3;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TAB OPTIONS
+   ========================================================= */
+
+.client-tab-options {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 
@@ -23,12 +37,12 @@
    TAB BUTTON
    ========================================================= */
 
-.client-tabs button {
+.client-tab-options button {
   position: relative;
 
-  height: 45px;
+  height: 54px;
 
-  padding: 0 14px;
+  padding: 0 16px;
 
   border: none;
   outline: none;
@@ -49,11 +63,12 @@
 
 
 /* =========================================================
-   HOVER
+   TAB HOVER
    ========================================================= */
 
-.client-tabs button:hover {
+.client-tab-options button:hover {
   background: rgba(37, 99, 235, 0.04);
+
   color: var(--primary-color, #2563eb);
 }
 
@@ -62,17 +77,18 @@
    ACTIVE TAB
    ========================================================= */
 
-.client-tabs button.active {
+.client-tab-options button.active {
   color: var(--primary-color, #2563eb);
+
   font-weight: 600;
 }
 
 
 /* =========================================================
-   ACTIVE BLUE LINE
+   ACTIVE TAB LINE
    ========================================================= */
 
-.client-tabs button.active::after {
+.client-tab-options button.active::after {
   content: "";
 
   position: absolute;
@@ -88,21 +104,63 @@
 
 
 /* =========================================================
+   EDIT BUTTON
+   ========================================================= */
+
+.tab-edit-btn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  height: 40px;
+
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: var(--primary-color, #4f46e5);
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+/* =========================================================
+   EDIT BUTTON HOVER
+   ========================================================= */
+
+.tab-edit-btn:hover {
+  background: var(--primary-color, #4338ca);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   EDIT ICON
+   ========================================================= */
+
+.tab-edit-btn i {
+  font-size: 14px;
+}
+
+
+/* =========================================================
    TAB CONTENT
    ========================================================= */
 
 .client-tab-content {
   padding: 24px;
-}
-.tab-action-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.tab-action-row h5 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
 }

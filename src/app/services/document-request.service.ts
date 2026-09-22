@@ -21,6 +21,15 @@ export class DocumentRequestService {
       { headers: this.getHeaders() }
     );
   }
+   update(payload: any): Observable<any> {
+    return this.http.post(
+      `${this.base}/update`,
+      payload,
+      {
+        headers: this.getHeaders()
+      }
+    );
+  }
 
   list(payload: any = {}): Observable<any> {
     return this.http.post(

@@ -5,87 +5,102 @@
   <!-- HEADER -->
   <!-- ===================================================== -->
 
-<header class="top-header">
-  <div class="header-left">
-    <button
-      type="button"
-      class="back-btn"
-      (click)="cancel()"
-      aria-label="Go back"
-    >
-      <img src="assets/img/back-icon.svg" alt="back" />
-    </button>
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
 
-    <div class="divider"></div>
+      <div class="divider"></div>
 
-    <div class="title-box">
-      <div class="title-icon">
-        <img
-          src="assets/img/Plus.svg"
-          alt="document request"
-        />
-      </div>
+      <div class="title-box">
+        <div class="title-icon">
+          <img
+            src="assets/img/Plus.svg"
+            alt="document request"
+          />
+        </div>
 
-      <div class="title-text">
-        <h4>
-          {{
-            isViewMode
-              ? "View Document Request"
-              : isEditMode
-                ? "Edit Document Request"
-                : "New Document Request"
-          }}
-        </h4>
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? "View Document Request"
+                : isEditMode
+                  ? "Edit Document Request"
+                  : "New Document Request"
+            }}
+          </h4>
 
-        <p>
-          {{
-            isViewMode
-              ? "View document request details"
-              : isEditMode
-                ? "Edit document request"
-                : "Create a document request for client"
-          }}
-        </p>
+          <p>
+            {{
+              isViewMode
+                ? "View document request details"
+                : isEditMode
+                  ? "Edit document request"
+                  : "Create a document request for client"
+            }}
+          </p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- HEADER ACTIONS -->
-  <div class="header-actions">
+    <!-- ================= HEADER ACTIONS ================= -->
 
-    <!-- Cancel / Back -->
-    <button
-      type="button"
-      class="btn-cancel"
-      (click)="cancel()"
-    >
-      {{ isViewMode ? "Back" : "Cancel" }}
-    </button>
+    <div class="header-actions">
 
-    <!-- Save / Update -->
-    <button
-      *ngIf="!isViewMode"
-      type="submit"
-      form="documentRequestForm"
-      class="btn-save"
-      [ngClass]="{
-        'btn-active': documentRequestForm.valid && !isSaving
-      }"
-      [disabled]="documentRequestForm.invalid || isSaving"
-    >
-      <img
-        class="save-icon"
-        src="assets/img/Group-Save.svg"
-        alt="save"
-      />
+      <ng-container *ngIf="isViewMode; else saveMode">
 
-      <span>
-        {{ isEditMode ? "Update Request" : "Create Request" }}
-      </span>
-    </button>
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
 
-  </div>
-</header>
+      </ng-container>
+
+      <ng-template #saveMode>
+
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="cancel()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="documentRequestForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': documentRequestForm.valid && !isSaving
+          }"
+          [disabled]="documentRequestForm.invalid || isSaving"
+        >
+          <img
+            class="save-icon"
+            src="assets/img/Group-Save.svg"
+            alt="save"
+          />
+
+          <span>
+            {{ isEditMode ? "Update Request" : "Create Request" }}
+          </span>
+        </button>
+
+      </ng-template>
+
+    </div>
+  </header>
 
   <!-- ===================================================== -->
   <!-- FORM -->
@@ -97,18 +112,26 @@
     (ngSubmit)="saveDocumentRequest()"
     class="form-padding-wrap"
   >
+
     <!-- ===================================================== -->
     <!-- REQUEST INFORMATION -->
     <!-- ===================================================== -->
 
     <article class="card complaint-card mb-4">
+
       <div class="section-title">
+
         <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Request Information </span>
+          <span class="header-text">
+            Request Information
+          </span>
         </div>
 
         <div class="required-group">
@@ -122,13 +145,17 @@
             />
           </span>
         </div>
+
       </div>
 
       <div class="form-padding-wrap">
-        <!-- Task Name -->
+
+        <!-- TASK NAME -->
 
         <div class="row mb-3">
+
           <div class="col-md-12 form-group">
+
             <label for="taskName">
               Task Name
 
@@ -161,6 +188,7 @@
                 documentRequestForm.get('taskName')?.touched
               "
             >
+
               <div
                 *ngIf="
                   documentRequestForm.get('taskName')?.errors?.['required']
@@ -184,16 +212,21 @@
               >
                 Task name cannot exceed 255 characters.
               </div>
+
             </div>
+
           </div>
+
         </div>
 
-        <!-- Client + Service -->
+        <!-- CLIENT + SERVICE -->
 
         <div class="row mb-3">
+
           <!-- CLIENT -->
 
           <div class="col-md-6 form-group">
+
             <label for="clientId">
               Client
 
@@ -208,18 +241,31 @@
               class="field-wrap"
               style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
             >
+
               <select
                 id="clientId"
                 formControlName="clientId"
                 class="form-controler"
                 (change)="onClientChange()"
               >
-                <option [ngValue]="null">Select client</option>
 
-                <option *ngFor="let client of clients" [ngValue]="client.id">
-                  {{ client.clientName || client.name || client.companyName }}
+                <option [ngValue]="null">
+                  Select client
                 </option>
+
+                <option
+                  *ngFor="let client of clients"
+                  [ngValue]="client.id"
+                >
+                  {{
+                    client.clientName ||
+                      client.name ||
+                      client.companyName
+                  }}
+                </option>
+
               </select>
+
             </div>
 
             <div
@@ -240,13 +286,17 @@
             >
               Client is required.
             </div>
+
           </div>
 
-          <!-- SERVICE -->
+          <!-- ================================================= -->
+          <!-- SERVICES : SEARCHABLE MULTI-SELECT DROPDOWN -->
+          <!-- ================================================= -->
 
           <div class="col-md-6 form-group">
-            <label for="serviceId">
-              Service
+
+            <label>
+              Service(s)
 
               <img
                 src="assets/img/star.svg"
@@ -256,36 +306,165 @@
             </label>
 
             <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+              class="multiselect"
+              [class.disabled]="isViewMode || !documentRequestForm.get('clientId')?.value"
             >
-              <select
-                id="serviceId"
-                formControlName="serviceId"
-                class="form-controler"
-                (change)="onServiceChange()"
+
+              <!-- TRIGGER -->
+
+              <div
+                class="multiselect-trigger"
+                #serviceTrigger
+                [class.open]="isServiceDropdownOpen"
+                (click)="toggleServiceDropdown()"
               >
-                <option [ngValue]="null">Select service</option>
 
-                <option
-                  *ngFor="let service of services"
-                  [ngValue]="service.serviceId"
+                <div class="multiselect-trigger-content">
+
+                  <span
+                    class="multiselect-placeholder"
+                    *ngIf="selectedServices.length === 0"
+                  >
+                    {{
+                      !documentRequestForm.get('clientId')?.value
+                        ? "Select a client first"
+                        : "Select service(s)"
+                    }}
+                  </span>
+
+                  <span
+                    class="multiselect-chip"
+                    *ngFor="let service of selectedServices"
+                  >
+                    {{
+                      service.serviceName ||
+                        service.service?.serviceName ||
+                        service.name
+                    }}
+
+                    <button
+                      type="button"
+                      class="multiselect-chip-remove"
+                      *ngIf="!isViewMode"
+                      (click)="
+                        removeSelectedService(service.serviceId);
+                        $event.stopPropagation()
+                      "
+                      aria-label="Remove service"
+                    >
+                      ×
+                    </button>
+
+                  </span>
+
+                </div>
+
+                <i
+                  class="bi bi-chevron-down multiselect-caret"
+                  [class.rotated]="isServiceDropdownOpen"
+                ></i>
+
+              </div>
+
+              <!-- PANEL -->
+
+              <div
+                class="multiselect-panel"
+                *ngIf="isServiceDropdownOpen && !isViewMode"
+                [ngStyle]="servicePanelStyle"
+                (click)="$event.stopPropagation()"
+              >
+
+                <div class="multiselect-search">
+
+                  <i class="bi bi-search"></i>
+
+                  <input
+                    type="text"
+                    placeholder="Search services..."
+                    [(ngModel)]="serviceSearchText"
+                    [ngModelOptions]="{ standalone: true }"
+                    autocomplete="off"
+                  />
+
+                  <button
+                    type="button"
+                    class="multiselect-search-clear"
+                    *ngIf="serviceSearchText"
+                    (click)="serviceSearchText = ''"
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+                <div
+                  class="multiselect-options"
+                  *ngIf="!loadingServices"
                 >
-                  {{
-                    service.serviceName ||
-                      service.service?.serviceName ||
-                      service.name
-                  }}
-                </option>
-              </select>
-            </div>
 
-            <div
-              class="text-muted mt-1"
-              style="font-size: 11px"
-              *ngIf="loadingServices"
-            >
-              Loading assigned services...
+                  <label
+                    class="multiselect-option"
+                    *ngFor="let service of filteredServices"
+                  >
+
+                    <input
+                      type="checkbox"
+                      [checked]="isServiceSelected(service.serviceId)"
+                      (change)="toggleService(service)"
+                    />
+
+                    <span>
+                      {{
+                        service.serviceName ||
+                          service.service?.serviceName ||
+                          service.name
+                      }}
+                    </span>
+
+                  </label>
+
+                  <div
+                    class="multiselect-empty"
+                    *ngIf="services.length > 0 && filteredServices.length === 0"
+                  >
+                    No services match "{{ serviceSearchText }}".
+                  </div>
+
+                  <div
+                    class="multiselect-empty"
+                    *ngIf="services.length === 0"
+                  >
+                    No services assigned to this client.
+                  </div>
+
+                </div>
+
+                <div
+                  class="multiselect-loading"
+                  *ngIf="loadingServices"
+                >
+                  Loading assigned services...
+                </div>
+
+                <div
+                  class="multiselect-footer"
+                  *ngIf="services.length > 0"
+                >
+                  <span>{{ selectedServices.length }} selected</span>
+
+                  <button
+                    type="button"
+                    (click)="clearAllServices()"
+                    *ngIf="selectedServices.length > 0"
+                  >
+                    Clear all
+                  </button>
+                </div>
+
+              </div>
+
             </div>
 
             <div
@@ -293,14 +472,19 @@
               style="font-size: 11px"
               *ngIf="
                 documentRequestForm.get('serviceId')?.invalid &&
-                documentRequestForm.get('serviceId')?.touched
+                documentRequestForm.get('serviceId')?.touched &&
+                selectedServices.length === 0
               "
             >
               Service is required.
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </article>
 
     <!-- ===================================================== -->
@@ -308,22 +492,34 @@
     <!-- ===================================================== -->
 
     <article class="card complaint-card mb-4">
+
       <div class="section-title">
+
         <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Assignment Information </span>
+          <span class="header-text">
+            Assignment Information
+          </span>
         </div>
+
       </div>
 
       <div class="form-padding-wrap">
+
         <div class="row mb-3">
+
           <!-- ASSIGNED STAFF -->
 
           <div class="col-md-6 form-group">
+
             <label for="assignedTo">
+
               Assigned Staff
 
               <img
@@ -331,23 +527,37 @@
                 class="required-icon"
                 alt="required"
               />
+
             </label>
 
             <div
               class="field-wrap"
               style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
             >
+
               <select
                 id="assignedTo"
                 formControlName="assignedTo"
                 class="form-controler"
               >
-                <option [ngValue]="null">Select assigned staff</option>
 
-                <option *ngFor="let user of staff" [ngValue]="user.id">
-                  {{ user.name || user.userName || user.fullName }}
+                <option [ngValue]="null">
+                  Select assigned staff
                 </option>
+
+                <option
+                  *ngFor="let user of staff"
+                  [ngValue]="user.id"
+                >
+                  {{
+                    user.name ||
+                      user.userName ||
+                      user.fullName
+                  }}
+                </option>
+
               </select>
+
             </div>
 
             <div
@@ -368,32 +578,53 @@
             >
               Assigned staff is required.
             </div>
+
           </div>
 
           <!-- REVIEWER -->
 
           <div class="col-md-6 form-group">
-            <label for="reviewerId"> Reviewer </label>
+
+            <label for="reviewerId">
+              Reviewer
+            </label>
 
             <div
               class="field-wrap"
               style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
             >
+
               <select
                 id="reviewerId"
                 formControlName="reviewerId"
                 class="form-controler"
               >
-                <option [ngValue]="null">Select reviewer</option>
 
-                <option *ngFor="let user of reviewers" [ngValue]="user.id">
-                  {{ user.name || user.userName || user.fullName }}
+                <option [ngValue]="null">
+                  Select reviewer
                 </option>
+
+                <option
+                  *ngFor="let user of reviewers"
+                  [ngValue]="user.id"
+                >
+                  {{
+                    user.name ||
+                      user.userName ||
+                      user.fullName
+                  }}
+                </option>
+
               </select>
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </article>
 
     <!-- ===================================================== -->
@@ -401,50 +632,78 @@
     <!-- ===================================================== -->
 
     <article class="card complaint-card mb-4">
+
       <div class="section-title">
+
         <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Request Details </span>
+          <span class="header-text">
+            Request Details
+          </span>
         </div>
+
       </div>
 
       <div class="form-padding-wrap">
+
         <div class="row mb-3">
+
           <!-- PRIORITY -->
 
           <div class="col-md-4 form-group">
-            <label for="priority"> Priority </label>
+
+            <label for="priority">
+              Priority
+            </label>
 
             <div
               class="field-wrap"
               style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
             >
+
               <select
                 id="priority"
                 formControlName="priority"
                 class="form-controler"
               >
-                <option [ngValue]="'LOW'">Low</option>
 
-                <option [ngValue]="'MEDIUM'">Medium</option>
+                <option [ngValue]="'LOW'">
+                  Low
+                </option>
 
-                <option [ngValue]="'HIGH'">High</option>
+                <option [ngValue]="'MEDIUM'">
+                  Medium
+                </option>
+
+                <option [ngValue]="'HIGH'">
+                  High
+                </option>
+
               </select>
+
             </div>
+
           </div>
 
           <!-- PERIOD -->
 
           <div class="col-md-4 form-group">
-            <label for="period"> Period </label>
+
+            <label for="period">
+              Period
+            </label>
 
             <div
               class="field-wrap"
               style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
             >
+
               <input
                 type="text"
                 id="period"
@@ -453,136 +712,503 @@
                 placeholder="e.g. May 2026"
                 autocomplete="off"
               />
+
             </div>
+
           </div>
 
           <!-- DUE DATE -->
 
           <div class="col-md-4 form-group">
-            <label for="dueDate"> Due Date </label>
+
+            <label for="dueDate">
+              Due Date
+            </label>
 
             <div
               class="field-wrap"
               style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
             >
+
               <input
                 type="date"
                 id="dueDate"
                 formControlName="dueDate"
                 class="form-controler"
               />
+
             </div>
+
           </div>
+
         </div>
+
       </div>
+
     </article>
 
     <!-- ===================================================== -->
-    <!-- DOCUMENTS REQUIRED -->
+    <!-- DOCUMENT REQUEST -->
     <!-- ===================================================== -->
 
     <article class="card complaint-card mb-4">
+
       <div class="section-title">
+
         <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Documents Required </span>
+          <span class="header-text">
+            Document Request
+          </span>
         </div>
 
-        <div class="required-group">
-          <span class="badge-required"> Required </span>
-        </div>
       </div>
 
       <div class="form-padding-wrap">
-        <!-- DOCUMENT ACTIONS -->
+
+        <!-- ================================================= -->
+        <!-- SELECTED SERVICES -->
+        <!-- ================================================= -->
 
         <div
-          class="d-flex justify-content-end gap-2 mb-3"
-          *ngIf="documents.length > 0"
+          class="selected-service-summary mb-4"
+          *ngIf="selectedServices.length > 0"
         >
-          <button
-            type="button"
-            class="btn-cancel"
-            (click)="selectAllDocuments()"
-          >
-            Select All
-          </button>
 
-          <button
-            type="button"
-            class="btn-cancel"
-            (click)="clearAllDocuments()"
-          >
-            Clear
-          </button>
+          <div class="document-section-heading">
+
+            <div>
+
+              <strong>
+                Selected Services
+              </strong>
+
+              <small>
+                {{ selectedServices.length }}
+                service(s) selected
+              </small>
+
+            </div>
+
+          </div>
+
+          <div class="selected-services-summary-list">
+
+            <span
+              class="selected-service-chip"
+              *ngFor="let service of selectedServices"
+            >
+              {{
+                service.serviceName ||
+                  service.service?.serviceName ||
+                  service.name
+              }}
+            </span>
+
+          </div>
+
         </div>
 
-        <!-- LOADING -->
+        <!-- ================================================= -->
+        <!-- REQUIRED DOCUMENTS -->
+        <!-- ================================================= -->
 
-        <div
-          class="text-muted"
-          style="font-size: 12px"
-          *ngIf="loadingDocuments"
-        >
-          Loading documents...
+        <div class="document-section mb-4">
+
+          <div class="document-section-heading">
+
+            <div class="document-section-heading-text">
+
+              <i class="bi bi-shield-check document-section-icon required-icon-color"></i>
+
+              <div>
+                <strong>
+                  Required Documents
+                </strong>
+
+                <small>
+                  Documents configured as required for the
+                  selected service(s). These are auto-included
+                  and can't be unchecked.
+                </small>
+              </div>
+
+            </div>
+
+            <span
+              class="document-count-badge required-count-badge"
+              *ngIf="requiredDocuments.length > 0"
+            >
+              {{ requiredDocuments.length }}
+            </span>
+
+          </div>
+
+          <!-- LOADING -->
+
+          <div
+            class="document-list-loading"
+            *ngIf="loadingDocuments"
+          >
+            <i class="bi bi-arrow-repeat spin"></i>
+            Loading required documents...
+          </div>
+
+          <!-- REQUIRED DOCUMENT LIST -->
+
+          <div
+            class="document-request-list"
+            *ngIf="
+              !loadingDocuments &&
+              requiredDocuments.length > 0
+            "
+          >
+
+            <div
+              class="document-request-item required-document-item"
+              *ngFor="let document of requiredDocuments"
+            >
+
+              <label class="document-checkbox">
+
+                <span class="document-check-indicator required">
+                  <i class="bi bi-check-lg"></i>
+                </span>
+
+                <input
+                  type="checkbox"
+                  [checked]="isDocumentSelected(document.id)"
+                  disabled
+                  hidden
+                />
+
+                <span class="document-checkbox-label">
+
+                  <span class="document-name">
+                    {{
+                      document.documentName ||
+                        document.name
+                    }}
+                  </span>
+
+                  <span
+                    class="document-description"
+                    *ngIf="
+                      document.documentDescription ||
+                      document.description
+                    "
+                  >
+                    {{
+                      document.documentDescription ||
+                        document.description
+                    }}
+                  </span>
+
+                </span>
+
+                <span class="required-document-badge">
+                  Required
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+          <!-- NO REQUIRED DOCUMENTS -->
+
+          <div
+            class="no-documents-view"
+            *ngIf="
+              !loadingDocuments &&
+              selectedServices.length > 0 &&
+              requiredDocuments.length === 0
+            "
+          >
+
+            <i class="bi bi-file-earmark-text"></i>
+
+            <span>
+              No required documents are configured for
+              the selected service(s).
+            </span>
+
+          </div>
+
+          <!-- NO SERVICE -->
+
+          <div
+            class="no-documents-view"
+            *ngIf="
+              !loadingDocuments &&
+              selectedServices.length === 0
+            "
+          >
+
+            <i class="bi bi-diagram-3"></i>
+
+            <span>
+              Select at least one service to view required
+              documents.
+            </span>
+
+          </div>
+
         </div>
 
-        <!-- DOCUMENT LIST -->
+        <!-- ================================================= -->
+        <!-- ADDITIONAL DOCUMENTS -->
+        <!-- ================================================= -->
 
-        <div
-          class="document-request-list"
-          *ngIf="!loadingDocuments && documents.length > 0"
-        >
-          <div class="document-request-item" *ngFor="let document of documents">
-            <label class="document-checkbox">
+        <div class="document-section">
+
+          <div class="document-section-heading">
+
+            <div class="document-section-heading-text">
+
+              <i class="bi bi-file-earmark-plus document-section-icon additional-icon-color"></i>
+
+              <div>
+                <strong>
+                  Add Additional Documents
+                </strong>
+
+                <small>
+                  Select any other document from the document
+                  master that you want to request from the client.
+                  Documents already listed as required won't repeat here.
+                </small>
+              </div>
+
+            </div>
+
+            <span
+              class="document-count-badge additional-count-badge"
+              *ngIf="additionalDocuments.length > 0"
+            >
+              {{ additionalDocuments.length }}
+            </span>
+
+          </div>
+
+          <!-- SEARCH + ACTIONS -->
+
+          <div
+            class="document-toolbar"
+            *ngIf="additionalDocuments.length > 0"
+          >
+
+            <div class="document-search">
+
+              <i class="bi bi-search"></i>
+
               <input
-                type="checkbox"
-                [checked]="isDocumentSelected(document.id)"
-                (change)="toggleDocument(document.id)"
+                type="text"
+                placeholder="Search additional documents..."
+                [(ngModel)]="additionalDocSearchText"
+                [ngModelOptions]="{ standalone: true }"
+                autocomplete="off"
+                [disabled]="isViewMode"
               />
 
-              <span class="document-checkbox-label">
-                <span class="document-name">
-                  {{ document.documentName || document.name }}
+              <button
+                type="button"
+                class="document-search-clear"
+                *ngIf="additionalDocSearchText"
+                (click)="additionalDocSearchText = ''"
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+
+            </div>
+
+            <div
+              class="document-toolbar-actions"
+              *ngIf="!isViewMode"
+            >
+
+              <button
+                type="button"
+                class="btn-cancel"
+                (click)="selectAllDocuments()"
+              >
+                Select All
+              </button>
+
+              <button
+                type="button"
+                class="btn-cancel"
+                (click)="clearAllDocuments()"
+              >
+                Clear Additional
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- LOADING -->
+
+          <div
+            class="document-list-loading"
+            *ngIf="loadingAdditionalDocuments"
+          >
+            <i class="bi bi-arrow-repeat spin"></i>
+            Loading available documents...
+          </div>
+
+          <!-- ADDITIONAL DOCUMENT LIST -->
+
+          <div
+            class="document-request-list"
+            *ngIf="
+              !loadingAdditionalDocuments &&
+              filteredAdditionalDocuments.length > 0
+            "
+          >
+
+            <div
+              class="document-request-item"
+              [class.selected]="isDocumentSelected(document.id)"
+              *ngFor="let document of filteredAdditionalDocuments"
+            >
+
+              <label class="document-checkbox">
+
+                <input
+                  type="checkbox"
+                  [checked]="isDocumentSelected(document.id)"
+                  [disabled]="isViewMode"
+                  (change)="toggleDocument(document.id)"
+                />
+
+                <span class="document-checkbox-label">
+
+                  <span class="document-name">
+                    {{
+                      document.documentName ||
+                        document.name
+                    }}
+                  </span>
+
+                  <span
+                    class="document-description"
+                    *ngIf="
+                      document.documentDescription ||
+                      document.description
+                    "
+                  >
+                    {{
+                      document.documentDescription ||
+                        document.description
+                    }}
+                  </span>
+
                 </span>
 
                 <span
-                  class="document-description"
-                  *ngIf="document.documentDescription || document.description"
+                  class="additional-document-badge"
+                  *ngIf="isDocumentSelected(document.id)"
                 >
-                  {{ document.documentDescription || document.description }}
+                  Selected
                 </span>
-              </span>
-            </label>
+
+              </label>
+
+            </div>
+
           </div>
+
+          <!-- SEARCH: NO MATCH -->
+
+          <div
+            class="no-documents-view"
+            *ngIf="
+              !loadingAdditionalDocuments &&
+              additionalDocuments.length > 0 &&
+              filteredAdditionalDocuments.length === 0
+            "
+          >
+
+            <i class="bi bi-search"></i>
+
+            <span>
+              No documents match "{{ additionalDocSearchText }}".
+            </span>
+
+          </div>
+
+          <!-- NO ADDITIONAL DOCUMENTS -->
+
+          <div
+            class="no-documents-view"
+            *ngIf="
+              !loadingAdditionalDocuments &&
+              selectedServices.length > 0 &&
+              additionalDocuments.length === 0
+            "
+          >
+
+            <i class="bi bi-file-earmark-plus"></i>
+
+            <span>
+              All available documents are already required
+              for the selected service(s).
+            </span>
+
+          </div>
+
+          <!-- NO SERVICE -->
+
+          <div
+            class="no-documents-view"
+            *ngIf="
+              !loadingAdditionalDocuments &&
+              selectedServices.length === 0
+            "
+          >
+
+            <i class="bi bi-file-earmark-plus"></i>
+
+            <span>
+              Select a service first to load available
+              additional documents.
+            </span>
+
+          </div>
+
         </div>
 
-        <!-- EMPTY STATE -->
-
-        <div
-          class="no-documents-view"
-          *ngIf="!loadingDocuments && documents.length === 0"
-        >
-          <i class="bi bi-file-earmark-text"></i>
-
-          <span> Select a service to view required documents. </span>
-        </div>
-
-        <!-- SELECTED COUNT -->
+        <!-- ================================================= -->
+        <!-- SELECTED DOCUMENT COUNT -->
+        <!-- ================================================= -->
 
         <div
           class="document-selected-count"
           *ngIf="selectedDocumentIds.length > 0"
         >
+
+          <i class="bi bi-check-circle"></i>
+
           {{ selectedDocumentIds.length }}
-          document(s) selected
+          document(s) will be requested from the client.
+
         </div>
+
       </div>
+
     </article>
+
   </form>
+
 </main>
 
 <!-- ===================================================== -->

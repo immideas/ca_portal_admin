@@ -51,6 +51,13 @@ export class DocumentService {
       { headers: this.getAuthHeaders() }
     );
   }
+  getAllDocumentMaster(): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}/all`,
+      {},
+      { headers: this.getAuthHeaders() }
+    );
+  }
 
   listDocumentById(id: string | number | null): Observable<any> {
     if (!id) {
