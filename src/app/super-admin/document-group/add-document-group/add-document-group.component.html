@@ -1,0 +1,426 @@
+<main id="main" class="complaint-wrapper">
+
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- Header -->
+  <header class="top-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img
+          src="assets/img/back-icon.svg"
+          alt="back"
+        />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+
+        <div class="title-icon">
+          <img
+            src="assets/img/Plus.svg"
+            alt="add"
+          />
+        </div>
+
+        <div class="title-text">
+
+          <h4>
+            {{
+              isViewMode
+                ? 'View Document Group'
+                : isEditMode
+                  ? 'Edit Document Group'
+                  : 'Add Document Group'
+            }}
+          </h4>
+
+          <p>
+            Document group details
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+
+      <ng-container
+        *ngIf="isViewMode; else editOrSaveMode"
+      >
+
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+
+      </ng-container>
+
+
+      <ng-template #editOrSaveMode>
+
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="cancel()"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          type="submit"
+          form="documentGroupForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': documentGroupForm.valid
+          }"
+        >
+
+          <img
+            class="save-icon"
+            src="assets/img/Group-Save.svg"
+            alt="save"
+          />
+
+          <span>
+            {{ isEditMode ? 'Update' : 'Save' }}
+          </span>
+
+        </button>
+
+      </ng-template>
+
+    </div>
+
+  </header>
+
+
+  <!-- Main Card -->
+  <article class="card complaint-card">
+
+    <!-- Section Header -->
+    <div class="section-title">
+
+      <div class="item-icon">
+
+        <img
+          src="assets/img/Information.svg"
+          alt="info"
+        />
+
+      </div>
+
+      <div class="header-content">
+
+        <span class="header-text">
+          Document Group Details
+        </span>
+
+      </div>
+
+      <div class="required-group">
+
+        <span class="badge-required">
+
+          Required
+
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- Error -->
+    <div
+      *ngIf="errorMessage"
+      class="alert alert-danger mx-4 mt-3"
+    >
+      {{ errorMessage }}
+    </div>
+
+
+    <!-- Form -->
+    <form
+      [formGroup]="documentGroupForm"
+      id="documentGroupForm"
+      (ngSubmit)="saveDocumentGroup()"
+      class="form-padding-wrap"
+    >
+
+      <!-- ====================================================== -->
+      <!-- GROUP NAME + GROUP CODE -->
+      <!-- ====================================================== -->
+
+      <div class="row mb-3">
+
+        <!-- Document Group Name -->
+        <div class="col-md-6 form-group">
+
+          <label for="documentGroupName">
+
+            Document Group Name
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+
+            <input
+              id="documentGroupName"
+              type="text"
+              formControlName="groupName"
+              class="form-controler"
+              maxlength="100"
+              placeholder="Enter document group name"
+              [readonly]="isViewMode"
+              (keypress)="allowOnlyAlphabets($event)"
+            />
+
+          </div>
+
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              documentGroupForm.get('groupName')?.invalid &&
+              documentGroupForm.get('groupName')?.touched
+            "
+          >
+
+            <div
+              *ngIf="
+                documentGroupForm.get('groupName')?.errors?.['required']
+              "
+            >
+              Document group name is required.
+            </div>
+
+            <div
+              *ngIf="
+                documentGroupForm.get('groupName')?.errors?.['minlength']
+              "
+            >
+              Document group name must be at least 2 characters long.
+            </div>
+
+            <div
+              *ngIf="
+                documentGroupForm.get('groupName')?.errors?.['maxlength']
+              "
+            >
+              Document group name cannot exceed 100 characters.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Document Group Code -->
+        <div class="col-md-6 form-group">
+
+          <label for="documentGroupCode">
+
+            Document Group Code
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+
+            <input
+              id="documentGroupCode"
+              type="text"
+              formControlName="groupCode"
+              class="form-controler"
+              maxlength="100"
+              placeholder="Automatically generated"
+              readonly
+            />
+
+          </div>
+
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              documentGroupForm.get('groupCode')?.invalid &&
+              documentGroupForm.get('groupCode')?.touched
+            "
+          >
+
+            <div
+              *ngIf="
+                documentGroupForm.get('groupCode')?.errors?.['required']
+              "
+            >
+              Document group code is required.
+            </div>
+
+            <div
+              *ngIf="
+                documentGroupForm.get('groupCode')?.errors?.['minlength']
+              "
+            >
+              Document group code must be at least 2 characters long.
+            </div>
+
+            <div
+              *ngIf="
+                documentGroupForm.get('groupCode')?.errors?.['maxlength']
+              "
+            >
+              Document group code cannot exceed 100 characters.
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ====================================================== -->
+      <!-- DESCRIPTION -->
+      <!-- ====================================================== -->
+
+      <div class="row mb-3">
+
+        <div class="col-md-12 form-group">
+
+          <label for="documentGroupDescription">
+            Description
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+
+            <textarea
+              id="documentGroupDescription"
+              formControlName="description"
+              class="form-controler"
+              rows="4"
+              maxlength="500"
+              placeholder="Enter document group description"
+              [readonly]="isViewMode"
+            ></textarea>
+
+          </div>
+
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              documentGroupForm.get('description')?.invalid &&
+              documentGroupForm.get('description')?.touched
+            "
+          >
+
+            <div
+              *ngIf="
+                documentGroupForm.get('description')?.errors?.['maxlength']
+              "
+            >
+              Description cannot exceed 500 characters.
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ====================================================== -->
+      <!-- STATUS -->
+      <!-- ====================================================== -->
+
+      <div class="row mb-3">
+
+        <div class="col-md-6 form-group">
+
+          <label for="documentGroupStatus">
+            Status
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+
+            <select
+              id="documentGroupStatus"
+              formControlName="status"
+              class="form-controler"
+              [disabled]="isViewMode"
+            >
+
+              <option [ngValue]="1">
+                Active
+              </option>
+
+              <option [ngValue]="0">
+                Inactive
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </form>
+
+  </article>
+
+</main>

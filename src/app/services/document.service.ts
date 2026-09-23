@@ -79,17 +79,17 @@ export class DocumentService {
     );
   }
 
-  getDocumentsByGroup(groupCode: string): Observable<any> {
-    if (!groupCode) {
-      throw new Error('Group code is required');
-    }
-
-    return this.http.post<any>(
-      `${this.apiUrl}/group`,
-      { groupCode },
-      { headers: this.getAuthHeaders() }
-    );
+ getDocumentsByGroup(groupId: string | number): Observable<any> {
+  if (!groupId) {
+    throw new Error('Group ID is required');
   }
+
+  return this.http.post<any>(
+    `${this.apiUrl}/group`,
+    { groupId },
+    { headers: this.getAuthHeaders() }
+  );
+}
     listUniqueGroupNames(): Observable<any> {
     return this.http.get<any>(
       `${this.apiUrl}/unique-group-names`,

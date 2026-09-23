@@ -4,7 +4,9 @@ import {
   OnInit,
   ElementRef,
   ViewChild,
+  HostListener,
 } from "@angular/core";
+
 import { Router, ActivatedRoute, RouterModule } from "@angular/router";
 
 import {
@@ -12,6 +14,7 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormsModule,
 } from "@angular/forms";
 
 import { CommonModule } from "@angular/common";
@@ -31,7 +34,11 @@ import { ConfirmDialogComponent } from "../../../confirm-dialog/confirm-dialog.c
 import { DocumentService } from "../../../services/document.service";
 
 import { DocumentTypeService } from "../../../services/document-type.service";
+
+import { DocumentGroupService } from "../../../services/document-group.service";
+
 import { UploadService } from "../../../services/upload.service";
+
 import { UploadType } from "../../../shared/enums/uploadTypeEnums";
 
 import { ImageUploaderLibComponent } from "@swiftlyme/image-uploader";
@@ -45,16 +52,17 @@ import { ImageUploaderLibComponent } from "@swiftlyme/image-uploader";
 
   standalone: true,
 
-imports: [
-  CommonModule,
-  HttpClientModule,
-  RouterModule,
-  ReactiveFormsModule,
-  NgxUiLoaderModule,
-  ToastrModule,
-  MatDialogModule,
-  ImageUploaderLibComponent,
-],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
+    NgxUiLoaderModule,
+    ToastrModule,
+    MatDialogModule,
+    ImageUploaderLibComponent,
+  ],
 })
 export class AddDocumentComponent implements OnInit, OnDestroy {
   documentForm: FormGroup;
@@ -72,39 +80,55 @@ export class AddDocumentComponent implements OnInit, OnDestroy {
   originalData: any = null;
 
   isSaving = false;
+
   // =========================================================
-// DOCUMENT PREVIEW
-// =========================================================
+  // DOCUMENT PREVIEW
+  // =========================================================
 
-@ViewChild("documentPreviewUploaderHost")
-documentPreviewUploaderHost?: ElementRef<HTMLElement>;
+  @ViewChild("documentPreviewUploaderHost")
+  documentPreviewUploaderHost?: ElementRef<HTMLElement>;
 
-maxPreviewImages = 1;
+  maxPreviewImages = 1;
 
-documentPreview: {
-  fileName: string;
-  filePath: string;
-  fileType: string;
-  fileSize: number;
-  previewUrl: string;
-} | null = null;
+  documentPreview: {
+    fileName: string;
+    filePath: string;
+    fileType: string;
+    fileSize: number;
+    previewUrl: string;
+  } | null = null;
 
-// S3 files uploaded during current Add/Edit session
-private newlyUploadedDocumentPreviewKeys: Set<string> = new Set<string>();
+  // S3 files uploaded during current Add/Edit session
+  private newlyUploadedDocumentPreviewKeys: Set<string> = new Set<string>();
 
-// Existing S3 file which should be deleted only after DB update succeeds
-private pendingDeleteDocumentPreviewKeys: string[] = [];
+  // Existing S3 file which should be deleted only after DB update succeeds
+  private pendingDeleteDocumentPreviewKeys: string[] = [];
 
-  /*
-   * Document Types
-   */
+  // =========================================================
+  // DOCUMENT TYPES
+  // =========================================================
+
   documentTypes: any[] = [];
 
   loadingDocumentTypes = false;
+
+  // =========================================================
+  // DOCUMENT GROUPS
+  // =========================================================
+
   documentGroups: any[] = [];
-loadingDocumentGroups = false;
-filteredDocumentGroups: any[] = [];
-showGroupSuggestions = false;
+
+  loadingDocumentGroups = false;
+
+  // =========================================================
+  // DOCUMENT GROUP MULTI SELECT
+  // =========================================================
+
+  filteredDocumentGroups: any[] = [];
+
+  showGroupDropdown = false;
+
+  groupSearchText = "";
 
   constructor(
     private fb: FormBuilder,
@@ -122,33 +146,18 @@ showGroupSuggestions = false;
     private documentService: DocumentService,
 
     private documentTypeService: DocumentTypeService,
-      private uploadService: UploadService,
+
+    private documentGroupService: DocumentGroupService,
+
+    private uploadService: UploadService,
   ) {
     this.documentForm = this.fb.group({
       // =================================================
-      // DOCUMENT GROUP NAME
+      // DOCUMENT GROUPS
+      // One document can belong to multiple groups
       // =================================================
 
-      groupName: [
-        "",
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(150),
-        ],
-      ],
-
-      // =================================================
-      // DOCUMENT GROUP CODE
-      // Automatically generated from groupName
-      // =================================================
-
-      groupCode: [
-        {
-          value: "",
-          disabled: true,
-        },
-      ],
+      groupIds: [[], [Validators.required]],
 
       // =================================================
       // DOCUMENT NAME
@@ -218,15 +227,22 @@ showGroupSuggestions = false;
   // =====================================================
 
   ngOnInit(): void {
-    /*
-     * Load active Document Types
-     */
-      this.loadDocumentGroups();
+    // =================================================
+    // Load active Document Groups
+    // =================================================
+
+    this.loadDocumentGroups();
+
+    // =================================================
+    // Load active Document Types
+    // =================================================
+
     this.loadDocumentTypes();
 
-    /*
-     * Check route ID.
-     */
+    // =================================================
+    // Check route ID
+    // =================================================
+
     this.route.paramMap.subscribe((params) => {
       this.documentId = params.get("id");
 
@@ -237,35 +253,16 @@ showGroupSuggestions = false;
       }
     });
 
-    /*
-     * Check view mode.
-     */
+    // =================================================
+    // Check view mode
+    // =================================================
+
     this.route.queryParamMap.subscribe((queryParams) => {
       this.isViewMode = queryParams.get("viewMode") === "true";
 
       if (this.isViewMode) {
         this.documentForm.disable();
       }
-    });
-
-    // =================================================
-    // AUTO GENERATE GROUP CODE
-    // =================================================
-
-    this.documentForm.get("groupName")?.valueChanges.subscribe((value) => {
-      /*
-       * Do not regenerate existing code while editing.
-       * Existing group code should remain unchanged.
-       */
-      if (this.isEditMode) {
-        return;
-      }
-
-      const code = this.generateCode(value);
-
-      this.documentForm.get("groupCode")?.setValue(code, {
-        emitEvent: false,
-      });
     });
 
     // =================================================
@@ -277,6 +274,7 @@ showGroupSuggestions = false;
        * Do not regenerate existing code while editing.
        * Existing document code should remain unchanged.
        */
+
       if (this.isEditMode) {
         return;
       }
@@ -288,91 +286,46 @@ showGroupSuggestions = false;
       });
     });
   }
+
   // =====================================================
-// LOAD EXISTING DOCUMENT GROUPS
-// =====================================================
+  // LOAD ACTIVE DOCUMENT GROUPS
+  // =====================================================
 
-// =====================================================
-// LOAD EXISTING DOCUMENT GROUPS
-// =====================================================
+  loadDocumentGroups(): void {
+    this.loadingDocumentGroups = true;
 
-loadDocumentGroups(): void {
-  this.loadingDocumentGroups = true;
+    this.documentGroupService.getActiveDocumentGroups().subscribe({
+      next: (response: any) => {
+        this.loadingDocumentGroups = false;
 
-  this.documentService.listUniqueGroupNames().subscribe({
-    next: (response: any) => {
-      this.loadingDocumentGroups = false;
+        if (response?.success) {
+          this.documentGroups = response.data || [];
+        } else {
+          this.documentGroups = response?.data || response || [];
+        }
 
-      if (response?.success) {
-        this.documentGroups = response.data || [];
-      } else {
-        this.documentGroups = response?.data || response || [];
-      }
+        // Initialize filtered document groups
+        this.filteredDocumentGroups = [...this.documentGroups];
 
-      // Initially show all groups
-      this.filteredDocumentGroups = this.documentGroups;
+        console.log("Document Groups:", this.documentGroups);
+      },
 
-      console.log("Document Groups:", this.documentGroups);
-    },
+      error: (err: any) => {
+        this.loadingDocumentGroups = false;
 
-    error: (err: any) => {
-      this.loadingDocumentGroups = false;
+        this.documentGroups = [];
+        this.filteredDocumentGroups = [];
 
-      this.documentGroups = [];
-      this.filteredDocumentGroups = [];
+        console.error("Failed to load document groups:", err);
 
-      console.error("Failed to load document groups:", err);
-
-      this.toastr.error(
-        err?.error?.message || "Failed to load document groups",
-        "Error"
-      );
-    }
-  });
-}
-// =====================================================
-// SEARCH DOCUMENT GROUPS
-// =====================================================
-
-onGroupInput(event: Event): void {
-  const input = event.target as HTMLInputElement;
-
-  const value = input.value.trim().toLowerCase();
-
-  this.showGroupSuggestions = true;
-
-  if (!value) {
-    this.filteredDocumentGroups = this.documentGroups;
-    return;
+        this.toastr.error(
+          err?.error?.message || "Failed to load document groups",
+          "Error",
+        );
+      },
+    });
   }
 
-  this.filteredDocumentGroups = this.documentGroups.filter(
-    (group) =>
-      group.groupName?.toLowerCase().includes(value) ||
-      group.groupCode?.toLowerCase().includes(value)
-  );
-}
-// =====================================================
-// SELECT EXISTING DOCUMENT GROUP
-// =====================================================
-
-selectDocumentGroup(group: any): void {
-  this.documentForm.patchValue({
-    groupName: group.groupName,
-    groupCode: group.groupCode
-  });
-
-  this.showGroupSuggestions = false;
-}
-// =====================================================
-// HIDE GROUP SUGGESTIONS
-// =====================================================
-
-hideGroupSuggestions(): void {
-  setTimeout(() => {
-    this.showGroupSuggestions = false;
-  }, 200);
-}
   // =====================================================
   // LOAD DOCUMENT TYPES
   // =====================================================
@@ -412,7 +365,147 @@ hideGroupSuggestions(): void {
   }
 
   // =====================================================
-  // GENERATE CODE
+  // DOCUMENT GROUP MULTI SELECT
+  // =====================================================
+
+  toggleGroupDropdown(event?: Event): void {
+    if (this.isViewMode) {
+      return;
+    }
+
+    if (event) {
+      event.stopPropagation();
+    }
+
+    this.showGroupDropdown = !this.showGroupDropdown;
+
+    if (this.showGroupDropdown) {
+      this.groupSearchText = "";
+      this.filteredDocumentGroups = [...this.documentGroups];
+    }
+  }
+
+  filterDocumentGroups(): void {
+    const search = (this.groupSearchText || "").trim().toLowerCase();
+
+    if (!search) {
+      this.filteredDocumentGroups = [...this.documentGroups];
+      return;
+    }
+
+    this.filteredDocumentGroups = this.documentGroups.filter(
+      (group: any) =>
+        group.groupName?.toLowerCase().includes(search) ||
+        group.groupCode?.toLowerCase().includes(search),
+    );
+  }
+
+  isDocumentGroupSelected(groupId: number | string): boolean {
+    const selectedIds = this.documentForm.get("groupIds")?.value || [];
+
+    return selectedIds.some(
+      (id: any) => Number(id) === Number(groupId),
+    );
+  }
+
+  toggleDocumentGroup(groupId: number | string, event: Event): void {
+    event.stopPropagation();
+
+    if (this.isViewMode) {
+      return;
+    }
+
+    let selectedIds: number[] =
+      this.documentForm.get("groupIds")?.value || [];
+
+    selectedIds = selectedIds.map((id: any) => Number(id));
+
+    const numericGroupId = Number(groupId);
+
+    if (selectedIds.includes(numericGroupId)) {
+      selectedIds = selectedIds.filter(
+        (id: number) => id !== numericGroupId,
+      );
+    } else {
+      selectedIds.push(numericGroupId);
+    }
+
+    this.documentForm.get("groupIds")?.setValue(selectedIds);
+    this.documentForm.get("groupIds")?.markAsTouched();
+    this.documentForm.get("groupIds")?.markAsDirty();
+  }
+
+  selectAllDocumentGroups(event: Event): void {
+    event.stopPropagation();
+
+    if (this.isViewMode) {
+      return;
+    }
+
+    const allGroupIds = this.documentGroups
+      .map((group: any) => Number(group.id))
+      .filter((id: number) => !isNaN(id) && id > 0);
+
+    this.documentForm.get("groupIds")?.setValue(allGroupIds);
+    this.documentForm.get("groupIds")?.markAsTouched();
+    this.documentForm.get("groupIds")?.markAsDirty();
+  }
+
+  clearAllDocumentGroups(event: Event): void {
+    event.stopPropagation();
+
+    if (this.isViewMode) {
+      return;
+    }
+
+    this.documentForm.get("groupIds")?.setValue([]);
+    this.documentForm.get("groupIds")?.markAsTouched();
+    this.documentForm.get("groupIds")?.markAsDirty();
+  }
+
+  getSelectedDocumentGroups(): any[] {
+    const selectedIds = this.documentForm.get("groupIds")?.value || [];
+
+    if (!Array.isArray(selectedIds)) {
+      return [];
+    }
+
+    return this.documentGroups.filter((group: any) =>
+      selectedIds.some(
+        (id: any) => Number(id) === Number(group.id),
+      ),
+    );
+  }
+
+  removeDocumentGroup(
+    groupId: number | string,
+    event: Event,
+  ): void {
+    event.stopPropagation();
+
+    if (this.isViewMode) {
+      return;
+    }
+
+    let selectedIds: number[] =
+      this.documentForm.get("groupIds")?.value || [];
+
+    selectedIds = selectedIds
+      .map((id: any) => Number(id))
+      .filter((id: number) => id !== Number(groupId));
+
+    this.documentForm.get("groupIds")?.setValue(selectedIds);
+    this.documentForm.get("groupIds")?.markAsDirty();
+    this.documentForm.get("groupIds")?.markAsTouched();
+  }
+
+  @HostListener("document:click")
+  closeGroupDropdown(): void {
+    this.showGroupDropdown = false;
+  }
+
+  // =====================================================
+  // GENERATE DOCUMENT CODE
   // =====================================================
 
   private generateCode(value: string): string {
@@ -431,69 +524,70 @@ hideGroupSuggestions(): void {
     this.ngxLoader.start();
 
     this.documentService.listDocumentById(id).subscribe({
-   next: async (response: any) => {
+      next: async (response: any) => {
         this.ngxLoader.stop();
 
         const documentData = response?.data || response;
 
         this.originalData = documentData;
+
         // =====================================================
-// LOAD EXISTING DOCUMENT PREVIEW
-// =====================================================
+        // LOAD EXISTING DOCUMENT PREVIEW
+        // =====================================================
 
-this.documentPreview = null;
+        this.documentPreview = null;
 
-if (documentData.documentPreview) {
-  let previewUrl = documentData.documentPreview;
+        if (documentData.documentPreview) {
+          let previewUrl = documentData.documentPreview;
 
-  try {
-    previewUrl = await this.uploadService.getPreviewUrl(
-      documentData.documentPreview,
-    );
-  } catch (err) {
-    console.error(
-      "Failed to generate document preview URL:",
-      err,
-    );
-  }
+          try {
+            previewUrl = await this.uploadService.getPreviewUrl(
+              documentData.documentPreview,
+            );
+          } catch (err) {
+            console.error("Failed to generate document preview URL:", err);
+          }
 
-  this.documentPreview = {
-    fileName:
-      documentData.documentPreview.split("/").pop() ||
-      "document-preview",
-    filePath: documentData.documentPreview,
-    fileType: this.getDocumentPreviewFileType(
-  documentData.documentPreview
-),
-    fileSize: 0,
-    previewUrl:
-      previewUrl || documentData.documentPreview,
-  };
-}
+          this.documentPreview = {
+            fileName:
+              documentData.documentPreview.split("/").pop() ||
+              "document-preview",
+
+            filePath: documentData.documentPreview,
+
+            fileType: this.getDocumentPreviewFileType(
+              documentData.documentPreview,
+            ),
+
+            fileSize: 0,
+
+            previewUrl: previewUrl || documentData.documentPreview,
+          };
+        }
+
+        // =====================================================
+        // NORMALIZE GROUP IDS
+        // =====================================================
+
+        let groupIds: number[] = [];
+
+        if (Array.isArray(documentData.groupIds)) {
+          groupIds = documentData.groupIds
+            .map((id: any) => Number(id))
+            .filter((id: number) => !isNaN(id));
+        }
+
+        // =====================================================
+        // PATCH FORM
+        // =====================================================
 
         this.documentForm.patchValue({
-          groupName: documentData.groupName || "",
-
-          groupCode: documentData.groupCode || "",
+          groupIds: groupIds,
 
           name: documentData.documentName || "",
 
           documentCode: documentData.documentCode || "",
 
-          /*
-           * NEW
-           *
-           * Backend now returns:
-           *
-           * documentTypeId: 1
-           *
-           * and also:
-           *
-           * documentType: {
-           *   id: 1,
-           *   name: "Identity Proof"
-           * }
-           */
           documentTypeId:
             documentData.documentTypeId ??
             documentData.documentType?.id ??
@@ -510,20 +604,18 @@ if (documentData.documentPreview) {
           status: documentData.status ?? 1,
         });
 
-        /*
-         * Keep the existing codes disabled.
-         */
-        this.documentForm.get("groupCode")?.disable({
-          emitEvent: false,
-        });
+        // =====================================================
+        // KEEP DOCUMENT CODE DISABLED
+        // =====================================================
 
         this.documentForm.get("documentCode")?.disable({
           emitEvent: false,
         });
 
-        /*
-         * View mode
-         */
+        // =====================================================
+        // VIEW MODE
+        // =====================================================
+
         if (this.isViewMode) {
           this.documentForm.disable();
         }
@@ -541,273 +633,277 @@ if (documentData.documentPreview) {
       },
     });
   }
+
+  // =====================================================
+  // DOCUMENT PREVIEW FILE TYPE
+  // =====================================================
+
   private getDocumentPreviewFileType(filePath: string): string {
-  const path = String(filePath || "")
-    .split("?")[0]
-    .toLowerCase();
+    const path = String(filePath || "")
+      .split("?")[0]
+      .toLowerCase();
 
-  if (path.endsWith(".pdf")) {
-    return "application/pdf";
-  }
-
-  if (path.endsWith(".png")) {
-    return "image/png";
-  }
-
-  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-    return "image/jpeg";
-  }
-
-  if (path.endsWith(".webp")) {
-    return "image/webp";
-  }
-
-  return "image/*";
-}
-
-isDocumentPreviewPdf(): boolean {
-  const fileType = String(
-    this.documentPreview?.fileType || ""
-  ).toLowerCase();
-
-  const filePath = String(
-    this.documentPreview?.filePath || ""
-  )
-    .split("?")[0]
-    .toLowerCase();
-
-  return (
-    fileType === "application/pdf" ||
-    filePath.endsWith(".pdf")
-  );
-}
-  // =========================================================
-// DOCUMENT PREVIEW HELPERS
-// =========================================================
-
-getDocumentPreviewUrls(): string[] {
-  if (!this.documentPreview?.previewUrl) {
-    return [];
-  }
-
-  return [this.documentPreview.previewUrl];
-}
-
-// =========================================================
-// DOCUMENT PREVIEW UPLOAD
-// =========================================================
-
-async onDocumentPreviewUpload(image: any): Promise<void> {
-  if (this.isViewMode || !image?.file) {
-    return;
-  }
-
-  try {
-    const result = await this.uploadService.upload(
-      image.file,
-      UploadType.DOCUMENT_PREVIEW,
-    );
-
-    image.key = result.key;
-
-    this.documentPreview = {
-      fileName: image.file.name,
-      filePath: result.key,
-      fileType: image.file.type || "",
-      fileSize: image.file.size,
-      previewUrl: result.previewUrl || result.key,
-    };
-
-    this.newlyUploadedDocumentPreviewKeys.add(result.key);
-
-    console.log("Document preview uploaded:", this.documentPreview);
-  } catch (err: any) {
-    console.error("Document preview S3 upload failed:", err);
-
-    this.toastr.error(
-      `Document preview upload failed: ${err?.message || err}`,
-      "Error",
-    );
-  }
-}
-
-// =========================================================
-// DOCUMENT PREVIEW REPLACE
-// =========================================================
-
-async onDocumentPreviewReplace(event: any): Promise<void> {
-  if (this.isViewMode || !event?.new?.file) {
-    return;
-  }
-
-  const oldPreview = this.documentPreview;
-  const oldKey = oldPreview?.filePath || "";
-
-  try {
-    // =====================================================
-    // UPLOAD NEW PREVIEW FIRST
-    // =====================================================
-
-    const result = await this.uploadService.upload(
-      event.new.file,
-      UploadType.DOCUMENT_PREVIEW,
-    );
-
-    event.new.key = result.key;
-
-    // =====================================================
-    // HANDLE OLD S3 FILE
-    // =====================================================
-
-    if (
-      oldKey &&
-      typeof oldKey === "string" &&
-      !oldKey.startsWith("http://") &&
-      !oldKey.startsWith("https://")
-    ) {
-      // Old file was uploaded during this session
-      if (this.newlyUploadedDocumentPreviewKeys.has(oldKey)) {
-        try {
-          await this.uploadService.delete(oldKey);
-
-          this.newlyUploadedDocumentPreviewKeys.delete(oldKey);
-        } catch (err) {
-          console.error(
-            "Failed to delete old document preview:",
-            err,
-          );
-        }
-      } else {
-        // Existing DB file
-        this.pendingDeleteDocumentPreviewKeys.push(oldKey);
-      }
+    if (path.endsWith(".pdf")) {
+      return "application/pdf";
     }
 
-    // =====================================================
-    // STORE NEW PREVIEW
-    // =====================================================
+    if (path.endsWith(".png")) {
+      return "image/png";
+    }
 
-    this.documentPreview = {
-      fileName: event.new.file.name,
-      filePath: result.key,
-      fileType: event.new.file.type || "",
-      fileSize: event.new.file.size,
-      previewUrl: result.previewUrl || result.key,
-    };
+    if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+      return "image/jpeg";
+    }
 
-    this.newlyUploadedDocumentPreviewKeys.add(result.key);
+    if (path.endsWith(".webp")) {
+      return "image/webp";
+    }
 
-    console.log("Document preview replaced:", this.documentPreview);
-  } catch (err: any) {
-    console.error("Document preview replacement failed:", err);
-
-    this.toastr.error(
-      `Document preview replacement failed: ${
-        err?.message || err
-      }`,
-      "Error",
-    );
-  }
-}
-
-// =========================================================
-// DOCUMENT PREVIEW DELETE
-// =========================================================
-
-async onDocumentPreviewDelete(): Promise<void> {
-  const preview = this.documentPreview;
-
-  if (!preview) {
-    return;
+    return "image/*";
   }
 
-  const key = preview.filePath;
+  // =====================================================
+  // CHECK PDF
+  // =====================================================
 
-  // Newly uploaded during current session
-  if (key && this.newlyUploadedDocumentPreviewKeys.has(key)) {
+  isDocumentPreviewPdf(): boolean {
+    const fileType = String(this.documentPreview?.fileType || "").toLowerCase();
+
+    const filePath = String(this.documentPreview?.filePath || "")
+      .split("?")[0]
+      .toLowerCase();
+
+    return fileType === "application/pdf" || filePath.endsWith(".pdf");
+  }
+
+  // =========================================================
+  // DOCUMENT PREVIEW HELPERS
+  // =========================================================
+
+  getDocumentPreviewUrls(): string[] {
+    if (!this.documentPreview?.previewUrl) {
+      return [];
+    }
+
+    return [this.documentPreview.previewUrl];
+  }
+
+  // =========================================================
+  // DOCUMENT PREVIEW UPLOAD
+  // =========================================================
+
+  async onDocumentPreviewUpload(image: any): Promise<void> {
+    if (this.isViewMode || !image?.file) {
+      return;
+    }
+
     try {
-      await this.uploadService.delete(key);
+      const result = await this.uploadService.upload(
+        image.file,
+        UploadType.DOCUMENT_PREVIEW,
+      );
 
-      this.newlyUploadedDocumentPreviewKeys.delete(key);
-    } catch (err) {
-      console.error(
-        "Failed to delete new document preview from S3:",
-        err,
+      image.key = result.key;
+
+      this.documentPreview = {
+        fileName: image.file.name,
+
+        filePath: result.key,
+
+        fileType: image.file.type || "",
+
+        fileSize: image.file.size,
+
+        previewUrl: result.previewUrl || result.key,
+      };
+
+      this.newlyUploadedDocumentPreviewKeys.add(result.key);
+
+      console.log("Document preview uploaded:", this.documentPreview);
+    } catch (err: any) {
+      console.error("Document preview S3 upload failed:", err);
+
+      this.toastr.error(
+        `Document preview upload failed: ${err?.message || err}`,
+        "Error",
       );
     }
   }
 
-  // Existing DB preview
-  else if (key) {
-    if (this.isEditMode && this.documentId) {
-      try {
-        await this.deleteExistingDocumentPreview();
-      } catch (err) {
-        console.error(
-          "Failed to delete existing document preview:",
-          err,
-        );
+  // =========================================================
+  // DOCUMENT PREVIEW REPLACE
+  // =========================================================
+
+  async onDocumentPreviewReplace(event: any): Promise<void> {
+    if (this.isViewMode || !event?.new?.file) {
+      return;
+    }
+
+    const oldPreview = this.documentPreview;
+
+    const oldKey = oldPreview?.filePath || "";
+
+    try {
+      // =====================================================
+      // UPLOAD NEW PREVIEW FIRST
+      // =====================================================
+
+      const result = await this.uploadService.upload(
+        event.new.file,
+        UploadType.DOCUMENT_PREVIEW,
+      );
+
+      event.new.key = result.key;
+
+      // =====================================================
+      // HANDLE OLD S3 FILE
+      // =====================================================
+
+      if (
+        oldKey &&
+        typeof oldKey === "string" &&
+        !oldKey.startsWith("http://") &&
+        !oldKey.startsWith("https://")
+      ) {
+        // Old file was uploaded during this session
+
+        if (this.newlyUploadedDocumentPreviewKeys.has(oldKey)) {
+          try {
+            await this.uploadService.delete(oldKey);
+
+            this.newlyUploadedDocumentPreviewKeys.delete(oldKey);
+          } catch (err) {
+            console.error("Failed to delete old document preview:", err);
+          }
+        } else {
+          // Existing DB file
+          this.pendingDeleteDocumentPreviewKeys.push(oldKey);
+        }
       }
+
+      // =====================================================
+      // STORE NEW PREVIEW
+      // =====================================================
+
+      this.documentPreview = {
+        fileName: event.new.file.name,
+
+        filePath: result.key,
+
+        fileType: event.new.file.type || "",
+
+        fileSize: event.new.file.size,
+
+        previewUrl: result.previewUrl || result.key,
+      };
+
+      this.newlyUploadedDocumentPreviewKeys.add(result.key);
+
+      console.log("Document preview replaced:", this.documentPreview);
+    } catch (err: any) {
+      console.error("Document preview replacement failed:", err);
+
+      this.toastr.error(
+        `Document preview replacement failed: ${err?.message || err}`,
+        "Error",
+      );
     }
   }
 
-  this.documentPreview = null;
-}
+  // =========================================================
+  // DOCUMENT PREVIEW DELETE
+  // =========================================================
 
-// =========================================================
-// DELETE EXISTING DOCUMENT PREVIEW
-// =========================================================
+  async onDocumentPreviewDelete(): Promise<void> {
+    const preview = this.documentPreview;
 
-private async deleteExistingDocumentPreview(): Promise<void> {
-  if (!this.documentId) {
-    return;
+    if (!preview) {
+      return;
+    }
+
+    const key = preview.filePath;
+
+    // Newly uploaded during current session
+
+    if (key && this.newlyUploadedDocumentPreviewKeys.has(key)) {
+      try {
+        await this.uploadService.delete(key);
+
+        this.newlyUploadedDocumentPreviewKeys.delete(key);
+      } catch (err) {
+        console.error("Failed to delete new document preview from S3:", err);
+      }
+    }
+
+    // Existing DB preview
+    else if (key) {
+      if (this.isEditMode && this.documentId) {
+        try {
+          await this.deleteExistingDocumentPreview();
+        } catch (err) {
+          console.error("Failed to delete existing document preview:", err);
+        }
+      }
+    }
+
+    this.documentPreview = null;
   }
 
-  // IMPORTANT:
-  // We should NOT directly delete the DB document here.
-  // Only remove the preview field.
+  // =========================================================
+  // DELETE EXISTING DOCUMENT PREVIEW
+  // =========================================================
 
-  await new Promise<void>((resolve, reject) => {
-    this.documentService
-      .updateDocument({
-        id: this.documentId,
-        documentPreview: null,
-      })
-      .subscribe({
-        next: () => resolve(),
-        error: (err) => reject(err),
-      });
-  });
-}
+  private async deleteExistingDocumentPreview(): Promise<void> {
+    if (!this.documentId) {
+      return;
+    }
 
-// =========================================================
-// IMAGE CHANGE
-// =========================================================
+    // IMPORTANT:
+    // We should NOT directly delete the DB document here.
+    // Only remove the preview field.
 
-handleDocumentPreviewImagesChange(images: any[]): void {
-  /*
-   * Same safety behavior used by KYC.
-   *
-   * Image uploader can sometimes emit an empty/stale
-   * imagesChange event.
-   */
+    await new Promise<void>((resolve, reject) => {
+      this.documentService
+        .updateDocument({
+          id: this.documentId,
+          documentPreview: null,
+        })
+        .subscribe({
+          next: () => resolve(),
 
-  if (!images) {
-    return;
+          error: (err) => reject(err),
+        });
+    });
   }
 
-  if (this.documentPreview && images.length === 0) {
-    return;
+  // =========================================================
+  // IMAGE CHANGE
+  // =========================================================
+
+  handleDocumentPreviewImagesChange(images: any[]): void {
+    /*
+     * Same safety behavior used by KYC.
+     *
+     * Image uploader can sometimes emit an empty/stale
+     * imagesChange event.
+     */
+
+    if (!images) {
+      return;
+    }
+
+    if (this.documentPreview && images.length === 0) {
+      return;
+    }
   }
-}
 
-// =========================================================
-// IMAGE EDIT
-// =========================================================
+  // =========================================================
+  // IMAGE EDIT
+  // =========================================================
 
-onDocumentPreviewEdit(image: any): void {
-  console.log("Document preview edited:", image);
-}
+  onDocumentPreviewEdit(image: any): void {
+    console.log("Document preview edited:", image);
+  }
 
   // =====================================================
   // SAVE DOCUMENT
@@ -833,21 +929,49 @@ onDocumentPreviewEdit(image: any): void {
      *
      * getRawValue() includes disabled fields.
      *
-     * Therefore groupCode and documentCode
-     * will still be included in the API payload.
+     * documentCode will still be included
+     * in the API payload.
      */
+
     const formValue = this.documentForm.getRawValue();
 
-    const payload: any = {
-      groupName: formValue.groupName?.trim(),
+    // =====================================================
+    // NORMALIZE GROUP IDS
+    // =====================================================
 
-      groupCode: formValue.groupCode?.trim(),
+    const groupIds: number[] = Array.isArray(formValue.groupIds)
+      ? formValue.groupIds
+          .map((id: any) => Number(id))
+          .filter((id: number) => !isNaN(id) && id > 0)
+      : [];
+
+    // =====================================================
+    // VALIDATE GROUP IDS
+    // =====================================================
+
+    if (groupIds.length === 0) {
+      this.ngxLoader.stop();
+
+      this.isSaving = false;
+
+      this.documentForm.get("groupIds")?.markAsTouched();
+
+      this.toastr.error("Please select at least one document group.");
+
+      return;
+    }
+
+    // =====================================================
+    // PAYLOAD
+    // =====================================================
+
+    const payload: any = {
+      groupIds: groupIds,
 
       documentName: formValue.name?.trim(),
 
       documentCode: formValue.documentCode?.trim(),
 
-    
       documentTypeId: Number(formValue.documentTypeId),
 
       documentDescription: formValue.description?.trim() || null,
@@ -862,8 +986,8 @@ onDocumentPreviewEdit(image: any): void {
           : null,
 
       status: formValue.status,
-        documentPreview:
-    this.documentPreview?.filePath || null,
+
+      documentPreview: this.documentPreview?.filePath || null,
     };
 
     // =================================================
@@ -874,37 +998,34 @@ onDocumentPreviewEdit(image: any): void {
       payload.id = this.documentId;
 
       this.documentService.updateDocument(payload).subscribe({
-       next: async () => {
-  // =====================================================
-  // DELETE OLD DOCUMENT PREVIEW FROM S3
-  // ONLY AFTER DB UPDATE SUCCESS
-  // =====================================================
+        next: async () => {
+          // =====================================================
+          // DELETE OLD DOCUMENT PREVIEW FROM S3
+          // ONLY AFTER DB UPDATE SUCCESS
+          // =====================================================
 
-  for (const key of this.pendingDeleteDocumentPreviewKeys) {
-    try {
-      await this.uploadService.delete(key);
-    } catch (err) {
-      console.error(
-        "Failed to delete old document preview from S3:",
-        key,
-        err,
-      );
-    }
-  }
+          for (const key of this.pendingDeleteDocumentPreviewKeys) {
+            try {
+              await this.uploadService.delete(key);
+            } catch (err) {
+              console.error(
+                "Failed to delete old document preview from S3:",
+                key,
+                err,
+              );
+            }
+          }
 
-  this.pendingDeleteDocumentPreviewKeys = [];
+          this.pendingDeleteDocumentPreviewKeys = [];
 
-  this.ngxLoader.stop();
+          this.ngxLoader.stop();
 
-  this.isSaving = false;
+          this.isSaving = false;
 
-  this.toastr.success(
-    "Document updated successfully",
-    "Success",
-  );
+          this.toastr.success("Document updated successfully", "Success");
 
-  this.router.navigate(["/documents"]);
-},
+          this.router.navigate(["/documents"]);
+        },
 
         error: (err: any) => {
           this.ngxLoader.stop();
@@ -970,11 +1091,9 @@ onDocumentPreviewEdit(image: any): void {
     this.documentForm.enable();
 
     /*
-     * Codes should remain auto-generated/read-only.
+     * Document code should remain
+     * auto-generated/read-only.
      */
-    this.documentForm.get("groupCode")?.disable({
-      emitEvent: false,
-    });
 
     this.documentForm.get("documentCode")?.disable({
       emitEvent: false,

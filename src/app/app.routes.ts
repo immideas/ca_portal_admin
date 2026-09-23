@@ -65,6 +65,9 @@ import { AddDocumentRequestComponent } from "./admin/document-request/add-docume
 // ================= DOCUMENT TYPE =================
 import { DocumentTypeListComponent } from "./super-admin/document-type/document-type-list/document-type-list.component";
 import { AddDocumentTypeComponent } from "./super-admin/document-type/add-document-type/add-document-type.component";
+// ================= DOCUMENT GROUP =================
+import { ManageDocumentGroupComponent } from "./super-admin/document-group/manage-document-group/manage-document-group.component";
+import { AddDocumentGroupComponent } from "./super-admin/document-group/add-document-group/add-document-group.component";
 // ================= SERVICE CATEGORY =================
 import { ManageServiceCategoryComponent } from "./super-admin/services/manage-service-category/manage-service-category.component";
 import { AddServiceCategoryComponent } from "./super-admin/services/add-service-category/add-service-category.component";
@@ -543,6 +546,32 @@ export const routes: Routes = [
         component: AddDocumentTypeComponent,
         canActivate: [SuperAdminAuthGuard],
       },
+      // ---- Document Group Management (Super Admin Only) ----
+
+{
+  path: "document-groups",
+  component: ManageDocumentGroupComponent,
+  canActivate: [SuperAdminAuthGuard],
+},
+
+{
+  path: "add-document-group",
+  component: AddDocumentGroupComponent,
+  canDeactivate: [CanDeactivateGuard],
+  canActivate: [SuperAdminAuthGuard],
+},
+
+{
+  path: "edit-document-group/:id",
+  component: AddDocumentGroupComponent,
+  canActivate: [SuperAdminAuthGuard],
+},
+
+{
+  path: "view-document-group/:id",
+  component: AddDocumentGroupComponent,
+  canActivate: [SuperAdminAuthGuard],
+},
       // ---- Document Management (Super Admin Only) ----
 
       {

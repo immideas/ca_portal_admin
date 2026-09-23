@@ -435,7 +435,7 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // =========================================================
 
   addDocumentRequest(): void {
-    this.router.navigate(["/service-request"]);
+    this.router.navigate(["/add-service-request"]);
   }
 
   // =========================================================

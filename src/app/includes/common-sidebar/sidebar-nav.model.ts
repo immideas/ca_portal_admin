@@ -76,17 +76,6 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
       icon: 'bi-file-earmark-text',
       children: [
         {
-          label: 'Manage Documents',
-          icon: '',
-          route: '/documents',
-          activeRoutes: [
-            '/documents',
-            '/add-document',
-            '/edit-document',
-            '/view-document'
-          ]
-        },
-        {
           label: 'Manage Document Types',
           icon: '',
           route: '/document-types',
@@ -95,6 +84,28 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
             '/add-document-type',
             '/edit-document-type',
             '/view-document-type'
+          ]
+        },
+        {
+          label: 'Manage Document Groups',
+          icon: '',
+          route: '/document-groups',
+          activeRoutes: [
+            '/document-groups',
+            '/add-document-group',
+            '/edit-document-group',
+            '/view-document-group'
+          ]
+        },
+        {
+          label: 'Manage Documents',
+          icon: '',
+          route: '/documents',
+          activeRoutes: [
+            '/documents',
+            '/add-document',
+            '/edit-document',
+            '/view-document'
           ]
         }
       ]

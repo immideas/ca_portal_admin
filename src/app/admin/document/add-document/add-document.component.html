@@ -90,172 +90,210 @@
     <!-- DOCUMENT GROUP INFORMATION -->
     <!-- ===================================================== -->
 
-    <article class="card complaint-card mb-4">
-      <div class="section-title">
-        <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
-        </div>
+<!-- ===================================================== -->
+<!-- DOCUMENT GROUP INFORMATION -->
+<!-- ===================================================== -->
 
-        <div class="header-content">
-          <span class="header-text"> Document Group Information </span>
-        </div>
-
-        <div class="required-group">
-          <span class="badge-required">
-            Required
-
-            <img
-              src="assets/img/star.svg"
-              class="required-icon"
-              alt="required"
-            />
-          </span>
-        </div>
-      </div>
-
-      <div class="form-padding-wrap">
-        <!-- Group Name + Group Code -->
-
-        <div class="row mb-3">
-          <!-- Group Name -->
-
-        <!-- Group Name -->
-
-<div class="col-md-6 form-group">
-  <label for="groupName">
-    Group Name
-
-    <img
-      src="assets/img/star.svg"
-      class="required-icon"
-      alt="required"
-    />
-  </label>
-
-  <div class="group-input-container">
-
-    <div
-      class="field-wrap"
-      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-    >
-      <input
-        type="text"
-        id="groupName"
-        formControlName="groupName"
-        class="form-controler"
-        placeholder="Enter document group name"
-        autocomplete="off"
-        (input)="onGroupInput($event)"
-        (focus)="showGroupSuggestions = true"
-        (blur)="hideGroupSuggestions()"
-      />
+<article class="card complaint-card mb-4 document-group-card">
+  <div class="section-title">
+    <div class="item-icon">
+      <img src="assets/img/Information.svg" alt="info" />
     </div>
 
-    <!-- Existing Groups -->
-    <div
-      class="group-dropdown"
-      *ngIf="
-        showGroupSuggestions &&
-        filteredDocumentGroups.length > 0
-      "
-    >
-      <div
-        class="group-option"
-        *ngFor="let group of filteredDocumentGroups"
-        (mousedown)="selectDocumentGroup(group)"
-      >
-        {{ group.groupName }}
-      </div>
+    <div class="header-content">
+      <span class="header-text"> Document Group Information </span>
     </div>
 
-  </div>
-
-  <!-- Loading -->
-  <div
-    class="text-muted mt-1"
-    style="font-size: 11px"
-    *ngIf="loadingDocumentGroups"
-  >
-    Loading document groups...
-  </div>
-
-  <!-- Validation -->
-  <div
-    class="text-danger mt-1"
-    style="font-size: 11px"
-    *ngIf="
-      documentForm.get('groupName')?.invalid &&
-      documentForm.get('groupName')?.touched
-    "
-  >
-    <div
-      *ngIf="documentForm.get('groupName')?.errors?.['required']"
-    >
-      Group name is required.
-    </div>
-
-    <div
-      *ngIf="documentForm.get('groupName')?.errors?.['minlength']"
-    >
-      Group name must be at least 2 characters long.
-    </div>
-
-    <div
-      *ngIf="documentForm.get('groupName')?.errors?.['maxlength']"
-    >
-      Group name cannot exceed 150 characters.
+    <div class="required-group">
+      <span class="badge-required">
+        Required
+        <img
+          src="assets/img/star.svg"
+          class="required-icon"
+          alt="required"
+        />
+      </span>
     </div>
   </div>
-</div>
 
-          <!-- Group Code -->
+  <div class="form-padding-wrap">
+    <div class="row mb-3">
+      <div class="col-md-12 form-group">
+        <label for="groupIds">
+          Document Groups
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required"
+          />
+        </label>
 
-          <div class="col-md-6 form-group">
-            <label for="groupCode">
-              Group Code
-
-              <img
-                src="assets/img/star.svg"
-                class="required-icon"
-                alt="required"
-              />
-            </label>
-
+        <div class="document-group-multiselect">
+          <div
+            class="document-group-select-box"
+            [class.disabled]="isViewMode"
+            (click)="toggleGroupDropdown($event)"
+          >
             <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+              class="selected-groups-container"
+              *ngIf="getSelectedDocumentGroups().length > 0"
             >
+              <span
+                class="selected-group-chip"
+                *ngFor="let group of getSelectedDocumentGroups()"
+              >
+                <span class="selected-group-name">
+                  {{ group.groupName }}
+                </span>
+
+                <button
+                  type="button"
+                  class="selected-group-remove"
+                  *ngIf="!isViewMode"
+                  (click)="removeDocumentGroup(group.id, $event)"
+                  aria-label="Remove group"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+
+            <span
+              class="document-group-placeholder"
+              *ngIf="getSelectedDocumentGroups().length === 0"
+            >
+              Select document groups
+            </span>
+
+            <i
+              class="bi"
+              [ngClass]="
+                showGroupDropdown
+                  ? 'bi-chevron-up'
+                  : 'bi-chevron-down'
+              "
+            ></i>
+          </div>
+
+          <div
+            class="document-group-dropdown"
+            *ngIf="showGroupDropdown && !isViewMode"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="document-group-search">
+              <i class="bi bi-search"></i>
+
               <input
                 type="text"
-                id="groupCode"
-                formControlName="groupCode"
-                class="form-controler"
-                placeholder="Auto-generated"
-                readonly
+                class="document-group-search-input"
+                placeholder="Search document groups..."
+                [(ngModel)]="groupSearchText"
+                [ngModelOptions]="{ standalone: true }"
+                (input)="filterDocumentGroups()"
               />
             </div>
 
-            <div
-              class="text-danger mt-1"
-              style="font-size: 11px"
-              *ngIf="
-                documentForm.get('groupCode')?.invalid &&
-                documentForm.get('groupCode')?.touched
-              "
-            >
-              <div *ngIf="documentForm.get('groupCode')?.errors?.['required']">
-                Group code is required.
-              </div>
+            <div class="document-group-dropdown-actions">
+              <button
+                type="button"
+                class="group-action-btn"
+                (click)="selectAllDocumentGroups($event)"
+              >
+                Select All
+              </button>
 
-              <div *ngIf="documentForm.get('groupCode')?.errors?.['maxlength']">
-                Group code cannot exceed 50 characters.
+              <button
+                type="button"
+                class="group-action-btn"
+                (click)="clearAllDocumentGroups($event)"
+              >
+                Clear All
+              </button>
+            </div>
+
+            <div
+              class="document-group-loading"
+              *ngIf="loadingDocumentGroups"
+            >
+              Loading document groups...
+            </div>
+
+            <div
+              class="document-group-options"
+              *ngIf="!loadingDocumentGroups"
+            >
+              <label
+                class="document-group-option"
+                *ngFor="let group of filteredDocumentGroups"
+                (click)="$event.stopPropagation()"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="isDocumentGroupSelected(group.id)"
+                  (change)="toggleDocumentGroup(group.id, $event)"
+                />
+
+                <span class="document-group-option-name">
+                  {{ group.groupName }}
+                </span>
+
+                <!-- <span
+                  class="document-group-option-code"
+                  *ngIf="group.groupCode"
+                >
+                  {{ group.groupCode }}
+                </span> -->
+              </label>
+
+              <div
+                class="document-group-no-data"
+                *ngIf="filteredDocumentGroups.length === 0"
+              >
+                No document groups found.
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </article>
 
+        <div
+          class="text-muted mt-1"
+          style="font-size: 11px"
+          *ngIf="loadingDocumentGroups"
+        >
+          Loading document groups...
+        </div>
+
+        <div
+          class="text-muted mt-1"
+          style="font-size: 11px"
+          *ngIf="
+            !loadingDocumentGroups &&
+            getSelectedDocumentGroups().length === 0
+          "
+        >
+          Select one or more document groups for this document.
+        </div>
+
+        <div
+          class="text-danger mt-1"
+          style="font-size: 11px"
+          *ngIf="
+            documentForm.get('groupIds')?.invalid &&
+            documentForm.get('groupIds')?.touched
+          "
+        >
+          <div
+            *ngIf="
+              documentForm.get('groupIds')?.errors?.['required']
+            "
+          >
+            At least one document group is required.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
     <!-- ===================================================== -->
     <!-- DOCUMENT INFORMATION -->
     <!-- ===================================================== -->
@@ -389,80 +427,62 @@
 
         <div class="row mb-3">
           <!-- Document Type -->
-<!-- Document Type -->
 
-<div class="col-md-6 form-group">
+          <div class="col-md-6 form-group">
+            <label for="documentTypeId">
+              Document Type
 
-  <label for="documentTypeId">
-    Document Type
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
 
-    <img
-      src="assets/img/star.svg"
-      class="required-icon"
-      alt="required"
-    />
-  </label>
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="documentTypeId"
+                formControlName="documentTypeId"
+                class="form-controler"
+              >
+                <option [ngValue]="null">Select document type</option>
 
-  <div
-    class="field-wrap"
-    style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-  >
+                <option *ngFor="let type of documentTypes" [ngValue]="type.id">
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
 
-    <select
-      id="documentTypeId"
-      formControlName="documentTypeId"
-      class="form-controler"
-    >
+            <!-- Loading -->
 
-      <option [ngValue]="null">
-        Select document type
-      </option>
+            <div
+              class="text-muted mt-1"
+              style="font-size: 11px"
+              *ngIf="loadingDocumentTypes"
+            >
+              Loading document types...
+            </div>
 
-      <option
-        *ngFor="let type of documentTypes"
-        [ngValue]="type.id"
-      >
-        {{ type.name }}
-      </option>
+            <!-- Validation -->
 
-    </select>
-
-  </div>
-
-
-  <!-- Loading -->
-
-  <div
-    class="text-muted mt-1"
-    style="font-size: 11px"
-    *ngIf="loadingDocumentTypes"
-  >
-    Loading document types...
-  </div>
-
-
-  <!-- Validation -->
-
-  <div
-    class="text-danger mt-1"
-    style="font-size: 11px"
-    *ngIf="
-      documentForm.get('documentTypeId')?.invalid &&
-      documentForm.get('documentTypeId')?.touched
-    "
-  >
-
-    <div
-      *ngIf="
-        documentForm.get('documentTypeId')?.errors?.['required']
-      "
-    >
-      Document type is required.
-    </div>
-
-  </div>
-
-</div>
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentForm.get('documentTypeId')?.invalid &&
+                documentForm.get('documentTypeId')?.touched
+              "
+            >
+              <div
+                *ngIf="documentForm.get('documentTypeId')?.errors?.['required']"
+              >
+                Document type is required.
+              </div>
+            </div>
+          </div>
 
           <!-- Mandatory -->
 
@@ -602,196 +622,131 @@
         </div>
       </div>
     </article>
+
     <!-- ===================================================== -->
-<!-- DOCUMENT PREVIEW -->
-<!-- ===================================================== -->
-<article class="card complaint-card mb-4">
-  <div class="section-title">
-    <div class="item-icon">
-      <img
-        src="assets/img/Information.svg"
-        alt="info"
-      />
-    </div>
+    <!-- DOCUMENT PREVIEW -->
+    <!-- ===================================================== -->
 
-    <div class="header-content">
-      <span class="header-text">
-        Document Preview
-      </span>
-    </div>
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
 
-    <div class="required-group">
-      <span class="badge-required">
-        Optional
-      </span>
-    </div>
-  </div>
+        <div class="header-content">
+          <span class="header-text"> Document Preview </span>
+        </div>
 
-  <div class="form-padding-wrap">
-
-    <div class="row mb-3">
-
-      <div class="col-md-4 form-group">
-
-        <!-- ============================= -->
-        <!-- LABEL -->
-        <!-- ============================= -->
-
-        <label class="upload-main-label">
-          Preview File
-          <span class="sub-label">
-            (PNG, JPG, WEBP, PDF)
-          </span>
-        </label>
-
-
-        <!-- ============================= -->
-        <!-- VIEW MODE -->
-        <!-- ============================= -->
-
-        <ng-container *ngIf="isViewMode; else previewUploadMode">
-
-          <!-- Existing Preview -->
-          <ng-container
-            *ngIf="
-              documentPreview?.previewUrl;
-              else noDocumentPreview
-            "
-          >
-
-            <!-- IMAGE PREVIEW -->
-            <div
-              *ngIf="
-                !isDocumentPreviewPdf();
-                else pdfPreview
-              "
-              class="document-preview-view"
-            >
-
-              <img
-                [src]="documentPreview?.previewUrl || ''"
-                [alt]="
-                  documentPreview?.fileName ||
-                  'Document Preview'
-                "
-                class="document-preview-image"
-              />
-
-            </div>
-
-
-            <!-- PDF PREVIEW -->
-            <ng-template #pdfPreview>
-
-              <div class="document-preview-pdf">
-
-                <div class="document-preview-pdf-icon">
-                  <i class="bi bi-file-earmark-pdf-fill"></i>
-                </div>
-
-                <div class="document-preview-pdf-name">
-                  {{
-                    documentPreview?.fileName ||
-                    "Document.pdf"
-                  }}
-                </div>
-
-                <a
-                  [href]="
-                    documentPreview?.previewUrl || ''
-                  "
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="btn-save btn-active document-preview-pdf-view-btn"
-                >
-                  <i class="bi bi-eye"></i>
-                  <span>View PDF</span>
-                </a>
-
-              </div>
-
-            </ng-template>
-
-          </ng-container>
-
-
-          <!-- NO PREVIEW -->
-          <ng-template #noDocumentPreview>
-
-            <div class="no-preview-message">
-              No preview file available.
-            </div>
-
-          </ng-template>
-
-        </ng-container>
-
-
-        <!-- ============================= -->
-        <!-- ADD / EDIT MODE -->
-        <!-- ============================= -->
-
-        <ng-template #previewUploadMode>
-
-          <div
-            class="modern-uploader-wrapper document-preview-uploader-wrapper"
-            #documentPreviewUploaderHost
-          >
-
-            <lib-image-uploader-lib
-              [imageUrls]="getDocumentPreviewUrls()"
-              [maxImages]="maxPreviewImages"
-              [aspectRatio]="1"
-              [outputFormat]="'original'"
-              [layoutMode]="'grid'"
-
-              [allowDrag]="true"
-              [allowEdit]="true"
-              [allowDelete]="true"
-              [allowReplace]="true"
-
-              (imagesChange)="
-                handleDocumentPreviewImagesChange($event)
-              "
-
-              (imageUpload)="
-                onDocumentPreviewUpload($event)
-              "
-
-              (imageReplace)="
-                onDocumentPreviewReplace($event)
-              "
-
-              (imageDelete)="
-                onDocumentPreviewDelete()
-              "
-
-              (imageEdit)="
-                onDocumentPreviewEdit($event)
-              "
-            >
-            </lib-image-uploader-lib>
-
-          </div>
-
-
-          <!-- HELP TEXT -->
-          <div
-            class="text-muted mt-1"
-            style="font-size: 11px"
-          >
-            Upload an optional preview image or PDF for this
-            document.
-          </div>
-
-        </ng-template>
-
+        <div class="required-group">
+          <span class="badge-required"> Optional </span>
+        </div>
       </div>
 
-    </div>
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <div class="col-md-4 form-group">
+            <!-- LABEL -->
 
-  </div>
-</article>
+            <label class="upload-main-label">
+              Preview File
+
+              <span class="sub-label"> (PNG, JPG, WEBP, PDF) </span>
+            </label>
+
+            <!-- ============================= -->
+            <!-- VIEW MODE -->
+            <!-- ============================= -->
+
+            <ng-container *ngIf="isViewMode; else previewUploadMode">
+              <!-- Existing Preview -->
+
+              <ng-container
+                *ngIf="documentPreview?.previewUrl; else noDocumentPreview"
+              >
+                <!-- IMAGE PREVIEW -->
+
+                <div
+                  *ngIf="!isDocumentPreviewPdf(); else pdfPreview"
+                  class="document-preview-view"
+                >
+                  <img
+                    [src]="documentPreview?.previewUrl || ''"
+                    [alt]="documentPreview?.fileName || 'Document Preview'"
+                    class="document-preview-image"
+                  />
+                </div>
+
+                <!-- PDF PREVIEW -->
+
+                <ng-template #pdfPreview>
+                  <div class="document-preview-pdf">
+                    <div class="document-preview-pdf-icon">
+                      <i class="bi bi-file-earmark-pdf-fill"></i>
+                    </div>
+
+                    <div class="document-preview-pdf-name">
+                      {{ documentPreview?.fileName || "Document.pdf" }}
+                    </div>
+
+                    <a
+                      [href]="documentPreview?.previewUrl || ''"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn-save btn-active document-preview-pdf-view-btn"
+                    >
+                      <i class="bi bi-eye"></i>
+                      <span>View PDF</span>
+                    </a>
+                  </div>
+                </ng-template>
+              </ng-container>
+
+              <!-- NO PREVIEW -->
+
+              <ng-template #noDocumentPreview>
+                <div class="no-preview-message">No preview file available.</div>
+              </ng-template>
+            </ng-container>
+
+            <!-- ============================= -->
+            <!-- ADD / EDIT MODE -->
+            <!-- ============================= -->
+
+            <ng-template #previewUploadMode>
+              <div
+                class="modern-uploader-wrapper document-preview-uploader-wrapper"
+                #documentPreviewUploaderHost
+              >
+                <lib-image-uploader-lib
+                  [imageUrls]="getDocumentPreviewUrls()"
+                  [maxImages]="maxPreviewImages"
+                  [aspectRatio]="1"
+                  [outputFormat]="'original'"
+                  [layoutMode]="'grid'"
+                  [allowDrag]="true"
+                  [allowEdit]="true"
+                  [allowDelete]="true"
+                  [allowReplace]="true"
+                  (imagesChange)="handleDocumentPreviewImagesChange($event)"
+                  (imageUpload)="onDocumentPreviewUpload($event)"
+                  (imageReplace)="onDocumentPreviewReplace($event)"
+                  (imageDelete)="onDocumentPreviewDelete()"
+                  (imageEdit)="onDocumentPreviewEdit($event)"
+                >
+                </lib-image-uploader-lib>
+              </div>
+
+              <!-- HELP TEXT -->
+
+              <div class="text-muted mt-1" style="font-size: 11px">
+                Upload an optional preview image or PDF for this document.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </article>
+
     <!-- ===================================================== -->
     <!-- STATUS INFORMATION -->
     <!-- ===================================================== -->

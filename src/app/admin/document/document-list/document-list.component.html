@@ -200,9 +200,24 @@
 
                   <!-- Group Name -->
 
-                  <td>
-                    {{ document.groupName }}
-                  </td>
+              <!-- Group Names -->
+
+<td>
+  <ng-container
+    *ngIf="document.groups?.length > 0; else noGroups"
+  >
+    <div
+      *ngFor="let group of document.groups"
+      class="document-group-name"
+    >
+      {{ group.groupName }}
+    </div>
+  </ng-container>
+
+  <ng-template #noGroups>
+    <span class="text-muted">—</span>
+  </ng-template>
+</td>
 
                   <!-- Group Code -->
 
