@@ -415,23 +415,25 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
 // },
 // ================= DOCUMENT REQUEST MANAGEMENT =================
 
+// ================= SERVICE REQUEST MANAGEMENT =================
+
 {
   items: [
     {
-      id: 'document-request-management',
-      label: 'Document Request Management',
+      id: 'service-request-management',
+      label: 'Service Request Management',
       icon: 'bi-file-earmark-text',
       children: [
         {
-          label: 'Manage Document Requests',
+          label: 'Manage Service Requests',
           icon: '',
-          route: '/document-requests',
+          route: '/service-requests',
           permission: 'manage_document_requests',
           activeRoutes: [
-            '/document-requests',
-            '/add-document-request',
-            '/edit-document-request',
-            '/view-document-request'
+            '/service-requests',
+            '/service-request',
+            '/edit-service-request',
+            '/view-service-request'
           ]
         }
       ]

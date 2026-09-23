@@ -572,26 +572,26 @@ export const routes: Routes = [
 // ---- Document Request Management ----
 
 {
-  path: "document-requests",
+  path: "service-requests",
   component: DocumentRequestListComponent,
   canActivate: [AdminAuthGuard, paymentStatusGuard],
 },
 
 {
-  path: "add-document-request",
+  path: "add-service-request",
   component: AddDocumentRequestComponent,
   canDeactivate: [CanDeactivateGuard],
   canActivate: [AdminAuthGuard, paymentStatusGuard],
 },
 
 {
-  path: "edit-document-request/:id",
+  path: "edit-service-request/:id",
   component: AddDocumentRequestComponent,
   canActivate: [AdminAuthGuard, paymentStatusGuard],
 },
 
 {
-  path: "view-document-request/:id",
+  path: "view-service-request/:id",
   component: AddDocumentRequestComponent,
   canActivate: [AdminAuthGuard, paymentStatusGuard],
 },

@@ -257,7 +257,7 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
         // Other errors
 
         this.toastr.error(
-          error?.error?.message || "Failed to fetch document requests",
+          error?.error?.message || "Failed to fetch service requests",
 
           "Error",
         );
@@ -435,7 +435,7 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // =========================================================
 
   addDocumentRequest(): void {
-    this.router.navigate(["/add-document-request"]);
+    this.router.navigate(["/service-request"]);
   }
 
   // =========================================================
@@ -443,7 +443,7 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // =========================================================
 
   editDocumentRequest(id: string | number): void {
-    this.router.navigate(["/edit-document-request", id]);
+    this.router.navigate(["/edit-service-request", id]);
   }
 
   // =========================================================
@@ -451,7 +451,7 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // =========================================================
 
   viewDocumentRequest(id: string | number): void {
-    this.router.navigate(["/view-document-request", id], {
+    this.router.navigate(["/view-service-request", id], {
       queryParams: {
         viewMode: "true",
       },
@@ -469,7 +469,7 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
       disableClose: true,
 
       data: {
-        message: "Are you sure you want to cancel this document request?",
+       message: "Are you sure you want to cancel this service request?",
       },
     });
 

@@ -181,6 +181,13 @@ export class AddDocumentRequestComponent implements OnInit {
   additionalDocSearchText = "";
 
   /*
+   * Whether the "Additional Documents" card is expanded.
+   * Defaults to open; the header (or its chevron button)
+   * toggles this via toggleAdditionalDocsExpand().
+   */
+  isAdditionalDocsExpanded = true;
+
+  /*
    * Combined selected document IDs.
    *
    * Required + Additional
@@ -1657,156 +1664,153 @@ export class AddDocumentRequestComponent implements OnInit {
   // LOAD ALL DOCUMENT MASTER LIST
   // =====================================================
 
-// =====================================================
-// LOAD ALL DOCUMENT MASTER LIST
-// =====================================================
+  private loadAdditionalDocuments(): void {
+    this.loadingAdditionalDocuments = true;
+    this.additionalDocSearchText = "";
 
-private loadAdditionalDocuments(): void {
-  this.loadingAdditionalDocuments = true;
-  this.additionalDocSearchText = "";
+    this.documentService.getAllDocumentMaster().subscribe({
+      next: (response: any) => {
 
-  this.documentService.getAllDocumentMaster().subscribe({
-    next: (response: any) => {
+        console.log(
+          "ALL DOCUMENT MASTER RESPONSE:",
+          response
+        );
 
-      console.log(
-        "ALL DOCUMENT MASTER RESPONSE:",
-        response
-      );
+        this.loadingAdditionalDocuments = false;
 
-      this.loadingAdditionalDocuments = false;
+        const allDocuments =
+          Array.isArray(response?.data)
+            ? response.data
+            : [];
 
-      const allDocuments =
-        Array.isArray(response?.data)
-          ? response.data
-          : [];
+        console.log(
+          "ALL DOCUMENT MASTER COUNT:",
+          allDocuments.length
+        );
 
-      console.log(
-        "ALL DOCUMENT MASTER COUNT:",
-        allDocuments.length
-      );
-
-      console.log(
-        "ALL DOCUMENT MASTER IDS:",
-        allDocuments.map(
-          (document: any) => document.id
-        )
-      );
-
-      // =================================================
-      // REQUIRED DOCUMENT IDS
-      // =================================================
-
-      const requiredIds = new Set(
-        this.requiredDocuments
-          .map(
-            (document: any) =>
-              Number(document.id)
+        console.log(
+          "ALL DOCUMENT MASTER IDS:",
+          allDocuments.map(
+            (document: any) => document.id
           )
-          .filter(
-            (id: number) =>
-              Number.isInteger(id) &&
-              id > 0
-          )
-      );
+        );
 
-      console.log(
-        "REQUIRED DOCUMENT COUNT:",
-        this.requiredDocuments.length
-      );
+        // =================================================
+        // REQUIRED DOCUMENT IDS
+        // =================================================
 
-      console.log(
-        "REQUIRED DOCUMENT IDS:",
-        Array.from(requiredIds)
-      );
+        const requiredIds = new Set(
+          this.requiredDocuments
+            .map(
+              (document: any) =>
+                Number(document.id)
+            )
+            .filter(
+              (id: number) =>
+                Number.isInteger(id) &&
+                id > 0
+            )
+        );
 
-      // =================================================
-      // ADDITIONAL DOCUMENTS
-      // =================================================
+        console.log(
+          "REQUIRED DOCUMENT COUNT:",
+          this.requiredDocuments.length
+        );
 
-      const seenAdditionalIds =
-        new Set<number>();
+        console.log(
+          "REQUIRED DOCUMENT IDS:",
+          Array.from(requiredIds)
+        );
 
-      this.additionalDocuments =
-        allDocuments
-          .filter((document: any) => {
+        // =================================================
+        // ADDITIONAL DOCUMENTS
+        // =================================================
 
-            const documentId =
-              Number(document?.id);
+        const seenAdditionalIds =
+          new Set<number>();
 
-            // Invalid document ID
-            if (
-              !Number.isInteger(documentId) ||
-              documentId <= 0
-            ) {
-              return false;
-            }
+        this.additionalDocuments =
+          allDocuments
+            .filter((document: any) => {
 
-            // Already required
-            if (
-              requiredIds.has(documentId)
-            ) {
-              return false;
-            }
+              const documentId =
+                Number(document?.id);
 
-            // Duplicate
-            if (
-              seenAdditionalIds.has(
+              // Invalid document ID
+              if (
+                !Number.isInteger(documentId) ||
+                documentId <= 0
+              ) {
+                return false;
+              }
+
+              // Already required
+              if (
+                requiredIds.has(documentId)
+              ) {
+                return false;
+              }
+
+              // Duplicate
+              if (
+                seenAdditionalIds.has(
+                  documentId
+                )
+              ) {
+                return false;
+              }
+
+              seenAdditionalIds.add(
                 documentId
-              )
-            ) {
-              return false;
-            }
+              );
 
-            seenAdditionalIds.add(
-              documentId
+              return true;
+            })
+            .sort(
+              (
+                a: any,
+                b: any
+              ) =>
+                String(
+                  a.documentName || ""
+                ).localeCompare(
+                  String(
+                    b.documentName || ""
+                  )
+                )
             );
 
-            return true;
-          })
-          .sort(
-            (
-              a: any,
-              b: any
-            ) =>
-              String(
-                a.documentName || ""
-              ).localeCompare(
-                String(
-                  b.documentName || ""
-                )
-              )
-          );
+        console.log(
+          "FINAL ADDITIONAL DOCUMENT COUNT:",
+          this.additionalDocuments.length
+        );
 
-      console.log(
-        "FINAL ADDITIONAL DOCUMENT COUNT:",
-        this.additionalDocuments.length
-      );
+        console.log(
+          "FINAL ADDITIONAL DOCUMENTS:",
+          this.additionalDocuments
+        );
+      },
 
-      console.log(
-        "FINAL ADDITIONAL DOCUMENTS:",
-        this.additionalDocuments
-      );
-    },
+      error: (err: any) => {
 
-    error: (err: any) => {
+        this.loadingAdditionalDocuments = false;
 
-      this.loadingAdditionalDocuments = false;
+        this.additionalDocuments = [];
 
-      this.additionalDocuments = [];
+        console.error(
+          "FAILED TO LOAD ALL DOCUMENT MASTER:",
+          err
+        );
 
-      console.error(
-        "FAILED TO LOAD ALL DOCUMENT MASTER:",
-        err
-      );
+        this.toastr.error(
+          err?.error?.message ||
+            "Failed to load additional documents",
+          "Error"
+        );
+      }
+    });
+  }
 
-      this.toastr.error(
-        err?.error?.message ||
-          "Failed to load additional documents",
-        "Error"
-      );
-    }
-  });
-}
   // =====================================================
   // BACKWARD COMPATIBLE SERVICE DOCUMENT METHOD
   // =====================================================
@@ -2076,6 +2080,16 @@ private loadAdditionalDocuments(): void {
   }
 
   // =====================================================
+  // TOGGLE ADDITIONAL DOCUMENTS CARD EXPAND / COLLAPSE
+  // =====================================================
+
+  toggleAdditionalDocsExpand(): void {
+
+    this.isAdditionalDocsExpanded =
+      !this.isAdditionalDocsExpanded;
+  }
+
+  // =====================================================
   // SAVE DOCUMENT REQUEST
   // =====================================================
 
@@ -2322,7 +2336,7 @@ private loadAdditionalDocuments(): void {
 
               this.toastr.error(
                 response?.message ||
-                  "Failed to update document request",
+                  "Failed to update service request",
                 "Error"
               );
 
@@ -2331,15 +2345,15 @@ private loadAdditionalDocuments(): void {
 
             this.toastr.success(
               response?.message ||
-                "Document request updated successfully",
+               "Service request updated successfully",
               "Success"
             );
 
             this.submitted = true;
 
-            this.router.navigate([
-              "/document-requests",
-            ]);
+           this.router.navigate([
+  "/service-requests",
+]);
           },
 
           error: (
@@ -2404,8 +2418,8 @@ private loadAdditionalDocuments(): void {
           this.submitted = true;
 
           this.router.navigate([
-            "/document-requests",
-          ]);
+  "/service-requests",
+]);
         },
 
         error: (
@@ -2434,12 +2448,11 @@ private loadAdditionalDocuments(): void {
   // CANCEL
   // =====================================================
 
-  cancel(): void {
-
-    this.router.navigate([
-      "/document-requests",
-    ]);
-  }
+ cancel(): void {
+  this.router.navigate([
+    "/service-requests",
+  ]);
+}
 
   // =====================================================
   // CAN DEACTIVATE
