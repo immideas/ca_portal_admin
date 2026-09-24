@@ -621,23 +621,26 @@
     </article>
 
     <!-- ===================================================== -->
-    <!-- REQUIRED DOCUMENTS -->
+    <!-- SERVICE DOCUMENTS -->
     <!-- ===================================================== -->
 
     <article
       class="card complaint-card mb-4 document-card required-document-card"
     >
+      <!-- ================= SECTION HEADER ================= -->
+
       <div class="section-title">
         <div class="item-icon document-icon-badge required-icon-badge">
-          <i class="bi bi-shield-check"></i>
+          <i class="bi bi-file-earmark-check"></i>
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Required Documents </span>
+          <span class="header-text"> Service Documents </span>
 
           <span class="header-subtext">
-            Configured as required for the selected service(s) — auto-included
-            and can't be unchecked
+            Documents related to the selected service(s). Select the
+            documents you want to request and mark each as Required or
+            Optional.
           </span>
         </div>
 
@@ -651,55 +654,136 @@
         </div>
       </div>
 
+      <!-- ================= DOCUMENT BODY ================= -->
+
       <div class="form-padding-wrap">
-        <!-- LOADING -->
+        <!-- ================= SELECT ALL / CLEAR ALL (this section only) ================= -->
+
+        <div
+          class="document-toolbar"
+          *ngIf="!loadingDocuments && requiredDocuments.length > 0 && !isViewMode"
+        >
+          <span class="document-toolbar-hint">
+            {{ selectedDocumentIds.length }} of
+            {{ requiredDocuments.length }} selected
+          </span>
+
+          <div class="document-toolbar-actions">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="selectAllServiceDocuments()"
+            >
+              Select All
+            </button>
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="clearAllServiceDocuments()"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- ================= LOADING ================= -->
 
         <div class="document-list-loading" *ngIf="loadingDocuments">
           <i class="bi bi-arrow-repeat spin"></i>
-          Loading required documents...
+          Loading service documents...
         </div>
 
-        <!-- REQUIRED DOCUMENT LIST -->
+        <!-- ================= SERVICE DOCUMENT LIST ================= -->
 
         <div
           class="document-grid"
           *ngIf="!loadingDocuments && requiredDocuments.length > 0"
         >
           <div
-            class="document-request-item required-document-item"
+            class="document-request-item"
+            [class.selected]="isDocumentSelected(document.id)"
+            [class.required-selected]="
+              isDocumentSelected(document.id) &&
+              isRequiredDocument(document.id)
+            "
+            [class.optional-selected]="
+              isDocumentSelected(document.id) &&
+              !isRequiredDocument(document.id)
+            "
             *ngFor="let document of requiredDocuments"
           >
-            <label class="document-checkbox">
-              <span class="document-check-indicator required">
-                <i class="bi bi-check-lg"></i>
-              </span>
+            <!-- ================= DOCUMENT SELECT + TYPE TOGGLE ================= -->
 
-              <input
-                type="checkbox"
-                [checked]="isDocumentSelected(document.id)"
-                disabled
-                hidden
-              />
-
-              <span class="document-checkbox-label">
-                <span class="document-name">
-                  {{ document.documentName || document.name }}
-                </span>
+            <div class="document-main-row">
+              <label class="document-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="isDocumentSelected(document.id)"
+                  [disabled]="isViewMode"
+                  (change)="toggleDocument(document.id)"
+                />
 
                 <span
-                  class="document-description"
-                  *ngIf="document.documentDescription || document.description"
+                  class="document-check-indicator"
+                  [class.required]="
+                    isDocumentSelected(document.id) &&
+                    isRequiredDocument(document.id)
+                  "
+                  [class.selected]="isDocumentSelected(document.id)"
                 >
-                  {{ document.documentDescription || document.description }}
+                  <i
+                    class="bi bi-check-lg"
+                    *ngIf="isDocumentSelected(document.id)"
+                  ></i>
                 </span>
-              </span>
 
-              <span class="required-document-badge"> Required </span>
-            </label>
+                <span class="document-checkbox-label">
+                  <span class="document-name">
+                    {{ document.documentName || document.name }}
+                  </span>
+
+                  <span
+                    class="document-description"
+                    *ngIf="
+                      document.documentDescription || document.description
+                    "
+                  >
+                    {{ document.documentDescription || document.description }}
+                  </span>
+                </span>
+              </label>
+
+              <!-- Compact inline Required/Optional toggle -->
+              <div
+                class="document-type-toggle"
+                *ngIf="isDocumentSelected(document.id)"
+              >
+                <button
+                  type="button"
+                  class="type-toggle-btn required"
+                  [class.active]="isRequiredDocument(document.id)"
+                  [disabled]="isViewMode"
+                  (click)="setDocumentRequired(document.id, true)"
+                >
+                  Required
+                </button>
+
+                <button
+                  type="button"
+                  class="type-toggle-btn optional"
+                  [class.active]="!isRequiredDocument(document.id)"
+                  [disabled]="isViewMode"
+                  (click)="setDocumentRequired(document.id, false)"
+                >
+                  Optional
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- NO REQUIRED DOCUMENTS -->
+        <!-- ================= NO DOCUMENTS ================= -->
 
         <div
           class="no-documents-view"
@@ -711,12 +795,10 @@
         >
           <i class="bi bi-file-earmark-text"></i>
 
-          <span>
-            No required documents are configured for the selected service(s).
-          </span>
+          <span> No documents are configured for the selected service(s). </span>
         </div>
 
-        <!-- NO SERVICE -->
+        <!-- ================= NO SERVICE ================= -->
 
         <div
           class="no-documents-view"
@@ -724,7 +806,7 @@
         >
           <i class="bi bi-diagram-3"></i>
 
-          <span> Select at least one service to view required documents. </span>
+          <span> Select at least one service to view related documents. </span>
         </div>
       </div>
     </article>
@@ -736,6 +818,8 @@
     <article
       class="card complaint-card mb-4 document-card additional-document-card"
     >
+      <!-- ================= ADDITIONAL HEADER ================= -->
+
       <div
         class="section-title additional-doc-toggle"
         (click)="toggleAdditionalDocsExpand()"
@@ -749,11 +833,11 @@
         </div>
 
         <div class="header-content">
-          <span class="header-text"> Add Additional Documents </span>
+          <span class="header-text"> Additional Documents </span>
 
           <span class="header-subtext">
-            Select any other document from the document master that you want to
-            request from the client
+            Select any other document from the document master that you want
+            to request from the client.
           </span>
         </div>
 
@@ -781,12 +865,14 @@
         </div>
       </div>
 
+      <!-- ================= ADDITIONAL BODY ================= -->
+
       <div
         class="additional-doc-body"
         [class.collapsed]="!isAdditionalDocsExpanded"
       >
         <div class="form-padding-wrap">
-          <!-- SEARCH + ACTIONS -->
+          <!-- ================= SEARCH + ACTIONS ================= -->
 
           <div class="document-toolbar" *ngIf="additionalDocuments.length > 0">
             <div class="document-search">
@@ -826,19 +912,22 @@
                 class="btn-cancel"
                 (click)="clearAllDocuments()"
               >
-                Clear Additional
+                Clear All
               </button>
             </div>
           </div>
 
-          <!-- LOADING -->
+          <!-- ================= LOADING ================= -->
 
-          <div class="document-list-loading" *ngIf="loadingAdditionalDocuments">
+          <div
+            class="document-list-loading"
+            *ngIf="loadingAdditionalDocuments"
+          >
             <i class="bi bi-arrow-repeat spin"></i>
             Loading available documents...
           </div>
 
-          <!-- ADDITIONAL DOCUMENT LIST -->
+          <!-- ================= ADDITIONAL DOCUMENT LIST ================= -->
 
           <div
             class="document-grid"
@@ -850,40 +939,89 @@
             <div
               class="document-request-item"
               [class.selected]="isDocumentSelected(document.id)"
+              [class.required-selected]="
+                isDocumentSelected(document.id) &&
+                isRequiredDocument(document.id)
+              "
+              [class.optional-selected]="
+                isDocumentSelected(document.id) &&
+                !isRequiredDocument(document.id)
+              "
               *ngFor="let document of filteredAdditionalDocuments"
             >
-              <label class="document-checkbox">
-                <input
-                  type="checkbox"
-                  [checked]="isDocumentSelected(document.id)"
-                  [disabled]="isViewMode"
-                  (change)="toggleDocument(document.id)"
-                />
+              <!-- ================= DOCUMENT SELECT + TYPE TOGGLE ================= -->
 
-                <span class="document-checkbox-label">
-                  <span class="document-name">
-                    {{ document.documentName || document.name }}
-                  </span>
+              <div class="document-main-row">
+                <label class="document-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="isDocumentSelected(document.id)"
+                    [disabled]="isViewMode"
+                    (change)="toggleDocument(document.id)"
+                  />
 
                   <span
-                    class="document-description"
-                    *ngIf="document.documentDescription || document.description"
+                    class="document-check-indicator"
+                    [class.required]="
+                      isDocumentSelected(document.id) &&
+                      isRequiredDocument(document.id)
+                    "
+                    [class.selected]="isDocumentSelected(document.id)"
                   >
-                    {{ document.documentDescription || document.description }}
+                    <i
+                      class="bi bi-check-lg"
+                      *ngIf="isDocumentSelected(document.id)"
+                    ></i>
                   </span>
-                </span>
 
-                <span
-                  class="additional-document-badge"
+                  <span class="document-checkbox-label">
+                    <span class="document-name">
+                      {{ document.documentName || document.name }}
+                    </span>
+
+                    <span
+                      class="document-description"
+                      *ngIf="
+                        document.documentDescription || document.description
+                      "
+                    >
+                      {{
+                        document.documentDescription || document.description
+                      }}
+                    </span>
+                  </span>
+                </label>
+
+                <!-- Compact inline Required/Optional toggle -->
+                <div
+                  class="document-type-toggle"
                   *ngIf="isDocumentSelected(document.id)"
                 >
-                  Selected
-                </span>
-              </label>
+                  <button
+                    type="button"
+                    class="type-toggle-btn required"
+                    [class.active]="isRequiredDocument(document.id)"
+                    [disabled]="isViewMode"
+                    (click)="setDocumentRequired(document.id, true)"
+                  >
+                    Required
+                  </button>
+
+                  <button
+                    type="button"
+                    class="type-toggle-btn optional"
+                    [class.active]="!isRequiredDocument(document.id)"
+                    [disabled]="isViewMode"
+                    (click)="setDocumentRequired(document.id, false)"
+                  >
+                    Optional
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- SEARCH: NO MATCH -->
+          <!-- ================= SEARCH: NO MATCH ================= -->
 
           <div
             class="no-documents-view"
@@ -898,7 +1036,7 @@
             <span> No documents match "{{ additionalDocSearchText }}". </span>
           </div>
 
-          <!-- NO ADDITIONAL DOCUMENTS -->
+          <!-- ================= NO ADDITIONAL DOCUMENTS ================= -->
 
           <div
             class="no-documents-view"
@@ -911,12 +1049,12 @@
             <i class="bi bi-file-earmark-plus"></i>
 
             <span>
-              All available documents are already required for the selected
-              service(s).
+              All available documents are already included in the service
+              document list.
             </span>
           </div>
 
-          <!-- NO SERVICE -->
+          <!-- ================= NO SERVICE ================= -->
 
           <div
             class="no-documents-view"
@@ -936,12 +1074,15 @@
     <!-- SELECTED DOCUMENT COUNT -->
     <!-- ===================================================== -->
 
-    <div class="document-selected-count" *ngIf="selectedDocumentIds.length > 0">
+    <!-- <div
+      class="document-selected-count"
+      *ngIf="selectedDocumentIds.length > 0"
+    >
       <i class="bi bi-check-circle"></i>
 
       {{ selectedDocumentIds.length }}
       document(s) will be requested from the client.
-    </div>
+    </div> -->
   </form>
 </main>
 

@@ -39,7 +39,6 @@ import { ServiceService } from "../../../services/service.service";
 @Component({
   selector: "app-add-document-request",
   standalone: true,
-
   imports: [
     CommonModule,
     RouterModule,
@@ -50,7 +49,6 @@ import { ServiceService } from "../../../services/service.service";
     ToastrModule,
     MatDialogModule,
   ],
-
   templateUrl: "./add-document-request.component.html",
   styleUrl: "./add-document-request.component.css",
 })
@@ -84,14 +82,13 @@ export class AddDocumentRequestComponent implements OnInit {
   loadingServices = false;
 
   /*
-   * SERVICE MULTI-SELECT DROPDOWN (search + open state)
+   * SERVICE MULTI-SELECT DROPDOWN
    */
   isServiceDropdownOpen = false;
   serviceSearchText = "";
 
   /*
-   * Reference to the dropdown trigger element, used to
-   * compute where the panel should float on screen.
+   * Reference to dropdown trigger
    */
   @ViewChild("serviceTrigger")
   serviceTriggerRef?: ElementRef<HTMLElement>;
@@ -107,6 +104,10 @@ export class AddDocumentRequestComponent implements OnInit {
 
   loadingStaff = false;
 
+  // =====================================================
+  // DOCUMENTS
+  // =====================================================
+
   requiredDocuments: any[] = [];
 
   additionalDocuments: any[] = [];
@@ -116,6 +117,16 @@ export class AddDocumentRequestComponent implements OnInit {
   isAdditionalDocsExpanded = true;
 
   selectedDocumentIds: number[] = [];
+
+  /*
+   * Request-level Required documents.
+   *
+   * IMPORTANT:
+   * This is NOT based on Document Master isMandatory.
+   * CA/user decides Required or Optional while creating
+   * the document request.
+   */
+  requiredDocumentIds: number[] = [];
 
   documents: any[] = [];
 
@@ -144,7 +155,6 @@ export class AddDocumentRequestComponent implements OnInit {
    *
    * requestServices contains all selected services.
    */
-
   selectedClientServiceId: number | null = null;
 
   constructor(
@@ -292,11 +302,8 @@ export class AddDocumentRequestComponent implements OnInit {
       next: (response: any) => {
         this.ngxLoader.stop();
 
-        console.log("DOCUMENT REQUEST RAW RESPONSE:", response);
-
         if (!response?.success) {
           console.error("API returned success=false:", response);
-
           return;
         }
 
@@ -310,11 +317,8 @@ export class AddDocumentRequestComponent implements OnInit {
 
         if (!request) {
           console.error("Document request data not found:", response);
-
           return;
         }
-
-        console.log("EDIT REQUEST:", request);
 
         // =================================================
         // GET DOCUMENT REQUEST ITEMS
@@ -329,8 +333,6 @@ export class AddDocumentRequestComponent implements OnInit {
               : Array.isArray(response?.data)
                 ? response.data[0]?.items || []
                 : [];
-
-        console.log("REQUEST ITEMS:", requestItems);
 
         // =================================================
         // PATCH FORM
@@ -380,7 +382,6 @@ export class AddDocumentRequestComponent implements OnInit {
           savedRequestServices = [
             {
               clientServiceId: Number(request.clientServiceId),
-
               serviceId: Number(request.serviceId),
             },
           ];
@@ -415,11 +416,23 @@ export class AddDocumentRequestComponent implements OnInit {
               Number.isInteger(documentId) && documentId > 0,
           );
 
-        this.selectedDocumentIds = Array.from(
-          new Set(this.selectedDocumentIds),
-        );
+        // =================================================
+        // REQUIRED DOCUMENTS FROM SAVED REQUEST
+        // =================================================
 
-        console.log("PATCHED DOCUMENT IDS:", this.selectedDocumentIds);
+        this.requiredDocumentIds = requestItems
+          .filter((item: any) => item.isRequired === true)
+          .map((item: any) => Number(item.documentId))
+          .filter(
+            (documentId: number) =>
+              Number.isInteger(documentId) && documentId > 0,
+          );
+
+        this.selectedDocumentIds = Array.from(new Set(this.selectedDocumentIds));
+
+        this.requiredDocumentIds = Array.from(
+          new Set(this.requiredDocumentIds),
+        );
 
         // =================================================
         // LOAD CLIENT SERVICES
@@ -570,6 +583,8 @@ export class AddDocumentRequestComponent implements OnInit {
 
     this.selectedDocumentIds = [];
 
+    this.requiredDocumentIds = [];
+
     if (!clientId) {
       return;
     }
@@ -599,7 +614,9 @@ export class AddDocumentRequestComponent implements OnInit {
           return;
         }
 
-        const assignments = Array.isArray(response.data) ? response.data : [];
+        const assignments = Array.isArray(response.data)
+          ? response.data
+          : [];
 
         this.services = assignments;
 
@@ -639,10 +656,6 @@ export class AddDocumentRequestComponent implements OnInit {
   // SERVICE MULTI-SELECT DROPDOWN
   // =====================================================
 
-  /*
-   * Services filtered by the search box inside the dropdown
-   * panel. Matches against whichever name field is present.
-   */
   get filteredServices(): any[] {
     const query = this.serviceSearchText.trim().toLowerCase();
 
@@ -652,10 +665,7 @@ export class AddDocumentRequestComponent implements OnInit {
 
     return this.services.filter((service: any) => {
       const name = String(
-        service.serviceName ||
-          service.service?.serviceName ||
-          service.name ||
-          "",
+        service.serviceName || service.service?.serviceName || service.name || "",
       ).toLowerCase();
 
       return name.includes(query);
@@ -670,11 +680,6 @@ export class AddDocumentRequestComponent implements OnInit {
     const opening = !this.isServiceDropdownOpen;
 
     if (opening) {
-      /*
-       * Compute position BEFORE flipping the flag, so the
-       * panel never renders (even for a single frame) at
-       * the wrong spot.
-       */
       this.positionServicePanel();
 
       this.serviceSearchText = "";
@@ -687,14 +692,6 @@ export class AddDocumentRequestComponent implements OnInit {
     this.isServiceDropdownOpen = false;
   }
 
-  /*
-   * Reads the trigger's current on-screen position and
-   * turns it into fixed-position coordinates for the panel.
-   * Using position: fixed (viewport-relative) instead of
-   * position: absolute (ancestor-relative) is what lets the
-   * dropdown escape a parent card's overflow: hidden instead
-   * of being clipped at the card's edge.
-   */
   private positionServicePanel(): void {
     const triggerEl = this.serviceTriggerRef?.nativeElement;
 
@@ -706,16 +703,11 @@ export class AddDocumentRequestComponent implements OnInit {
 
     const gap = 6;
 
-    /*
-     * Flip the panel above the trigger if there isn't
-     * enough room below it in the viewport.
-     */
     const estimatedPanelHeight = 300;
 
     const spaceBelow = window.innerHeight - rect.bottom;
 
-    const openUpwards =
-      spaceBelow < estimatedPanelHeight && rect.top > spaceBelow;
+    const openUpwards = spaceBelow < estimatedPanelHeight && rect.top > spaceBelow;
 
     this.servicePanelStyle = openUpwards
       ? {
@@ -732,11 +724,6 @@ export class AddDocumentRequestComponent implements OnInit {
         };
   }
 
-  /*
-   * Keep the panel glued to the trigger while the page
-   * scrolls or the window resizes, instead of drifting away
-   * from the field it belongs to.
-   */
   @HostListener("window:scroll")
   @HostListener("window:resize")
   onWindowScrollOrResize(): void {
@@ -759,11 +746,6 @@ export class AddDocumentRequestComponent implements OnInit {
     this.loadSelectedServiceDocuments();
   }
 
-  /*
-   * Closes the service dropdown when the user clicks
-   * anywhere outside of this component (e.g. another
-   * field, or the page background).
-   */
   @HostListener("document:click", ["$event"])
   onDocumentClick(event: MouseEvent): void {
     if (!this.isServiceDropdownOpen) {
@@ -826,9 +808,7 @@ export class AddDocumentRequestComponent implements OnInit {
 
       this.selectedServices.push({
         ...assignment,
-
         serviceId,
-
         id: clientServiceId,
       });
     }
@@ -840,7 +820,7 @@ export class AddDocumentRequestComponent implements OnInit {
     this.syncPrimaryService();
 
     // =================================================
-    // LOAD REQUIRED DOCUMENTS
+    // LOAD DOCUMENTS
     // =================================================
 
     this.loadSelectedServiceDocuments();
@@ -920,6 +900,8 @@ export class AddDocumentRequestComponent implements OnInit {
 
       this.selectedDocumentIds = [];
 
+      this.requiredDocumentIds = [];
+
       return;
     }
 
@@ -948,7 +930,7 @@ export class AddDocumentRequestComponent implements OnInit {
   }
 
   // =====================================================
-  // LOAD REQUIRED DOCUMENTS
+  // LOAD DOCUMENTS FOR SELECTED SERVICES
   // =====================================================
 
   private loadSelectedServiceDocuments(): void {
@@ -962,6 +944,8 @@ export class AddDocumentRequestComponent implements OnInit {
       this.loadingDocuments = false;
 
       this.additionalDocuments = [];
+
+      this.requiredDocumentIds = [];
 
       return;
     }
@@ -980,19 +964,12 @@ export class AddDocumentRequestComponent implements OnInit {
 
         // =================================================
         // REMOVE DUPLICATES
-        //
-        // Two (or more) selected services can both require
-        // the same document (e.g. "Aadhaar"). We key this
-        // Map by document.id, so whichever service listed
-        // it first "wins" and it only appears once in
-        // requiredDocuments below.
         // =================================================
 
         const uniqueRequiredDocuments = Array.from(
           new Map(
             allRequiredDocuments.map((document: any) => [
               Number(document.id),
-
               document,
             ]),
           ).values(),
@@ -1001,23 +978,20 @@ export class AddDocumentRequestComponent implements OnInit {
         // =================================================
         // SORT
         // =================================================
+        //
+        // IMPORTANT:
+        // Do NOT use document.isMandatory here.
+        //
+        // Required / Optional is now decided at the
+        // document-request level.
+        //
 
-        uniqueRequiredDocuments.sort((a: any, b: any) => {
-          const mandatoryA = a.isMandatory ? 1 : 0;
-
-          const mandatoryB = b.isMandatory ? 1 : 0;
-
-          if (mandatoryA !== mandatoryB) {
-            return mandatoryB - mandatoryA;
-          }
-
-          return String(a.documentName || "").localeCompare(
-            String(b.documentName || ""),
-          );
-        });
+        uniqueRequiredDocuments.sort((a: any, b: any) =>
+          String(a.documentName || "").localeCompare(String(b.documentName || "")),
+        );
 
         // =================================================
-        // REQUIRED DOCUMENTS
+        // SERVICE DOCUMENTS
         // =================================================
 
         this.requiredDocuments = uniqueRequiredDocuments;
@@ -1029,32 +1003,18 @@ export class AddDocumentRequestComponent implements OnInit {
         this.documents = uniqueRequiredDocuments;
 
         // =================================================
-        // REQUIRED DOCUMENT IDS
+        // NOTE:
+        // -----
+        // We do NOT prune selectedDocumentIds/requiredDocumentIds
+        // against requiredDocuments here. At this point we only
+        // know the Service Documents list — Additional Documents
+        // haven't loaded yet. Pruning here would incorrectly wipe
+        // out any saved document that happens to be an Additional
+        // Document rather than a Service Document (this was the
+        // cause of "Additional Documents not patching" in edit
+        // mode). Final pruning happens in loadAdditionalDocuments()
+        // once both lists are known.
         // =================================================
-
-        const requiredIds = uniqueRequiredDocuments
-          .map((document: any) => Number(document.id))
-          .filter((id: number) => Number.isInteger(id) && id > 0);
-
-        // =================================================
-        // AUTOMATICALLY SELECT REQUIRED DOCUMENTS
-        // =================================================
-
-        this.selectedDocumentIds = Array.from(
-          new Set([...this.selectedDocumentIds, ...requiredIds]),
-        );
-
-        // =================================================
-        // CLEAN IDS
-        // =================================================
-
-        this.selectedDocumentIds = Array.from(
-          new Set(
-            this.selectedDocumentIds
-              .map(Number)
-              .filter((id) => Number.isInteger(id) && id > 0),
-          ),
-        );
 
         this.loadingDocuments = false;
 
@@ -1088,9 +1048,7 @@ export class AddDocumentRequestComponent implements OnInit {
         next: (serviceResponse: any) => {
           if (!serviceResponse?.success || !serviceResponse?.data) {
             subscriber.next([]);
-
             subscriber.complete();
-
             return;
           }
 
@@ -1113,9 +1071,7 @@ export class AddDocumentRequestComponent implements OnInit {
 
           if (uniqueGroupCodes.length === 0) {
             subscriber.next([]);
-
             subscriber.complete();
-
             return;
           }
 
@@ -1130,9 +1086,7 @@ export class AddDocumentRequestComponent implements OnInit {
                 !Array.isArray(groupResponse.data)
               ) {
                 subscriber.next([]);
-
                 subscriber.complete();
-
                 return;
               }
 
@@ -1158,9 +1112,7 @@ export class AddDocumentRequestComponent implements OnInit {
 
               if (groupIds.length === 0) {
                 subscriber.next([]);
-
                 subscriber.complete();
-
                 return;
               }
 
@@ -1204,36 +1156,24 @@ export class AddDocumentRequestComponent implements OnInit {
 
   private loadAdditionalDocuments(): void {
     this.loadingAdditionalDocuments = true;
+
     this.additionalDocSearchText = "";
 
     this.documentService.getAllDocumentMaster().subscribe({
       next: (response: any) => {
-        console.log("ALL DOCUMENT MASTER RESPONSE:", response);
-
         this.loadingAdditionalDocuments = false;
 
         const allDocuments = Array.isArray(response?.data) ? response.data : [];
 
-        console.log("ALL DOCUMENT MASTER COUNT:", allDocuments.length);
-
-        console.log(
-          "ALL DOCUMENT MASTER IDS:",
-          allDocuments.map((document: any) => document.id),
-        );
-
         // =================================================
-        // REQUIRED DOCUMENT IDS
+        // SERVICE DOCUMENT IDS
         // =================================================
 
-        const requiredIds = new Set(
+        const serviceDocumentIds = new Set(
           this.requiredDocuments
             .map((document: any) => Number(document.id))
             .filter((id: number) => Number.isInteger(id) && id > 0),
         );
-
-        console.log("REQUIRED DOCUMENT COUNT:", this.requiredDocuments.length);
-
-        console.log("REQUIRED DOCUMENT IDS:", Array.from(requiredIds));
 
         // =================================================
         // ADDITIONAL DOCUMENTS
@@ -1250,8 +1190,8 @@ export class AddDocumentRequestComponent implements OnInit {
               return false;
             }
 
-            // Already required
-            if (requiredIds.has(documentId)) {
+            // Already part of selected service
+            if (serviceDocumentIds.has(documentId)) {
               return false;
             }
 
@@ -1270,12 +1210,53 @@ export class AddDocumentRequestComponent implements OnInit {
             ),
           );
 
-        console.log(
-          "FINAL ADDITIONAL DOCUMENT COUNT:",
-          this.additionalDocuments.length,
+        // =================================================
+        // PRUNE SELECTIONS
+        // =================================================
+        //
+        // Now that BOTH Service Documents and Additional
+        // Documents are known, drop any selected/required id
+        // that no longer exists in either list (e.g. it
+        // belonged to a service that's no longer selected).
+        // Doing this here — instead of right after Service
+        // Documents load — is what fixes Additional Documents
+        // not patching in edit mode.
+        //
+
+        const allAvailableDocumentIds = new Set([
+          ...this.requiredDocuments.map((document: any) =>
+            Number(document.id),
+          ),
+          ...this.additionalDocuments.map((document: any) =>
+            Number(document.id),
+          ),
+        ]);
+
+        this.selectedDocumentIds = Array.from(
+          new Set(
+            this.selectedDocumentIds
+              .map(Number)
+              .filter(
+                (id) =>
+                  Number.isInteger(id) &&
+                  id > 0 &&
+                  allAvailableDocumentIds.has(id),
+              ),
+          ),
         );
 
-        console.log("FINAL ADDITIONAL DOCUMENTS:", this.additionalDocuments);
+        this.requiredDocumentIds = Array.from(
+          new Set(
+            this.requiredDocumentIds
+              .map(Number)
+              .filter(
+                (id) =>
+                  Number.isInteger(id) &&
+                  id > 0 &&
+                  this.selectedDocumentIds.includes(id),
+              ),
+          ),
+        );
       },
 
       error: (err: any) => {
@@ -1330,9 +1311,43 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   isRequiredDocument(documentId: number): boolean {
-    return this.requiredDocuments.some(
-      (document: any) => Number(document.id) === Number(documentId),
-    );
+    return this.requiredDocumentIds.includes(Number(documentId));
+  }
+
+  // =====================================================
+  // SET DOCUMENT REQUIRED / OPTIONAL
+  // =====================================================
+
+  setDocumentRequired(documentId: number, required: boolean): void {
+    if (this.isViewMode) {
+      return;
+    }
+
+    const numericDocumentId = Number(documentId);
+
+    if (!Number.isInteger(numericDocumentId) || numericDocumentId <= 0) {
+      return;
+    }
+
+    /*
+     * A document must first be selected before
+     * it can be marked Required.
+     */
+    if (required && !this.selectedDocumentIds.includes(numericDocumentId)) {
+      return;
+    }
+
+    if (required) {
+      if (!this.requiredDocumentIds.includes(numericDocumentId)) {
+        this.requiredDocumentIds.push(numericDocumentId);
+      }
+    } else {
+      this.requiredDocumentIds = this.requiredDocumentIds.filter(
+        (id) => id !== numericDocumentId,
+      );
+    }
+
+    this.requiredDocumentIds = Array.from(new Set(this.requiredDocumentIds));
   }
 
   // =====================================================
@@ -1347,9 +1362,7 @@ export class AddDocumentRequestComponent implements OnInit {
     }
 
     return this.additionalDocuments.filter((document: any) => {
-      const name = String(
-        document.documentName || document.name || "",
-      ).toLowerCase();
+      const name = String(document.documentName || document.name || "").toLowerCase();
 
       const description = String(
         document.documentDescription || document.description || "",
@@ -1375,34 +1388,74 @@ export class AddDocumentRequestComponent implements OnInit {
     }
 
     // =================================================
-    // REQUIRED DOCUMENT
-    // =================================================
-
-    if (this.isRequiredDocument(numericDocumentId)) {
-      /*
-       * Required documents are automatically
-       * included in the request.
-       *
-       * We don't allow removing them.
-       */
-      return;
-    }
-
-    // =================================================
-    // ADDITIONAL DOCUMENT
+    // TOGGLE DOCUMENT SELECTION
     // =================================================
 
     if (this.selectedDocumentIds.includes(numericDocumentId)) {
       this.selectedDocumentIds = this.selectedDocumentIds.filter(
         (id) => id !== numericDocumentId,
       );
+
+      /*
+       * If document is removed from request,
+       * it cannot remain Required.
+       */
+      this.requiredDocumentIds = this.requiredDocumentIds.filter(
+        (id) => id !== numericDocumentId,
+      );
     } else {
       this.selectedDocumentIds.push(numericDocumentId);
     }
+
+    this.selectedDocumentIds = Array.from(new Set(this.selectedDocumentIds));
+
+    this.requiredDocumentIds = Array.from(new Set(this.requiredDocumentIds));
   }
 
   // =====================================================
-  // SELECT ALL DOCUMENTS
+  // SELECT ALL SERVICE DOCUMENTS (Service Documents section only)
+  // =====================================================
+
+  selectAllServiceDocuments(): void {
+    if (this.isViewMode) {
+      return;
+    }
+
+    // Only touches requiredDocuments (Service Documents),
+    // never additionalDocuments.
+    const serviceIds = this.requiredDocuments
+      .map((document: any) => Number(document.id))
+      .filter((id) => Number.isInteger(id) && id > 0);
+
+    this.selectedDocumentIds = Array.from(
+      new Set([...this.selectedDocumentIds, ...serviceIds]),
+    );
+  }
+
+  // =====================================================
+  // CLEAR ALL SERVICE DOCUMENTS (Service Documents section only)
+  // =====================================================
+
+  clearAllServiceDocuments(): void {
+    if (this.isViewMode) {
+      return;
+    }
+
+    const serviceIds = new Set(
+      this.requiredDocuments.map((document: any) => Number(document.id)),
+    );
+
+    this.selectedDocumentIds = this.selectedDocumentIds.filter(
+      (id) => !serviceIds.has(Number(id)),
+    );
+
+    this.requiredDocumentIds = this.requiredDocumentIds.filter(
+      (id) => !serviceIds.has(Number(id)),
+    );
+  }
+
+  // =====================================================
+  // SELECT ALL DOCUMENTS (Additional Documents section only)
   // =====================================================
 
   selectAllDocuments(): void {
@@ -1410,31 +1463,19 @@ export class AddDocumentRequestComponent implements OnInit {
       return;
     }
 
-    /*
-     * Select all applies to the currently visible
-     * (search-filtered) additional documents plus
-     * everything already required, so a narrowed
-     * search doesn't accidentally drop selections
-     * made before the search was typed.
-     */
-
-    const allVisibleDocumentIds = [
-      ...this.requiredDocuments,
-
-      ...this.filteredAdditionalDocuments,
-    ].map((document: any) => Number(document.id));
+    // Only touches filteredAdditionalDocuments (Additional
+    // Documents), never requiredDocuments (Service Documents).
+    const additionalIds = this.filteredAdditionalDocuments
+      .map((document: any) => Number(document.id))
+      .filter((id) => Number.isInteger(id) && id > 0);
 
     this.selectedDocumentIds = Array.from(
-      new Set(
-        [...this.selectedDocumentIds, ...allVisibleDocumentIds].filter(
-          (id) => Number.isInteger(id) && id > 0,
-        ),
-      ),
+      new Set([...this.selectedDocumentIds, ...additionalIds]),
     );
   }
 
   // =====================================================
-  // CLEAR ADDITIONAL DOCUMENTS
+  // CLEAR ALL DOCUMENTS (Additional Documents section only)
   // =====================================================
 
   clearAllDocuments(): void {
@@ -1442,19 +1483,21 @@ export class AddDocumentRequestComponent implements OnInit {
       return;
     }
 
-    /*
-     * Required documents must remain selected.
-     */
-
-    const requiredIds = this.requiredDocuments.map((document: any) =>
-      Number(document.id),
+    const additionalIds = new Set(
+      this.additionalDocuments.map((document: any) => Number(document.id)),
     );
 
-    this.selectedDocumentIds = Array.from(new Set(requiredIds));
+    this.selectedDocumentIds = this.selectedDocumentIds.filter(
+      (id) => !additionalIds.has(Number(id)),
+    );
+
+    this.requiredDocumentIds = this.requiredDocumentIds.filter(
+      (id) => !additionalIds.has(Number(id)),
+    );
   }
 
   // =====================================================
-  // TOGGLE ADDITIONAL DOCUMENTS CARD EXPAND / COLLAPSE
+  // TOGGLE ADDITIONAL DOCUMENTS CARD
   // =====================================================
 
   toggleAdditionalDocsExpand(): void {
@@ -1517,13 +1560,11 @@ export class AddDocumentRequestComponent implements OnInit {
     // =================================================
 
     const normalizedRequestServices = this.selectedServices
-
       .map((item: any) => ({
         clientServiceId: Number(item.id),
 
         serviceId: Number(item.serviceId),
       }))
-
       .filter(
         (item: any) =>
           Number.isInteger(item.clientServiceId) &&
@@ -1575,7 +1616,7 @@ export class AddDocumentRequestComponent implements OnInit {
       dueDate: formValue.dueDate || null,
 
       /*
-       * Required + Additional documents.
+       * All selected documents.
        */
       documentIds: Array.from(
         new Set(
@@ -1584,9 +1625,21 @@ export class AddDocumentRequestComponent implements OnInit {
             .filter((id) => Number.isInteger(id) && id > 0),
         ),
       ),
-    };
 
-    console.log("DOCUMENT REQUEST PAYLOAD:", payload);
+      /*
+       * Documents which CA marked as Required.
+       *
+       * Only selected documents can be Required.
+       */
+      requiredDocumentIds: Array.from(
+        new Set(
+          this.requiredDocumentIds
+            .map(Number)
+            .filter((id) => Number.isInteger(id) && id > 0)
+            .filter((id) => this.selectedDocumentIds.includes(id)),
+        ),
+      ),
+    };
 
     // =================================================
     // SAVE
@@ -1702,7 +1755,11 @@ export class AddDocumentRequestComponent implements OnInit {
   // =====================================================
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.documentRequestForm.dirty && !this.submitted && !this.isViewMode) {
+    if (
+      this.documentRequestForm.dirty &&
+      !this.submitted &&
+      !this.isViewMode
+    ) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: "550px",
         disableClose: true,
