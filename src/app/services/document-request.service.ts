@@ -55,4 +55,39 @@ export class DocumentRequestService {
       { headers: this.getHeaders() }
     );
   }
+    // =====================================================
+  // APPROVE SUBMITTED DOCUMENT
+  // =====================================================
+
+  approveSubmittedDocument(
+    documentId: number | string
+  ): Observable<any> {
+    return this.http.post(
+      `${this.base}/submitted-document/approve`,
+      { documentId },
+      {
+        headers: this.getHeaders()
+      }
+    );
+  }
+
+  // =====================================================
+  // REJECT SUBMITTED DOCUMENT
+  // =====================================================
+
+  rejectSubmittedDocument(
+    documentId: number | string,
+    rejectionReason: string
+  ): Observable<any> {
+    return this.http.post(
+      `${this.base}/submitted-document/reject`,
+      {
+        documentId,
+        rejectionReason
+      },
+      {
+        headers: this.getHeaders()
+      }
+    );
+  }
 }

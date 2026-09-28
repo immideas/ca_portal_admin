@@ -1,26 +1,21 @@
 import { Component, OnInit } from "@angular/core";
-
 import { CommonModule } from "@angular/common";
-
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
-
 import { HttpClientModule } from "@angular/common/http";
-
+import { FormsModule } from "@angular/forms";
 import { NgxUiLoaderModule, NgxUiLoaderService } from "ngx-ui-loader";
-
 import { ToastrModule, ToastrService } from "ngx-toastr";
-
 import { DocumentRequestService } from "../../../services/document-request.service";
 
 @Component({
   selector: "app-submitted-documents",
-
   standalone: true,
 
   imports: [
     CommonModule,
     RouterModule,
     HttpClientModule,
+    FormsModule,
     NgxUiLoaderModule,
     ToastrModule,
   ],
@@ -45,6 +40,20 @@ export class SubmittedDocumentsComponent implements OnInit {
   // =====================================================
 
   loading = false;
+
+  // =====================================================
+  // DOCUMENT VERIFICATION
+  // =====================================================
+
+  showRejectModal = false;
+
+  selectedDocument: any = null;
+
+  rejectionReason = "";
+
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
 
   constructor(
     private route: ActivatedRoute,
@@ -220,25 +229,80 @@ export class SubmittedDocumentsComponent implements OnInit {
 
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
-  getUploadedCount(): number {
-  return this.documents.filter(
-    (item) => item.uploaded
-  ).length;
-}
 
-getPendingCount(): number {
-  return this.documents.filter(
-    (item) => !item.uploaded
-  ).length;
-}
+  // =====================================================
+  // UPLOADED COUNT
+  // =====================================================
+
+  getUploadedCount(): number {
+    return this.documents.filter((item) => item.uploaded).length;
+  }
+
+  // =====================================================
+  // PENDING COUNT
+  // =====================================================
+
+  getPendingCount(): number {
+    return this.documents.filter((item) => !item.uploaded).length;
+  }
+
+  // =====================================================
+  // APPROVED COUNT
+  // =====================================================
+
+  getApprovedCount(): number {
+    return this.documents.filter(
+      (item) => item?.uploadedDocument?.status === "APPROVED",
+    ).length;
+  }
+
+  // =====================================================
+  // REJECTED COUNT
+  // =====================================================
+
+  getRejectedCount(): number {
+    return this.documents.filter(
+      (item) => item?.uploadedDocument?.status === "REJECTED",
+    ).length;
+  }
+
+  // =====================================================
+  // UNDER REVIEW COUNT
+  // =====================================================
+
+  getUnderReviewCount(): number {
+    return this.documents.filter((item) => {
+      const status = item?.uploadedDocument?.status;
+
+      return status === "UPLOADED" || status === "UNDER_VERIFICATION";
+    }).length;
+  }
+
+  // =====================================================
+  // DOCUMENT STATUS
+  // =====================================================
+
+  isApproved(document: any): boolean {
+    return document?.uploadedDocument?.status === "APPROVED";
+  }
+
+  isRejected(document: any): boolean {
+    return document?.uploadedDocument?.status === "REJECTED";
+  }
+
+  isUnderReview(document: any): boolean {
+    const status = document?.uploadedDocument?.status;
+
+    return status === "UPLOADED" || status === "UNDER_VERIFICATION";
+  }
 
   // =====================================================
   // DOCUMENT URL
   // =====================================================
 
- getDocumentUrl(document: any): string {
-  return document?.uploadedDocument?.fileUrl || "";
-}
+  getDocumentUrl(document: any): string {
+    return document?.uploadedDocument?.fileUrl || "";
+  }
 
   // =====================================================
   // VIEW DOCUMENT
@@ -278,6 +342,122 @@ getPendingCount(): number {
     link.download = this.getFileName(document);
 
     link.click();
+  }
+
+  // =====================================================
+  // APPROVE DOCUMENT
+  // =====================================================
+
+  approveDocument(document: any): void {
+    const documentId = document?.uploadedDocument?.id;
+
+    if (!documentId) {
+      this.toastr.error("Submitted document ID is missing", "Error");
+
+      return;
+    }
+
+    this.documentRequestService.approveSubmittedDocument(documentId).subscribe({
+      next: (response: any) => {
+        if (!response?.success) {
+          this.toastr.error(
+            response?.message || "Failed to approve document",
+            "Error",
+          );
+
+          return;
+        }
+
+        this.toastr.success("Document approved successfully", "Success");
+
+        this.loadSubmittedDocuments();
+      },
+
+      error: (error: any) => {
+        console.error("APPROVE DOCUMENT ERROR:", error);
+
+        this.toastr.error(
+          error?.error?.message || "Failed to approve document",
+          "Error",
+        );
+      },
+    });
+  }
+
+  // =====================================================
+  // OPEN REJECT MODAL
+  // =====================================================
+
+  openRejectModal(document: any): void {
+    this.selectedDocument = document;
+
+    this.rejectionReason = "";
+
+    this.showRejectModal = true;
+  }
+
+  // =====================================================
+  // CLOSE REJECT MODAL
+  // =====================================================
+
+  closeRejectModal(): void {
+    this.showRejectModal = false;
+
+    this.selectedDocument = null;
+
+    this.rejectionReason = "";
+  }
+
+  // =====================================================
+  // REJECT DOCUMENT
+  // =====================================================
+
+  rejectDocument(): void {
+    const documentId = this.selectedDocument?.uploadedDocument?.id;
+
+    if (!documentId) {
+      this.toastr.error("Submitted document ID is missing", "Error");
+
+      return;
+    }
+
+    const reason = this.rejectionReason.trim();
+
+    if (!reason) {
+      this.toastr.warning("Please enter rejection reason", "Required");
+
+      return;
+    }
+
+    this.documentRequestService
+      .rejectSubmittedDocument(documentId, reason)
+      .subscribe({
+        next: (response: any) => {
+          if (!response?.success) {
+            this.toastr.error(
+              response?.message || "Failed to reject document",
+              "Error",
+            );
+
+            return;
+          }
+
+          this.toastr.success("Document rejected successfully", "Success");
+
+          this.closeRejectModal();
+
+          this.loadSubmittedDocuments();
+        },
+
+        error: (error: any) => {
+          console.error("REJECT DOCUMENT ERROR:", error);
+
+          this.toastr.error(
+            error?.error?.message || "Failed to reject document",
+            "Error",
+          );
+        },
+      });
   }
 
   // =====================================================

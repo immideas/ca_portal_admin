@@ -20,7 +20,10 @@
 
       <div class="title-box">
         <div class="title-icon">
-          <img src="assets/img/Plus.svg" alt="submitted documents" />
+          <img
+            src="assets/img/Plus.svg"
+            alt="submitted documents"
+          />
         </div>
 
         <div class="title-text">
@@ -96,7 +99,9 @@
               <input
                 type="text"
                 class="form-controler"
-                [value]="documentRequest.requestCode || '-'"
+                [value]="
+                  documentRequest.requestCode || '-'
+                "
                 readonly
               />
             </div>
@@ -111,7 +116,9 @@
               <input
                 type="text"
                 class="form-controler"
-                [value]="documentRequest.requestId || '-'"
+                [value]="
+                  documentRequest.requestId || '-'
+                "
                 readonly
               />
             </div>
@@ -126,7 +133,9 @@
               <input
                 type="text"
                 class="form-controler"
-                [value]="documentRequest.requestStatus || '-'"
+                [value]="
+                  documentRequest.requestStatus || '-'
+                "
                 readonly
               />
             </div>
@@ -218,6 +227,60 @@
 
           </div>
 
+          <!-- APPROVED -->
+
+          <div class="summary-item">
+
+            <div class="summary-icon">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+
+            <div>
+              <span>Approved</span>
+
+              <strong>
+                {{ getApprovedCount() }}
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- REJECTED -->
+
+          <div class="summary-item">
+
+            <div class="summary-icon">
+              <i class="bi bi-x-circle-fill"></i>
+            </div>
+
+            <div>
+              <span>Rejected</span>
+
+              <strong>
+                {{ getRejectedCount() }}
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- UNDER REVIEW -->
+
+          <div class="summary-item">
+
+            <div class="summary-icon">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+
+            <div>
+              <span>Under Review</span>
+
+              <strong>
+                {{ getUnderReviewCount() }}
+              </strong>
+            </div>
+
+          </div>
+
         </div>
 
       </div>
@@ -279,7 +342,10 @@
 
         <div
           class="no-documents-view"
-          *ngIf="!loading && documents.length === 0"
+          *ngIf="
+            !loading &&
+            documents.length === 0
+          "
         >
           <i class="bi bi-file-earmark-x"></i>
 
@@ -292,7 +358,10 @@
 
         <div
           class="submitted-document-grid"
-          *ngIf="!loading && documents.length > 0"
+          *ngIf="
+            !loading &&
+            documents.length > 0
+          "
         >
 
           <div
@@ -352,6 +421,47 @@
                     ? "Required"
                     : "Optional"
                 }}
+              </span>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- DOCUMENT REVIEW STATUS -->
+            <!-- ================================================= -->
+
+            <div
+              class="document-review-status"
+              *ngIf="isUploaded(document)"
+            >
+
+              <!-- UNDER REVIEW -->
+
+              <span
+                class="review-status-badge review-under-review"
+                *ngIf="isUnderReview(document)"
+              >
+                <i class="bi bi-hourglass-split"></i>
+                Under Review
+              </span>
+
+              <!-- APPROVED -->
+
+              <span
+                class="review-status-badge review-approved"
+                *ngIf="isApproved(document)"
+              >
+                <i class="bi bi-check-circle-fill"></i>
+                Approved
+              </span>
+
+              <!-- REJECTED -->
+
+              <span
+                class="review-status-badge review-rejected"
+                *ngIf="isRejected(document)"
+              >
+                <i class="bi bi-x-circle-fill"></i>
+                Rejected
               </span>
 
             </div>
@@ -518,6 +628,34 @@
 
               </div>
 
+              <!-- ================================================= -->
+              <!-- REJECTION REASON -->
+              <!-- ================================================= -->
+
+              <div
+                class="document-rejection-reason"
+                *ngIf="
+                  isRejected(document) &&
+                  document.uploadedDocument?.rejectionReason
+                "
+              >
+
+                <div class="rejection-reason-title">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+
+                  <span>
+                    Rejection Reason
+                  </span>
+                </div>
+
+                <div class="rejection-reason-text">
+                  {{
+                    document.uploadedDocument?.rejectionReason
+                  }}
+                </div>
+
+              </div>
+
             </div>
 
             <!-- ================================================= -->
@@ -529,28 +667,56 @@
               *ngIf="isUploaded(document)"
             >
 
+              <!-- VIEW -->
+
               <button
                 type="button"
                 class="btn-cancel"
                 (click)="viewDocument(document)"
               >
-
                 <i class="bi bi-eye"></i>
-
                 View
-
               </button>
+
+              <!-- DOWNLOAD -->
 
               <button
                 type="button"
                 class="btn-save btn-active"
                 (click)="downloadDocument(document)"
               >
-
                 <i class="bi bi-download"></i>
-
                 Download
+              </button>
 
+              <!-- APPROVE -->
+
+              <button
+                type="button"
+                class="btn-approve"
+                *ngIf="
+                  document.uploadedDocument?.status === 'UPLOADED' ||
+                  document.uploadedDocument?.status === 'UNDER_VERIFICATION'
+                "
+                (click)="approveDocument(document)"
+              >
+                <i class="bi bi-check-circle"></i>
+                Approve
+              </button>
+
+              <!-- REJECT -->
+
+              <button
+                type="button"
+                class="btn-reject"
+                *ngIf="
+                  document.uploadedDocument?.status === 'UPLOADED' ||
+                  document.uploadedDocument?.status === 'UNDER_VERIFICATION'
+                "
+                (click)="openRejectModal(document)"
+              >
+                <i class="bi bi-x-circle"></i>
+                Reject
               </button>
 
             </div>
@@ -562,6 +728,97 @@
       </div>
 
     </article>
+
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- REJECT DOCUMENT MODAL -->
+  <!-- ===================================================== -->
+
+  <div
+    class="reject-modal-overlay"
+    *ngIf="showRejectModal"
+  >
+
+    <div class="reject-modal">
+
+      <!-- MODAL HEADER -->
+
+      <div class="reject-modal-header">
+
+        <div>
+          <h3>
+            Reject Document
+          </h3>
+
+          <p>
+            {{
+              selectedDocument?.documentName ||
+              "Document"
+            }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="reject-modal-close"
+          (click)="closeRejectModal()"
+          aria-label="Close"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+      </div>
+
+      <!-- MODAL BODY -->
+
+      <div class="reject-modal-body">
+
+        <label for="rejectionReason">
+          Rejection Reason
+          <span>*</span>
+        </label>
+
+        <textarea
+          id="rejectionReason"
+          class="rejection-reason-input"
+          rows="5"
+          [(ngModel)]="rejectionReason"
+          placeholder="Enter reason for rejecting this document..."
+        ></textarea>
+
+        <small>
+          Please provide a clear reason so the client knows
+          what needs to be corrected.
+        </small>
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+
+      <div class="reject-modal-footer">
+
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="closeRejectModal()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="btn-reject"
+          [disabled]="!rejectionReason.trim()"
+          (click)="rejectDocument()"
+        >
+          <i class="bi bi-x-circle"></i>
+          Reject Document
+        </button>
+
+      </div>
+
+    </div>
 
   </div>
 
