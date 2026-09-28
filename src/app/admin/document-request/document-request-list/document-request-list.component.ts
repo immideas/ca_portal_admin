@@ -139,6 +139,10 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
       label: "View",
     });
 
+      items.push({
+    id: "submitted-documents",
+    label: "Submitted Documents",
+  });
     // ---------------------------------------------------------
     // EDIT
     // ---------------------------------------------------------
@@ -409,6 +413,9 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
         this.viewDocumentRequest(id);
 
         break;
+    case "submitted-documents":
+      this.viewSubmittedDocuments(id);
+      break;
 
       // -----------------------------------------------------
       // EDIT
@@ -457,7 +464,19 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
       },
     });
   }
+// =========================================================
+// VIEW SUBMITTED DOCUMENTS
+// =========================================================
 
+viewSubmittedDocuments(
+  id: string | number
+): void {
+
+  this.router.navigate([
+    "/submitted-documents",
+    id,
+  ]);
+}
   // =========================================================
   // CANCEL DOCUMENT REQUEST
   // =========================================================

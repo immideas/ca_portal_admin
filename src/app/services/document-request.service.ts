@@ -46,4 +46,13 @@ export class DocumentRequestService {
       { headers: this.getHeaders() }
     );
   }
+   getSubmittedDocuments(
+    documentRequestId: number | string
+  ): Observable<any> {
+    return this.http.post(
+      `${this.base}/submitted-documents`,
+      { documentRequestId },
+      { headers: this.getHeaders() }
+    );
+  }
 }

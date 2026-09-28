@@ -62,6 +62,7 @@ import { AddDocumentComponent } from "./admin/document/add-document/add-document
 // ================= DOCUMENT REQUEST =================
 import { DocumentRequestListComponent } from "./admin/document-request/document-request-list/document-request-list.component";
 import { AddDocumentRequestComponent } from "./admin/document-request/add-document-request/add-document-request.component";
+import { SubmittedDocumentsComponent } from "./admin/document-request/submitted-documents/submitted-documents.component";
 // ================= DOCUMENT TYPE =================
 import { DocumentTypeListComponent } from "./super-admin/document-type/document-type-list/document-type-list.component";
 import { AddDocumentTypeComponent } from "./super-admin/document-type/add-document-type/add-document-type.component";
@@ -548,30 +549,30 @@ export const routes: Routes = [
       },
       // ---- Document Group Management (Super Admin Only) ----
 
-{
-  path: "document-groups",
-  component: ManageDocumentGroupComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "document-groups",
+        component: ManageDocumentGroupComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "add-document-group",
-  component: AddDocumentGroupComponent,
-  canDeactivate: [CanDeactivateGuard],
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "add-document-group",
+        component: AddDocumentGroupComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "edit-document-group/:id",
-  component: AddDocumentGroupComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "edit-document-group/:id",
+        component: AddDocumentGroupComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
-{
-  path: "view-document-group/:id",
-  component: AddDocumentGroupComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "view-document-group/:id",
+        component: AddDocumentGroupComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
       // ---- Document Management (Super Admin Only) ----
 
       {
@@ -598,30 +599,35 @@ export const routes: Routes = [
         component: AddDocumentComponent,
         canActivate: [SuperAdminAuthGuard],
       },
-// ---- Document Request Management ----
+      // ---- Document Request Management ----
 
-{
-  path: "service-requests",
-  component: DocumentRequestListComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+      {
+        path: "service-requests",
+        component: DocumentRequestListComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "add-service-request",
-  component: AddDocumentRequestComponent,
-  canDeactivate: [CanDeactivateGuard],
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+      {
+        path: "add-service-request",
+        component: AddDocumentRequestComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "edit-service-request/:id",
-  component: AddDocumentRequestComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+      {
+        path: "edit-service-request/:id",
+        component: AddDocumentRequestComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "view-service-request/:id",
-  component: AddDocumentRequestComponent,
+      {
+        path: "view-service-request/:id",
+        component: AddDocumentRequestComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+      {
+  path: "submitted-documents/:id",
+  component: SubmittedDocumentsComponent,
   canActivate: [AdminAuthGuard, paymentStatusGuard],
 },
       {

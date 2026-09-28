@@ -1,0 +1,568 @@
+<main id="main" class="complaint-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="submitted documents" />
+        </div>
+
+        <div class="title-text">
+          <h4>Submitted Documents</h4>
+          <p>View documents submitted by client</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HEADER ACTIONS ================= -->
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="cancel()"
+      >
+        Back
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================================================== -->
+  <!-- CONTENT -->
+  <!-- ===================================================== -->
+
+  <div class="form-padding-wrap">
+
+    <!-- ===================================================== -->
+    <!-- REQUEST INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article
+      class="card complaint-card mb-4"
+      *ngIf="documentRequest"
+    >
+      <div class="section-title">
+
+        <div class="item-icon">
+          <img
+            src="assets/img/Information.svg"
+            alt="info"
+          />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text">
+            Request Information
+          </span>
+
+          <span class="header-subtext">
+            Service request information
+          </span>
+        </div>
+
+        <div class="required-group">
+          <span class="request-status-badge">
+            {{ documentRequest.requestStatus || "N/A" }}
+          </span>
+        </div>
+
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+
+          <!-- REQUEST CODE -->
+
+          <div class="col-md-4 form-group">
+            <label>Request Code</label>
+
+            <div class="field-wrap">
+              <input
+                type="text"
+                class="form-controler"
+                [value]="documentRequest.requestCode || '-'"
+                readonly
+              />
+            </div>
+          </div>
+
+          <!-- REQUEST ID -->
+
+          <div class="col-md-4 form-group">
+            <label>Request ID</label>
+
+            <div class="field-wrap">
+              <input
+                type="text"
+                class="form-controler"
+                [value]="documentRequest.requestId || '-'"
+                readonly
+              />
+            </div>
+          </div>
+
+          <!-- STATUS -->
+
+          <div class="col-md-4 form-group">
+            <label>Request Status</label>
+
+            <div class="field-wrap">
+              <input
+                type="text"
+                class="form-controler"
+                [value]="documentRequest.requestStatus || '-'"
+                readonly
+              />
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- DOCUMENT SUMMARY -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+
+      <div class="section-title">
+
+        <div class="item-icon">
+          <i class="bi bi-file-earmark-check"></i>
+        </div>
+
+        <div class="header-content">
+          <span class="header-text">
+            Submitted Documents
+          </span>
+
+          <span class="header-subtext">
+            Documents submitted by the client for this request
+          </span>
+        </div>
+
+      </div>
+
+      <div class="form-padding-wrap">
+
+        <div class="document-summary-grid">
+
+          <!-- TOTAL DOCUMENTS -->
+
+          <div class="summary-item">
+
+            <div class="summary-icon">
+              <i class="bi bi-files"></i>
+            </div>
+
+            <div>
+              <span>Total Documents</span>
+
+              <strong>
+                {{ documents.length }}
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- SUBMITTED -->
+
+          <div class="summary-item">
+
+            <div class="summary-icon">
+              <i class="bi bi-check-circle"></i>
+            </div>
+
+            <div>
+              <span>Submitted</span>
+
+              <strong>
+                {{ getUploadedCount() }}
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- PENDING -->
+
+          <div class="summary-item">
+
+            <div class="summary-icon">
+              <i class="bi bi-clock"></i>
+            </div>
+
+            <div>
+              <span>Pending</span>
+
+              <strong>
+                {{ getPendingCount() }}
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- DOCUMENT LIST -->
+    <!-- ===================================================== -->
+
+    <article
+      class="card complaint-card mb-4 document-card"
+    >
+
+      <div class="section-title">
+
+        <div class="item-icon document-icon-badge">
+          <i class="bi bi-folder2-open"></i>
+        </div>
+
+        <div class="header-content">
+
+          <span class="header-text">
+            Documents
+          </span>
+
+          <span class="header-subtext">
+            Review documents submitted for this service request
+          </span>
+
+        </div>
+
+        <div class="required-group">
+
+          <span class="document-count-badge">
+            {{ documents.length }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <div class="form-padding-wrap">
+
+        <!-- ================= LOADING ================= -->
+
+        <div
+          class="document-list-loading"
+          *ngIf="loading"
+        >
+          <i class="bi bi-arrow-repeat spin"></i>
+
+          <span>
+            Loading submitted documents...
+          </span>
+        </div>
+
+        <!-- ================= NO DOCUMENTS ================= -->
+
+        <div
+          class="no-documents-view"
+          *ngIf="!loading && documents.length === 0"
+        >
+          <i class="bi bi-file-earmark-x"></i>
+
+          <span>
+            No documents have been submitted for this request.
+          </span>
+        </div>
+
+        <!-- ================= DOCUMENT GRID ================= -->
+
+        <div
+          class="submitted-document-grid"
+          *ngIf="!loading && documents.length > 0"
+        >
+
+          <div
+            class="submitted-document-item"
+            *ngFor="
+              let document of documents;
+              trackBy: trackByDocument
+            "
+          >
+
+            <!-- ================================================= -->
+            <!-- DOCUMENT HEADER -->
+            <!-- ================================================= -->
+
+            <div class="submitted-document-header">
+
+              <div class="submitted-document-title">
+
+                <div class="submitted-document-icon">
+
+                  <i
+                    class="bi"
+                    [ngClass]="
+                      isUploaded(document)
+                        ? isPdf(document)
+                          ? 'bi-file-earmark-pdf'
+                          : 'bi-file-earmark-image'
+                        : 'bi-file-earmark'
+                    "
+                  ></i>
+
+                </div>
+
+                <div>
+
+                  <span class="document-name">
+                    {{ document.documentName || "Document" }}
+                  </span>
+
+                  <span
+                    class="document-code"
+                    *ngIf="document.documentCode"
+                  >
+                    {{ document.documentCode }}
+                  </span>
+
+                </div>
+
+              </div>
+
+              <span
+                class="document-type-badge"
+                [class.optional]="!document.isRequired"
+              >
+                {{
+                  document.isRequired
+                    ? "Required"
+                    : "Optional"
+                }}
+              </span>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- PREVIEW -->
+            <!-- ================================================= -->
+
+            <div
+              class="submitted-document-preview"
+              *ngIf="isUploaded(document)"
+            >
+
+              <!-- IMAGE -->
+
+              <div
+                class="image-preview"
+                *ngIf="isImage(document)"
+              >
+
+                <img
+                  [src]="getDocumentUrl(document)"
+                  [alt]="document.documentName"
+                />
+
+              </div>
+
+              <!-- PDF -->
+
+              <div
+                class="pdf-preview"
+                *ngIf="isPdf(document)"
+              >
+
+                <i class="bi bi-file-earmark-pdf"></i>
+
+                <span>
+                  PDF Document
+                </span>
+
+                <small>
+                  {{ getFileName(document) }}
+                </small>
+
+              </div>
+
+              <!-- OTHER FILE -->
+
+              <div
+                class="file-preview"
+                *ngIf="
+                  !isImage(document) &&
+                  !isPdf(document)
+                "
+              >
+
+                <i class="bi bi-file-earmark"></i>
+
+                <span>
+                  File
+                </span>
+
+                <small>
+                  {{ getFileName(document) }}
+                </small>
+
+              </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- NOT SUBMITTED -->
+            <!-- ================================================= -->
+
+            <div
+              class="document-not-submitted"
+              *ngIf="!isUploaded(document)"
+            >
+
+              <i class="bi bi-hourglass-split"></i>
+
+              <span>
+                Not submitted
+              </span>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- DOCUMENT DETAILS -->
+            <!-- ================================================= -->
+
+            <div
+              class="submitted-document-details"
+              *ngIf="isUploaded(document)"
+            >
+
+              <div class="document-detail-row">
+
+                <span>
+                  File Name
+                </span>
+
+                <strong>
+                  {{ getFileName(document) }}
+                </strong>
+
+              </div>
+
+              <div class="document-detail-row">
+
+                <span>
+                  File Type
+                </span>
+
+                <strong>
+                  {{
+                    document.uploadedDocument?.fileType || "-"
+                  }}
+                </strong>
+
+              </div>
+
+              <div class="document-detail-row">
+
+                <span>
+                  File Size
+                </span>
+
+                <strong>
+                  {{
+                    formatFileSize(
+                      document.uploadedDocument?.fileSize
+                    )
+                  }}
+                </strong>
+
+              </div>
+
+              <div class="document-detail-row">
+
+                <span>
+                  Upload Version
+                </span>
+
+                <strong>
+                  {{
+                    document.uploadedDocument?.uploadVersion || 1
+                  }}
+                </strong>
+
+              </div>
+
+              <div class="document-detail-row">
+
+                <span>
+                  Status
+                </span>
+
+                <strong class="document-status">
+                  {{
+                    document.uploadedDocument?.status || "-"
+                  }}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- ACTIONS -->
+            <!-- ================================================= -->
+
+            <div
+              class="submitted-document-actions"
+              *ngIf="isUploaded(document)"
+            >
+
+              <button
+                type="button"
+                class="btn-cancel"
+                (click)="viewDocument(document)"
+              >
+
+                <i class="bi bi-eye"></i>
+
+                View
+
+              </button>
+
+              <button
+                type="button"
+                class="btn-save btn-active"
+                (click)="downloadDocument(document)"
+              >
+
+                <i class="bi bi-download"></i>
+
+                Download
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </div>
+
+</main>
