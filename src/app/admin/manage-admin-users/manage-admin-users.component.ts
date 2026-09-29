@@ -92,7 +92,7 @@ searchTimeout: any;
     });
 
     const perms = (localStorage.getItem('permissions') || '').split(',');
-    this.canList = perms.includes('sub_admin_users_list');
+    this.canList = perms.includes('manage_sub_admin_users');
     this.canAdd = perms.includes('add_sub_admin_users');
     this.canEdit = perms.includes('edit_sub_admin_users');
     this.canView = perms.includes('view_sub_admin_users');

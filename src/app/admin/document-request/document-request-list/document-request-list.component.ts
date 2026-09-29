@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy, HostListener } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  Input
+} from "@angular/core";
 
 import { FormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
@@ -51,6 +57,7 @@ import { DocumentRequestService } from "../../../services/document-request.servi
   ],
 })
 export class DocumentRequestListComponent implements OnInit, OnDestroy {
+    @Input() serviceId!: number;
   // =========================================================
   // VARIABLES
   // =========================================================
@@ -176,98 +183,87 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // FETCH DOCUMENT REQUESTS
   // =========================================================
 
-  fetchDocumentRequests(): void {
-    if (!this.token || this.isLoggingOut) {
-      this.toastr.warning(
-        "Session expired or not logged in. Redirecting to login...",
-        "Warning",
-      );
+ fetchDocumentRequests(): void {
+  if (!this.token || this.isLoggingOut) {
+    this.toastr.warning(
+      "Session expired or not logged in. Redirecting to login...",
+      "Warning"
+    );
 
-      this.router.navigate(["/login"]);
+    this.router.navigate(["/login"]);
 
-      return;
-    }
-
-    this.loading = true;
-
-    const payload = {
-      search: this.search,
-
-      page: this.currentPage,
-
-      limit: this.pageSize,
-    };
-
-    this.documentRequestService.list(payload).subscribe({
-      // -----------------------------------------------------
-      // SUCCESS
-      // -----------------------------------------------------
-
-      next: (response: any) => {
-        console.log("Document Requests Response:", response);
-
-        const rawData =
-          response?.data && Array.isArray(response.data)
-            ? response.data
-            : Array.isArray(response)
-              ? response
-              : [];
-
-        this.documentRequests = rawData;
-
-        this.filteredDocumentRequests = rawData;
-
-        this.totalItems =
-          response?.totalItems ?? response?.total ?? rawData.length;
-
-        this.loading = false;
-      },
-
-      // -----------------------------------------------------
-      // ERROR
-      // -----------------------------------------------------
-
-      error: (error: any) => {
-        this.loading = false;
-
-        console.error("Error fetching document requests:", error);
-
-        // JWT expired
-
-        if (error.status === 400 && error.error?.error === "jwt expired") {
-          this.toastr.error("Session expired. Please log in again.");
-
-          localStorage.removeItem("token");
-
-          this.router.navigate(["/login"]);
-
-          return;
-        }
-
-        // Unauthorized
-
-        if (error.status === 401) {
-          this.toastr.error("Unauthorized access. Please log in again.");
-
-          localStorage.removeItem("token");
-
-          this.router.navigate(["/login"]).then(() => {
-            window.location.reload();
-          });
-
-          return;
-        }
-
-        // Other errors
-
-        this.toastr.error(
-          error?.error?.message || "Failed to fetch service requests",
-
-          "Error",
-        );
-      },
-    });
+    return;
   }
+
+  this.loading = true;
+
+  const payload: any = {
+    search: this.search,
+    page: this.currentPage,
+    limit: this.pageSize,
+  };
+
+  // When opened from Service View,
+  // fetch only requests belonging to that service
+  if (this.serviceId) {
+    payload.serviceId = this.serviceId;
+  }
+
+  this.documentRequestService.list(payload).subscribe({
+    next: (response: any) => {
+      console.log("Document Requests Response:", response);
+
+      const rawData =
+        response?.data && Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response)
+            ? response
+            : [];
+
+      this.documentRequests = rawData;
+
+      this.filteredDocumentRequests = rawData;
+
+      this.totalItems =
+        response?.totalItems ?? response?.total ?? rawData.length;
+
+      this.loading = false;
+    },
+
+    error: (error: any) => {
+      this.loading = false;
+
+      console.error("Error fetching document requests:", error);
+
+      if (error.status === 400 && error.error?.error === "jwt expired") {
+        this.toastr.error("Session expired. Please log in again.");
+
+        localStorage.removeItem("token");
+
+        this.router.navigate(["/login"]);
+
+        return;
+      }
+
+      if (error.status === 401) {
+        this.toastr.error("Unauthorized access. Please log in again.");
+
+        localStorage.removeItem("token");
+
+        this.router.navigate(["/login"]).then(() => {
+          window.location.reload();
+        });
+
+        return;
+      }
+
+      this.toastr.error(
+        error?.error?.message || "Failed to fetch service requests",
+        "Error"
+      );
+    },
+  });
+}
 
   // =========================================================
   // SEARCH
