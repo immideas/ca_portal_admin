@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit, HostListener } from "@angular/core";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
@@ -30,7 +31,8 @@ export class SubmittedDocumentsComponent implements OnInit {
   // =====================================================
 
   documentRequestId: number | null = null;
-
+  @Input() serviceId!: number;
+  @Input() embedded = false;
   documentRequest: any = null;
 
   documents: any[] = [];
@@ -50,6 +52,16 @@ export class SubmittedDocumentsComponent implements OnInit {
   selectedDocument: any = null;
 
   rejectionReason = "";
+  // =====================================================
+  // DOCUMENT PREVIEW MODAL
+  // =====================================================
+
+  showDocumentPreview = false;
+  previewDocument: any = null;
+  previewUrl = "";
+  previewSafeUrl: SafeResourceUrl | null = null;
+  previewType: "image" | "pdf" | "file" | "" = "";
+  previewLoading = false;
 
   // =====================================================
   // CONSTRUCTOR
@@ -63,6 +75,7 @@ export class SubmittedDocumentsComponent implements OnInit {
     private toastr: ToastrService,
 
     private documentRequestService: DocumentRequestService,
+    private sanitizer: DomSanitizer,
   ) {}
 
   // =====================================================
@@ -70,6 +83,19 @@ export class SubmittedDocumentsComponent implements OnInit {
   // =====================================================
 
   ngOnInit(): void {
+    // =====================================================
+    // SERVICE VIEW MODE
+    // =====================================================
+
+    if (this.serviceId) {
+      this.loadSubmittedDocumentsByService();
+      return;
+    }
+
+    // =====================================================
+    // NORMAL REQUEST MODE
+    // =====================================================
+
     this.route.paramMap.subscribe((params) => {
       const id = params.get("id");
 
@@ -96,7 +122,20 @@ export class SubmittedDocumentsComponent implements OnInit {
       this.loadSubmittedDocuments();
     });
   }
+  // =====================================================
+  // ESCAPE KEY
+  // =====================================================
 
+  @HostListener("document:keydown.escape")
+  onEscapeKey(): void {
+    if (this.showDocumentPreview) {
+      this.closeDocumentPreview();
+    }
+
+    if (this.showRejectModal) {
+      this.closeRejectModal();
+    }
+  }
   // =====================================================
   // LOAD SUBMITTED DOCUMENTS
   // =====================================================
@@ -154,6 +193,60 @@ export class SubmittedDocumentsComponent implements OnInit {
         },
       });
   }
+  // =====================================================
+  // LOAD SUBMITTED DOCUMENTS BY SERVICE
+  // =====================================================
+
+  loadSubmittedDocumentsByService(): void {
+    if (!this.serviceId) {
+      return;
+    }
+
+    this.loading = true;
+
+    this.ngxLoader.start();
+
+    this.documentRequestService
+      .getSubmittedDocumentsByService(this.serviceId)
+      .subscribe({
+        next: (response: any) => {
+          this.loading = false;
+
+          this.ngxLoader.stop();
+
+          if (!response?.success) {
+            this.toastr.error(
+              response?.message || "Failed to load submitted documents",
+              "Error",
+            );
+
+            return;
+          }
+
+          const data = response?.data || {};
+
+          this.documentRequest = {
+            serviceId: data.serviceId,
+            serviceName: data.serviceName,
+          };
+
+          this.documents = Array.isArray(data.documents) ? data.documents : [];
+        },
+
+        error: (error: any) => {
+          this.loading = false;
+
+          this.ngxLoader.stop();
+
+          console.error("SUBMITTED DOCUMENTS BY SERVICE API ERROR:", error);
+
+          this.toastr.error(
+            error?.error?.message || "Failed to load submitted documents",
+            "Error",
+          );
+        },
+      });
+  }
 
   // =====================================================
   // BACK
@@ -180,12 +273,24 @@ export class SubmittedDocumentsComponent implements OnInit {
       document?.uploadedDocument?.fileType || "",
     ).toLowerCase();
 
-    return (
-      fileType.includes("image") ||
-      ["jpg", "jpeg", "png", "webp", "gif"].includes(fileType)
-    );
-  }
+    const fileName = String(
+      document?.uploadedDocument?.originalFileName ||
+        document?.uploadedDocument?.fileName ||
+        "",
+    ).toLowerCase();
 
+    // Check MIME type
+    if (fileType.includes("image")) {
+      return true;
+    }
+
+    // Check extension
+    const imageExtensions = ["jpg", "jpeg", "png", "webp", "gif", "bmp", "svg"];
+
+    const extension = fileName.split(".").pop() || "";
+
+    return imageExtensions.includes(extension);
+  }
   // =====================================================
   // PDF
   // =====================================================
@@ -195,9 +300,20 @@ export class SubmittedDocumentsComponent implements OnInit {
       document?.uploadedDocument?.fileType || "",
     ).toLowerCase();
 
-    return fileType.includes("pdf") || fileType === "application/pdf";
-  }
+    const fileName = String(
+      document?.uploadedDocument?.originalFileName ||
+        document?.uploadedDocument?.fileName ||
+        "",
+    ).toLowerCase();
 
+    if (fileType.includes("pdf") || fileType === "application/pdf") {
+      return true;
+    }
+
+    const extension = fileName.split(".").pop() || "";
+
+    return extension === "pdf";
+  }
   // =====================================================
   // FILE NAME
   // =====================================================
@@ -260,41 +376,20 @@ export class SubmittedDocumentsComponent implements OnInit {
   // REJECTED COUNT
   // =====================================================
 
-  getRejectedCount(): number {
-    return this.documents.filter(
-      (item) => item?.uploadedDocument?.status === "REJECTED",
-    ).length;
-  }
-
-  // =====================================================
-  // UNDER REVIEW COUNT
-  // =====================================================
-
-  getUnderReviewCount(): number {
-    return this.documents.filter((item) => {
-      const status = item?.uploadedDocument?.status;
-
-      return status === "UPLOADED" || status === "UNDER_VERIFICATION";
-    }).length;
-  }
+getResubmissionCount(): number {
+  return this.documents.filter(
+    (item) => item?.uploadedDocument?.status === "RESUBMISSION_REQUIRED",
+  ).length;
+}
 
   // =====================================================
   // DOCUMENT STATUS
   // =====================================================
-
-  isApproved(document: any): boolean {
-    return document?.uploadedDocument?.status === "APPROVED";
-  }
-
-  isRejected(document: any): boolean {
-    return document?.uploadedDocument?.status === "REJECTED";
-  }
-
-  isUnderReview(document: any): boolean {
-    const status = document?.uploadedDocument?.status;
-
-    return status === "UPLOADED" || status === "UNDER_VERIFICATION";
-  }
+  isResubmission(document: any): boolean {
+  return (
+    document?.uploadedDocument?.status === "RESUBMISSION_REQUIRED"
+  );
+}
 
   // =====================================================
   // DOCUMENT URL
@@ -308,40 +403,112 @@ export class SubmittedDocumentsComponent implements OnInit {
   // VIEW DOCUMENT
   // =====================================================
 
+  // =====================================================
+  // VIEW DOCUMENT
+  // =====================================================
+
   viewDocument(document: any): void {
     const url = this.getDocumentUrl(document);
 
     if (!url) {
       this.toastr.warning("Document file is not available", "Warning");
-
       return;
     }
 
-    window.open(url, "_blank");
+    this.previewDocument = document;
+    this.previewUrl = url;
+    this.previewSafeUrl = null;
+    this.previewLoading = true;
+
+    if (this.isImage(document)) {
+      this.previewType = "image";
+    } else if (this.isPdf(document)) {
+      this.previewType = "pdf";
+
+      this.previewSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    } else {
+      this.previewType = "file";
+    }
+
+    this.showDocumentPreview = true;
+
+    setTimeout(() => {
+      this.previewLoading = false;
+    }, 200);
   }
+  // =====================================================
+  // CLOSE DOCUMENT PREVIEW
+  // =====================================================
+
+  closeDocumentPreview(): void {
+    this.showDocumentPreview = false;
+    this.previewDocument = null;
+    this.previewUrl = "";
+    this.previewSafeUrl = null;
+    this.previewType = "";
+    this.previewLoading = false;
+  }
+  // =====================================================
+  // DOWNLOAD DOCUMENT
+  // =====================================================
 
   // =====================================================
   // DOWNLOAD DOCUMENT
   // =====================================================
 
-  downloadDocument(document: any): void {
+  async downloadDocument(document: any): Promise<void> {
     const url = this.getDocumentUrl(document);
 
     if (!url) {
       this.toastr.warning("Document file is not available", "Warning");
-
       return;
     }
 
-    const link = window.document.createElement("a");
+    const fileName = this.getFileName(document);
 
-    link.href = url;
+    try {
+      this.ngxLoader.start();
 
-    link.target = "_blank";
+      const response = await fetch(url, {
+        mode: "cors",
+      });
 
-    link.download = this.getFileName(document);
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.status}`);
+      }
 
-    link.click();
+      const blob = await response.blob();
+
+      if (!blob || blob.size === 0) {
+        throw new Error("Downloaded file is empty");
+      }
+
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = window.document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName;
+      link.style.display = "none";
+
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
+
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 1000);
+
+      this.toastr.success("Document downloaded successfully", "Download");
+    } catch (error) {
+      console.error("DOWNLOAD DOCUMENT ERROR:", error);
+
+      this.toastr.error(
+        "Unable to download document. Please check S3 CORS configuration.",
+        "Download Failed",
+      );
+    } finally {
+      this.ngxLoader.stop();
+    }
   }
 
   // =====================================================
@@ -370,7 +537,11 @@ export class SubmittedDocumentsComponent implements OnInit {
 
         this.toastr.success("Document approved successfully", "Success");
 
-        this.loadSubmittedDocuments();
+        if (this.serviceId) {
+          this.loadSubmittedDocumentsByService();
+        } else {
+          this.loadSubmittedDocuments();
+        }
       },
 
       error: (error: any) => {
@@ -424,7 +595,7 @@ export class SubmittedDocumentsComponent implements OnInit {
     const reason = this.rejectionReason.trim();
 
     if (!reason) {
-      this.toastr.warning("Please enter rejection reason", "Required");
+      this.toastr.warning("Please enter resubmission reason", "Required");
 
       return;
     }
@@ -442,11 +613,18 @@ export class SubmittedDocumentsComponent implements OnInit {
             return;
           }
 
-          this.toastr.success("Document rejected successfully", "Success");
+          this.toastr.success(
+            "Document resubmission requested successfully",
+            "Success",
+          );
 
           this.closeRejectModal();
 
-          this.loadSubmittedDocuments();
+          if (this.serviceId) {
+            this.loadSubmittedDocumentsByService();
+          } else {
+            this.loadSubmittedDocuments();
+          }
         },
 
         error: (error: any) => {

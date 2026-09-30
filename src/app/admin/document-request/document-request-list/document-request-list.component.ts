@@ -3,7 +3,7 @@ import {
   OnInit,
   OnDestroy,
   HostListener,
-  Input
+  Input,
 } from "@angular/core";
 
 import { FormsModule } from "@angular/forms";
@@ -57,7 +57,7 @@ import { DocumentRequestService } from "../../../services/document-request.servi
   ],
 })
 export class DocumentRequestListComponent implements OnInit, OnDestroy {
-    @Input() serviceId!: number;
+  @Input() serviceId!: number;
   // =========================================================
   // VARIABLES
   // =========================================================
@@ -146,10 +146,10 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
       label: "View",
     });
 
-      items.push({
-    id: "submitted-documents",
-    label: "Submitted Documents",
-  });
+    items.push({
+      id: "submitted-documents",
+      label: "Submitted Documents",
+    });
     // ---------------------------------------------------------
     // EDIT
     // ---------------------------------------------------------
@@ -183,87 +183,87 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // FETCH DOCUMENT REQUESTS
   // =========================================================
 
- fetchDocumentRequests(): void {
-  if (!this.token || this.isLoggingOut) {
-    this.toastr.warning(
-      "Session expired or not logged in. Redirecting to login...",
-      "Warning"
-    );
-
-    this.router.navigate(["/login"]);
-
-    return;
-  }
-
-  this.loading = true;
-
-  const payload: any = {
-    search: this.search,
-    page: this.currentPage,
-    limit: this.pageSize,
-  };
-
-  // When opened from Service View,
-  // fetch only requests belonging to that service
-  if (this.serviceId) {
-    payload.serviceId = this.serviceId;
-  }
-
-  this.documentRequestService.list(payload).subscribe({
-    next: (response: any) => {
-      console.log("Document Requests Response:", response);
-
-      const rawData =
-        response?.data && Array.isArray(response.data)
-          ? response.data
-          : Array.isArray(response)
-            ? response
-            : [];
-
-      this.documentRequests = rawData;
-
-      this.filteredDocumentRequests = rawData;
-
-      this.totalItems =
-        response?.totalItems ?? response?.total ?? rawData.length;
-
-      this.loading = false;
-    },
-
-    error: (error: any) => {
-      this.loading = false;
-
-      console.error("Error fetching document requests:", error);
-
-      if (error.status === 400 && error.error?.error === "jwt expired") {
-        this.toastr.error("Session expired. Please log in again.");
-
-        localStorage.removeItem("token");
-
-        this.router.navigate(["/login"]);
-
-        return;
-      }
-
-      if (error.status === 401) {
-        this.toastr.error("Unauthorized access. Please log in again.");
-
-        localStorage.removeItem("token");
-
-        this.router.navigate(["/login"]).then(() => {
-          window.location.reload();
-        });
-
-        return;
-      }
-
-      this.toastr.error(
-        error?.error?.message || "Failed to fetch service requests",
-        "Error"
+  fetchDocumentRequests(): void {
+    if (!this.token || this.isLoggingOut) {
+      this.toastr.warning(
+        "Session expired or not logged in. Redirecting to login...",
+        "Warning",
       );
-    },
-  });
-}
+
+      this.router.navigate(["/login"]);
+
+      return;
+    }
+
+    this.loading = true;
+
+    const payload: any = {
+      search: this.search,
+      page: this.currentPage,
+      limit: this.pageSize,
+    };
+
+    // When opened from Service View,
+    // fetch only requests belonging to that service
+    if (this.serviceId) {
+      payload.serviceId = this.serviceId;
+    }
+
+    this.documentRequestService.list(payload).subscribe({
+      next: (response: any) => {
+        console.log("Document Requests Response:", response);
+
+        const rawData =
+          response?.data && Array.isArray(response.data)
+            ? response.data
+            : Array.isArray(response)
+              ? response
+              : [];
+
+        this.documentRequests = rawData;
+
+        this.filteredDocumentRequests = rawData;
+
+        this.totalItems =
+          response?.totalItems ?? response?.total ?? rawData.length;
+
+        this.loading = false;
+      },
+
+      error: (error: any) => {
+        this.loading = false;
+
+        console.error("Error fetching document requests:", error);
+
+        if (error.status === 400 && error.error?.error === "jwt expired") {
+          this.toastr.error("Session expired. Please log in again.");
+
+          localStorage.removeItem("token");
+
+          this.router.navigate(["/login"]);
+
+          return;
+        }
+
+        if (error.status === 401) {
+          this.toastr.error("Unauthorized access. Please log in again.");
+
+          localStorage.removeItem("token");
+
+          this.router.navigate(["/login"]).then(() => {
+            window.location.reload();
+          });
+
+          return;
+        }
+
+        this.toastr.error(
+          error?.error?.message || "Failed to fetch service requests",
+          "Error",
+        );
+      },
+    });
+  }
 
   // =========================================================
   // SEARCH
@@ -409,9 +409,9 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
         this.viewDocumentRequest(id);
 
         break;
-    case "submitted-documents":
-      this.viewSubmittedDocuments(id);
-      break;
+      case "submitted-documents":
+        this.viewSubmittedDocuments(id);
+        break;
 
       // -----------------------------------------------------
       // EDIT
@@ -460,19 +460,13 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
       },
     });
   }
-// =========================================================
-// VIEW SUBMITTED DOCUMENTS
-// =========================================================
+  // =========================================================
+  // VIEW SUBMITTED DOCUMENTS
+  // =========================================================
 
-viewSubmittedDocuments(
-  id: string | number
-): void {
-
-  this.router.navigate([
-    "/submitted-documents",
-    id,
-  ]);
-}
+  viewSubmittedDocuments(id: string | number): void {
+    this.router.navigate(["/submitted-documents", id]);
+  }
   // =========================================================
   // CANCEL DOCUMENT REQUEST
   // =========================================================
@@ -484,7 +478,7 @@ viewSubmittedDocuments(
       disableClose: true,
 
       data: {
-       message: "Are you sure you want to cancel this service request?",
+        message: "Are you sure you want to cancel this service request?",
       },
     });
 

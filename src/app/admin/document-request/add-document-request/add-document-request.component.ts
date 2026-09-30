@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Input,
   OnInit,
   ViewChild,
 } from "@angular/core";
@@ -65,8 +66,10 @@ export class AddDocumentRequestComponent implements OnInit {
   isViewMode = false;
   isEditMode = false;
 
-  documentRequestId: number | null = null;
+@Input() documentRequestId: number | null = null;
 
+@Input() forceViewMode = false;
+@Input() embedded = false;
   // =====================================================
   // CLIENTS
   // =====================================================
@@ -229,7 +232,14 @@ export class AddDocumentRequestComponent implements OnInit {
     this.loadClients();
 
     this.loadUsers();
+  if (this.forceViewMode && this.documentRequestId) {
+    this.isViewMode = true;
+    this.isEditMode = false;
 
+    this.loadDocumentRequest(this.documentRequestId);
+
+    return;
+  }
     // =================================================
     // ROUTE ID -> EDIT MODE
     // =================================================
@@ -624,7 +634,10 @@ export class AddDocumentRequestComponent implements OnInit {
         // EDIT MODE
         // =================================================
 
-        if (this.isEditMode && this.selectedServiceIds.length > 0) {
+        if (
+  (this.isEditMode || this.forceViewMode) &&
+  this.selectedServiceIds.length > 0
+) {
           this.selectedServices = this.selectedServiceIds
             .map((serviceId: number) =>
               this.services.find(

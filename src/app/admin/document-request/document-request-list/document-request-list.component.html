@@ -1,63 +1,41 @@
 <main id="main" class="main">
   <section class="section">
     <div class="container-fluid py-4">
-
       <!-- ================= PAGE HEADER ================= -->
 
       <div class="page-header-row">
-
         <div class="page-header">
           <h1>Service Requests</h1>
 
-<p>
-  View and manage all service requests
-</p>
+          <p>View and manage all service requests</p>
         </div>
 
         <div class="page-header-actions">
-
-          <button
-            class="btn-primary"
-            (click)="addDocumentRequest()"
-          >
+          <button class="btn-primary" (click)="addDocumentRequest()">
             <i class="bi bi-plus-lg"></i>
 
-          New Service Request
+            New Service Request
           </button>
-
         </div>
-
       </div>
-
 
       <!-- ================= DATA TABLE ================= -->
 
       <div class="data-table-wrapper">
-
         <!-- ================= TOP TOOLBAR ================= -->
 
         <div class="page-top-toolbar">
-
           <div class="toolbar-left">
-
             <label class="entries-label">
-
               Show
 
               <span class="entries-select-wrap">
-
                 <div class="entries-select-box">
-
                   <span class="entries-number">
                     {{ pageSize }}
                   </span>
 
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                  >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path
                       d="M3 4.5L6 7.5L9 4.5"
                       stroke="currentColor"
@@ -66,7 +44,6 @@
                       stroke-linejoin="round"
                     />
                   </svg>
-
                 </div>
 
                 <select
@@ -74,40 +51,22 @@
                   [value]="pageSize"
                   (change)="onPageSizeChange($event)"
                 >
-
-                  <option
-                    *ngFor="let s of [10, 25, 50, 100]"
-                    [value]="s"
-                  >
+                  <option *ngFor="let s of [10, 25, 50, 100]" [value]="s">
                     {{ s }}
                   </option>
-
                 </select>
-
               </span>
 
               entries
-
             </label>
-
           </div>
-
 
           <!-- ================= SEARCH ================= -->
 
           <div class="toolbar-right">
-
             <div class="search-input-wrap">
-
               <span class="search-icon">
-
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                >
-
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <circle
                     cx="6"
                     cy="6"
@@ -122,9 +81,7 @@
                     stroke-width="1.5"
                     stroke-linecap="round"
                   />
-
                 </svg>
-
               </span>
 
               <input
@@ -134,42 +91,23 @@
                 [(ngModel)]="search"
                 (input)="onSearchChange()"
               />
-
             </div>
-
           </div>
-
         </div>
-
 
         <!-- ================= TABLE ================= -->
 
         <div class="data-table-scroll">
-
-          <table
-            id="documentRequestTable"
-            class="data-table"
-          >
-
+          <table id="documentRequestTable" class="data-table">
             <thead>
-
               <tr>
+                <th>Request Code</th>
 
-                <th>
-                  Request Code
-                </th>
+                <th>Task Name</th>
 
-                <th>
-                  Task Name
-                </th>
+                <th>Client</th>
 
-                <th>
-                  Client
-                </th>
-
-                <th>
-                  Service
-                </th>
+                <th>Service</th>
 
                 <!-- <th>
                   Assigned Staff
@@ -179,39 +117,21 @@
                   Reviewer
                 </th> -->
 
-                <th>
-                  Priority
-                </th>
+                <th>Priority</th>
 
-                <th>
-                  Period
-                </th>
+                <th>Period</th>
 
-                <th>
-                  Status
-                </th>
+                <th>Status</th>
 
-                <th class="col-action">
-                  Actions
-                </th>
-
+                <th class="col-action">Actions</th>
               </tr>
-
             </thead>
 
-
             <tbody>
-
-
               <!-- ================= LOADING SKELETON ================= -->
 
               <ng-container *ngIf="loading">
-
-                <tr
-                  *ngFor="let r of [1, 2, 3, 4, 5]"
-                  class="sk-list-row"
-                >
-
+                <tr *ngFor="let r of [1, 2, 3, 4, 5]" class="sk-list-row">
                   <td>
                     <div class="sk sk-cell sk-cell--sm"></div>
                   </td>
@@ -249,46 +169,25 @@
                   </td>
 
                   <td class="col-action">
-
                     <div
                       class="sk sk-cell sk-cell--xs"
                       style="margin: 0 auto"
                     ></div>
-
                   </td>
-
                 </tr>
-
               </ng-container>
-
 
               <!-- ================= NO DATA ================= -->
 
-              <tr
-                *ngIf="
-                  !loading &&
-                  filteredDocumentRequests.length === 0
-                "
-              >
-
-                <td
-                  colspan="10"
-                  class="text-center py-5"
-                >
-
-                  <div class="text-muted">
-                    No service requests found.
-                  </div>
-
+              <tr *ngIf="!loading && filteredDocumentRequests.length === 0">
+                <td colspan="10" class="text-center py-5">
+                  <div class="text-muted">No service requests found.</div>
                 </td>
-
               </tr>
-
 
               <!-- ================= DOCUMENT REQUESTS ================= -->
 
               <ng-container *ngIf="!loading">
-
                 <tr
                   *ngFor="
                     let request of filteredDocumentRequests;
@@ -297,53 +196,39 @@
                   (click)="viewDocumentRequest(request.id)"
                   style="cursor: pointer"
                 >
-
-
                   <!-- ================= REQUEST CODE ================= -->
 
                   <td>
-
                     {{ request.requestCode || "—" }}
-
                   </td>
-
 
                   <!-- ================= TASK NAME ================= -->
 
                   <td>
-
                     {{ request.taskName || "—" }}
-
                   </td>
-
 
                   <!-- ================= CLIENT ================= -->
 
                   <td>
-
                     {{
                       request.client?.clientName ||
-                      request.clientName ||
-                      request.client?.name ||
-                      "—"
+                        request.clientName ||
+                        request.client?.name ||
+                        "—"
                     }}
-
                   </td>
-
 
                   <!-- ================= SERVICE ================= -->
 
                   <td>
-
                     {{
                       request.service?.serviceName ||
-                      request.serviceName ||
-                      request.service?.name ||
-                      "—"
+                        request.serviceName ||
+                        request.service?.name ||
+                        "—"
                     }}
-
                   </td>
-
 
                   <!-- ================= ASSIGNED STAFF ================= -->
 
@@ -359,7 +244,6 @@
 
                   </td> -->
 
-
                   <!-- ================= REVIEWER ================= -->
 
                   <!-- <td>
@@ -374,103 +258,63 @@
 
                   </td> -->
 
-
                   <!-- ================= PRIORITY ================= -->
 
                   <td>
-
-                    <span
-                      *ngIf="request.priority"
-                    >
+                    <span *ngIf="request.priority">
                       {{ request.priority }}
                     </span>
 
-                    <span
-                      *ngIf="!request.priority"
-                      class="text-muted"
-                    >
+                    <span *ngIf="!request.priority" class="text-muted">
                       —
                     </span>
-
                   </td>
-
 
                   <!-- ================= PERIOD ================= -->
 
                   <td>
-
-                    {{
-                      request.period || "—"
-                    }}
-
+                    {{ request.period || "—" }}
                   </td>
-
 
                   <!-- ================= STATUS ================= -->
 
                   <td>
-
                     <span
                       class="request-status"
                       [ngClass]="{
-                        'status-requested':
-                          request.status === 'REQUESTED',
+                        'status-requested': request.status === 'REQUESTED',
 
                         'status-partially-uploaded':
                           request.status === 'PARTIALLY_UPLOADED',
 
-                        'status-uploaded':
-                          request.status === 'UPLOADED',
+                        'status-uploaded': request.status === 'UPLOADED',
 
                         'status-under-verification':
                           request.status === 'UNDER_VERIFICATION',
 
-                        'status-completed':
-                          request.status === 'COMPLETED',
+                        'status-completed': request.status === 'COMPLETED',
 
-                        'status-cancelled':
-                          request.status === 'CANCELLED'
+                        'status-cancelled': request.status === 'CANCELLED',
                       }"
                     >
-
-                      {{
-                        request.status || "REQUESTED"
-                      }}
-
+                      {{ request.status || "REQUESTED" }}
                     </span>
-
                   </td>
-
 
                   <!-- ================= ACTIONS ================= -->
 
-                  <td
-                    class="col-action"
-                    (click)="$event.stopPropagation()"
-                  >
-
+                  <td class="col-action" (click)="$event.stopPropagation()">
                     <app-three-dots-button
-                      [active]="
-                        activeMenuId === request.id
-                      "
-                      (menuClick)="
-                        openMenu(request, $event)
-                      "
+                      [active]="activeMenuId === request.id"
+                      (menuClick)="openMenu(request, $event)"
                     >
                     </app-three-dots-button>
-
                   </td>
-
                 </tr>
-
               </ng-container>
-
             </tbody>
-
           </table>
-
         </div>
-
 
         <!-- ================= PAGINATION ================= -->
 
@@ -483,27 +327,19 @@
           (pageChange)="onPageChange($event)"
         >
         </app-pagination-footer>
-
       </div>
-
     </div>
   </section>
 </main>
-
 
 <!-- ================= POPUP MENU ================= -->
 
 <app-popup-menu
   *ngIf="menuPopupPosition"
-
   title="Actions"
-
   [items]="actionItems"
-
   [position]="menuPopupPosition"
-
   (itemClick)="onMenuItemClick($event)"
-
   (closeClick)="closeMenu()"
 >
 </app-popup-menu>

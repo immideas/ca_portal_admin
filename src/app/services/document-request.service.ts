@@ -55,6 +55,15 @@ export class DocumentRequestService {
       { headers: this.getHeaders() }
     );
   }
+  getSubmittedDocumentsByService(
+  serviceId: number | string
+): Observable<any> {
+  return this.http.post(
+    `${this.base}/submitted-documents-by-service`,
+    { serviceId },
+    { headers: this.getHeaders() }
+  );
+}
     // =====================================================
   // APPROVE SUBMITTED DOCUMENT
   // =====================================================

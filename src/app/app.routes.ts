@@ -63,6 +63,7 @@ import { AddDocumentComponent } from "./admin/document/add-document/add-document
 import { DocumentRequestListComponent } from "./admin/document-request/document-request-list/document-request-list.component";
 import { AddDocumentRequestComponent } from "./admin/document-request/add-document-request/add-document-request.component";
 import { SubmittedDocumentsComponent } from "./admin/document-request/submitted-documents/submitted-documents.component";
+import { ServiceViewComponent } from "./admin/document-request/service-view/service-view.component";
 // ================= DOCUMENT TYPE =================
 import { DocumentTypeListComponent } from "./super-admin/document-type/document-type-list/document-type-list.component";
 import { AddDocumentTypeComponent } from "./super-admin/document-type/add-document-type/add-document-type.component";
@@ -622,14 +623,15 @@ export const routes: Routes = [
 
       {
         path: "view-service-request/:id",
-        component: AddDocumentRequestComponent,
+       component: ServiceViewComponent,
         canActivate: [AdminAuthGuard, paymentStatusGuard],
       },
+      
       {
-  path: "submitted-documents/:id",
-  component: SubmittedDocumentsComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+        path: "submitted-documents/:id",
+        component: SubmittedDocumentsComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
       {
         path: "add-users",
         component: AddSubAdminComponent,

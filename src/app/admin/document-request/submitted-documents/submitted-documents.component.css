@@ -1311,3 +1311,615 @@
   }
 
 }
+/* =========================================================
+   DOCUMENT THUMBNAIL
+   ========================================================= */
+
+.submitted-document-preview {
+  width: 100%;
+  height: 230px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f5f7fb;
+  border: 1px solid #e3e8f0;
+}
+
+.document-thumbnail {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f5f7fb;
+}
+
+/* =========================================================
+   IMAGE THUMBNAIL
+   ========================================================= */
+
+.image-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-thumbnail img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #f5f7fb;
+  transition: transform 0.25s ease;
+}
+
+.image-thumbnail:hover img {
+  transform: scale(1.03);
+}
+
+/* =========================================================
+   PDF THUMBNAIL
+   ========================================================= */
+
+.pdf-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: #f8f9fc;
+}
+
+.pdf-thumbnail-icon {
+  width: 58px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e3e7ef;
+}
+
+.pdf-thumbnail-icon i {
+  font-size: 38px;
+}
+
+.pdf-thumbnail-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdf-thumbnail-content .pdf-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #dc2626;
+}
+
+.pdf-thumbnail-content strong {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   FILE THUMBNAIL
+   ========================================================= */
+
+.file-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: #f8f9fc;
+}
+
+.file-thumbnail-icon {
+  width: 58px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e3e7ef;
+}
+
+.file-thumbnail-icon i {
+  font-size: 36px;
+}
+
+.file-thumbnail-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-thumbnail-content span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.file-thumbnail-content strong {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   THUMBNAIL HOVER OVERLAY
+   ========================================================= */
+
+.thumbnail-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background: rgba(15, 23, 42, 0.42);
+  transition: opacity 0.2s ease;
+}
+
+.document-thumbnail:hover .thumbnail-overlay {
+  opacity: 1;
+}
+
+.thumbnail-view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 82px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+.thumbnail-view-btn i {
+  font-size: 14px;
+}
+
+/* =========================================================
+   DOCUMENT PREVIEW MODAL
+   ========================================================= */
+
+.document-preview-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  box-sizing: border-box;
+
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(3px);
+}
+
+/* =========================================================
+   MODAL CONTAINER
+   ========================================================= */
+
+.document-preview-modal {
+  width: min(1100px, 95vw);
+  height: min(760px, 92vh);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 12px;
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 50px rgba(15, 23, 42, 0.28),
+    0 5px 18px rgba(15, 23, 42, 0.12);
+}
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.document-preview-modal-header {
+  min-height: 58px;
+  padding: 0 18px 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.document-preview-modal-title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.document-preview-modal-title i {
+  font-size: 18px;
+  color: var(--primary-color, #4f46e5);
+}
+
+.document-preview-modal-title h5 {
+  margin: 0;
+  max-width: 700px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.document-preview-close {
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 7px;
+
+  background: transparent;
+  color: #64748b;
+
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.document-preview-close:hover {
+  background: #f1f5f9;
+  color: #1f2937;
+}
+
+.document-preview-close i {
+  font-size: 15px;
+}
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.document-preview-modal-body {
+  position: relative;
+
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #f8fafc;
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.document-preview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* =========================================================
+   FULL IMAGE
+   ========================================================= */
+
+.document-full-image {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  overflow: auto;
+}
+
+.document-full-image img {
+  max-width: 100%;
+  max-height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+
+  border-radius: 5px;
+}
+
+/* =========================================================
+   FULL PDF
+   ========================================================= */
+
+.document-full-pdf {
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  overflow: hidden;
+}
+
+.document-full-pdf iframe {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  border: none;
+  background: #ffffff;
+}
+
+/* =========================================================
+   FULL FILE
+   ========================================================= */
+
+.document-full-file {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  padding: 30px;
+  box-sizing: border-box;
+
+  text-align: center;
+}
+
+.document-full-file > i {
+  font-size: 64px;
+  color: #64748b;
+}
+
+.document-full-file h5 {
+  margin: 0;
+
+  max-width: 500px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.document-full-file p {
+  margin: 0;
+
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.document-preview-modal-footer {
+  min-height: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 0 18px;
+
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.preview-close-btn {
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 16px;
+
+  border: 1px solid #d8dee8;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #475569;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.preview-close-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* =========================================================
+   DOWNLOAD BUTTON
+   ========================================================= */
+
+.preview-download-btn {
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: var(--primary-color, #4f46e5);
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.preview-download-btn:hover {
+  background: var(--primary-color, #4338ca);
+  transform: translateY(-1px);
+}
+
+.preview-download-btn i {
+  font-size: 14px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .submitted-document-preview {
+    height: 200px;
+  }
+
+  .document-preview-modal-overlay {
+    padding: 12px;
+  }
+
+  .document-preview-modal {
+    width: 100%;
+    height: 94vh;
+    border-radius: 10px;
+  }
+
+  .document-preview-modal-header {
+    min-height: 54px;
+    padding: 0 12px 0 14px;
+  }
+
+  .document-preview-modal-title h5 {
+    max-width: 240px;
+  }
+
+  .document-preview-modal-footer {
+    min-height: 58px;
+    padding: 0 12px;
+  }
+
+  .pdf-thumbnail {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .file-thumbnail {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .pdf-thumbnail-icon,
+  .file-thumbnail-icon {
+    width: 48px;
+    height: 58px;
+  }
+
+  .pdf-thumbnail-icon i,
+  .file-thumbnail-icon i {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .submitted-document-preview {
+    height: 180px;
+  }
+
+  .document-preview-modal-title h5 {
+    max-width: 180px;
+  }
+
+  .document-preview-modal-footer {
+    justify-content: stretch;
+  }
+
+  .preview-close-btn,
+  .preview-download-btn {
+    flex: 1;
+  }
+
+  .pdf-thumbnail-content strong,
+  .file-thumbnail-content strong {
+    max-width: 150px;
+  }
+}

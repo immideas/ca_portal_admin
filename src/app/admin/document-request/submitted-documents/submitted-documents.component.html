@@ -5,8 +5,9 @@
   <!-- HEADER -->
   <!-- ===================================================== -->
 
-  <header class="top-header">
+  <header class="top-header" *ngIf="!embedded">
     <div class="header-left">
+
       <button
         type="button"
         class="back-btn"
@@ -31,6 +32,7 @@
           <p>View documents submitted by client</p>
         </div>
       </div>
+
     </div>
 
     <!-- ================= HEADER ACTIONS ================= -->
@@ -46,6 +48,7 @@
     </div>
   </header>
 
+
   <!-- ===================================================== -->
   <!-- CONTENT -->
   <!-- ===================================================== -->
@@ -60,6 +63,7 @@
       class="card complaint-card mb-4"
       *ngIf="documentRequest"
     >
+
       <div class="section-title">
 
         <div class="item-icon">
@@ -88,62 +92,73 @@
       </div>
 
       <div class="form-padding-wrap">
+
         <div class="row mb-3">
 
           <!-- REQUEST CODE -->
 
           <div class="col-md-4 form-group">
+
             <label>Request Code</label>
 
             <div class="field-wrap">
+
               <input
                 type="text"
                 class="form-controler"
-                [value]="
-                  documentRequest.requestCode || '-'
-                "
+                [value]="documentRequest.requestCode || '-'"
                 readonly
               />
+
             </div>
+
           </div>
+
 
           <!-- REQUEST ID -->
 
           <div class="col-md-4 form-group">
+
             <label>Request ID</label>
 
             <div class="field-wrap">
+
               <input
                 type="text"
                 class="form-controler"
-                [value]="
-                  documentRequest.requestId || '-'
-                "
+                [value]="documentRequest.requestId || '-'"
                 readonly
               />
+
             </div>
+
           </div>
+
 
           <!-- STATUS -->
 
           <div class="col-md-4 form-group">
+
             <label>Request Status</label>
 
             <div class="field-wrap">
+
               <input
                 type="text"
                 class="form-controler"
-                [value]="
-                  documentRequest.requestStatus || '-'
-                "
+                [value]="documentRequest.requestStatus || '-'"
                 readonly
               />
+
             </div>
+
           </div>
 
         </div>
+
       </div>
     </article>
+
 
     <!-- ===================================================== -->
     <!-- DOCUMENT SUMMARY -->
@@ -158,6 +173,7 @@
         </div>
 
         <div class="header-content">
+
           <span class="header-text">
             Submitted Documents
           </span>
@@ -165,9 +181,11 @@
           <span class="header-subtext">
             Documents submitted by the client for this request
           </span>
+
         </div>
 
       </div>
+
 
       <div class="form-padding-wrap">
 
@@ -191,6 +209,7 @@
 
           </div>
 
+
           <!-- SUBMITTED -->
 
           <div class="summary-item">
@@ -208,6 +227,7 @@
             </div>
 
           </div>
+
 
           <!-- PENDING -->
 
@@ -227,55 +247,20 @@
 
           </div>
 
-          <!-- APPROVED -->
+
+          <!-- RESUBMISSION -->
 
           <div class="summary-item">
 
             <div class="summary-icon">
-              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-arrow-repeat"></i>
             </div>
 
             <div>
-              <span>Approved</span>
+              <span>Resubmission</span>
 
               <strong>
-                {{ getApprovedCount() }}
-              </strong>
-            </div>
-
-          </div>
-
-          <!-- REJECTED -->
-
-          <div class="summary-item">
-
-            <div class="summary-icon">
-              <i class="bi bi-x-circle-fill"></i>
-            </div>
-
-            <div>
-              <span>Rejected</span>
-
-              <strong>
-                {{ getRejectedCount() }}
-              </strong>
-            </div>
-
-          </div>
-
-          <!-- UNDER REVIEW -->
-
-          <div class="summary-item">
-
-            <div class="summary-icon">
-              <i class="bi bi-hourglass-split"></i>
-            </div>
-
-            <div>
-              <span>Under Review</span>
-
-              <strong>
-                {{ getUnderReviewCount() }}
+                {{ getResubmissionCount() }}
               </strong>
             </div>
 
@@ -284,8 +269,8 @@
         </div>
 
       </div>
-
     </article>
+
 
     <!-- ===================================================== -->
     <!-- DOCUMENT LIST -->
@@ -323,6 +308,7 @@
 
       </div>
 
+
       <div class="form-padding-wrap">
 
         <!-- ================= LOADING ================= -->
@@ -331,12 +317,15 @@
           class="document-list-loading"
           *ngIf="loading"
         >
+
           <i class="bi bi-arrow-repeat spin"></i>
 
           <span>
             Loading submitted documents...
           </span>
+
         </div>
+
 
         <!-- ================= NO DOCUMENTS ================= -->
 
@@ -347,12 +336,15 @@
             documents.length === 0
           "
         >
+
           <i class="bi bi-file-earmark-x"></i>
 
           <span>
             No documents have been submitted for this request.
           </span>
+
         </div>
+
 
         <!-- ================= DOCUMENT GRID ================= -->
 
@@ -388,7 +380,9 @@
                       isUploaded(document)
                         ? isPdf(document)
                           ? 'bi-file-earmark-pdf'
-                          : 'bi-file-earmark-image'
+                          : isImage(document)
+                            ? 'bi-file-earmark-image'
+                            : 'bi-file-earmark'
                         : 'bi-file-earmark'
                     "
                   ></i>
@@ -412,6 +406,7 @@
 
               </div>
 
+
               <span
                 class="document-type-badge"
                 [class.optional]="!document.isRequired"
@@ -425,6 +420,7 @@
 
             </div>
 
+
             <!-- ================================================= -->
             <!-- DOCUMENT REVIEW STATUS -->
             <!-- ================================================= -->
@@ -434,40 +430,34 @@
               *ngIf="isUploaded(document)"
             >
 
-              <!-- UNDER REVIEW -->
+              <!-- UPLOADED -->
 
               <span
                 class="review-status-badge review-under-review"
-                *ngIf="isUnderReview(document)"
+                *ngIf="
+                  document.uploadedDocument?.status === 'UPLOADED'
+                "
               >
-                <i class="bi bi-hourglass-split"></i>
-                Under Review
+                <i class="bi bi-cloud-check"></i>
+                Uploaded
               </span>
 
-              <!-- APPROVED -->
 
-              <span
-                class="review-status-badge review-approved"
-                *ngIf="isApproved(document)"
-              >
-                <i class="bi bi-check-circle-fill"></i>
-                Approved
-              </span>
-
-              <!-- REJECTED -->
+              <!-- RESUBMISSION -->
 
               <span
                 class="review-status-badge review-rejected"
-                *ngIf="isRejected(document)"
+                *ngIf="isResubmission(document)"
               >
-                <i class="bi bi-x-circle-fill"></i>
-                Rejected
+                <i class="bi bi-arrow-repeat"></i>
+                Resubmission
               </span>
 
             </div>
 
+
             <!-- ================================================= -->
-            <!-- PREVIEW -->
+            <!-- DOCUMENT THUMBNAIL -->
             <!-- ================================================= -->
 
             <div
@@ -475,62 +465,126 @@
               *ngIf="isUploaded(document)"
             >
 
-              <!-- IMAGE -->
+              <!-- ================= IMAGE ================= -->
 
               <div
-                class="image-preview"
+                class="document-thumbnail image-thumbnail"
                 *ngIf="isImage(document)"
+                (click)="viewDocument(document)"
               >
 
                 <img
                   [src]="getDocumentUrl(document)"
-                  [alt]="document.documentName"
+                  [alt]="document.documentName || 'Document'"
                 />
 
+                <div class="thumbnail-overlay">
+
+                  <div class="thumbnail-view-btn">
+
+                    <i class="bi bi-eye"></i>
+
+                    <span>
+                      View
+                    </span>
+
+                  </div>
+
+                </div>
+
               </div>
 
-              <!-- PDF -->
+
+              <!-- ================= PDF ================= -->
 
               <div
-                class="pdf-preview"
+                class="document-thumbnail pdf-thumbnail"
                 *ngIf="isPdf(document)"
+                (click)="viewDocument(document)"
               >
 
-                <i class="bi bi-file-earmark-pdf"></i>
+                <div class="pdf-thumbnail-icon">
 
-                <span>
-                  PDF Document
-                </span>
+                  <i class="bi bi-file-earmark-pdf-fill"></i>
 
-                <small>
-                  {{ getFileName(document) }}
-                </small>
+                </div>
+
+                <div class="pdf-thumbnail-content">
+
+                  <span class="pdf-label">
+                    PDF
+                  </span>
+
+                  <strong>
+                    {{ getFileName(document) }}
+                  </strong>
+
+                </div>
+
+                <div class="thumbnail-overlay">
+
+                  <div class="thumbnail-view-btn">
+
+                    <i class="bi bi-eye"></i>
+
+                    <span>
+                      View
+                    </span>
+
+                  </div>
+
+                </div>
 
               </div>
 
-              <!-- OTHER FILE -->
+
+              <!-- ================= OTHER FILE ================= -->
 
               <div
-                class="file-preview"
+                class="document-thumbnail file-thumbnail"
                 *ngIf="
                   !isImage(document) &&
                   !isPdf(document)
                 "
+                (click)="viewDocument(document)"
               >
 
-                <i class="bi bi-file-earmark"></i>
+                <div class="file-thumbnail-icon">
 
-                <span>
-                  File
-                </span>
+                  <i class="bi bi-file-earmark-fill"></i>
 
-                <small>
-                  {{ getFileName(document) }}
-                </small>
+                </div>
+
+                <div class="file-thumbnail-content">
+
+                  <span>
+                    FILE
+                  </span>
+
+                  <strong>
+                    {{ getFileName(document) }}
+                  </strong>
+
+                </div>
+
+                <div class="thumbnail-overlay">
+
+                  <div class="thumbnail-view-btn">
+
+                    <i class="bi bi-eye"></i>
+
+                    <span>
+                      View
+                    </span>
+
+                  </div>
+
+                </div>
 
               </div>
 
             </div>
+
 
             <!-- ================================================= -->
             <!-- NOT SUBMITTED -->
@@ -544,10 +598,11 @@
               <i class="bi bi-hourglass-split"></i>
 
               <span>
-                Not submitted
+                Pending
               </span>
 
             </div>
+
 
             <!-- ================================================= -->
             <!-- DOCUMENT DETAILS -->
@@ -570,6 +625,7 @@
 
               </div>
 
+
               <div class="document-detail-row">
 
                 <span>
@@ -583,6 +639,7 @@
                 </strong>
 
               </div>
+
 
               <div class="document-detail-row">
 
@@ -600,6 +657,7 @@
 
               </div>
 
+
               <div class="document-detail-row">
 
                 <span>
@@ -613,6 +671,7 @@
                 </strong>
 
               </div>
+
 
               <div class="document-detail-row">
 
@@ -628,35 +687,41 @@
 
               </div>
 
+
               <!-- ================================================= -->
-              <!-- REJECTION REASON -->
+              <!-- RESUBMISSION REASON -->
               <!-- ================================================= -->
 
               <div
                 class="document-rejection-reason"
                 *ngIf="
-                  isRejected(document) &&
+                  isResubmission(document) &&
                   document.uploadedDocument?.rejectionReason
                 "
               >
 
                 <div class="rejection-reason-title">
+
                   <i class="bi bi-exclamation-triangle-fill"></i>
 
                   <span>
-                    Rejection Reason
+                    Resubmission Reason
                   </span>
+
                 </div>
 
                 <div class="rejection-reason-text">
+
                   {{
                     document.uploadedDocument?.rejectionReason
                   }}
+
                 </div>
 
               </div>
 
             </div>
+
 
             <!-- ================================================= -->
             <!-- ACTIONS -->
@@ -674,9 +739,13 @@
                 class="btn-cancel"
                 (click)="viewDocument(document)"
               >
+
                 <i class="bi bi-eye"></i>
+
                 View
+
               </button>
+
 
               <!-- DOWNLOAD -->
 
@@ -685,38 +754,29 @@
                 class="btn-save btn-active"
                 (click)="downloadDocument(document)"
               >
+
                 <i class="bi bi-download"></i>
+
                 Download
+
               </button>
 
-              <!-- APPROVE -->
 
-              <button
-                type="button"
-                class="btn-approve"
-                *ngIf="
-                  document.uploadedDocument?.status === 'UPLOADED' ||
-                  document.uploadedDocument?.status === 'UNDER_VERIFICATION'
-                "
-                (click)="approveDocument(document)"
-              >
-                <i class="bi bi-check-circle"></i>
-                Approve
-              </button>
-
-              <!-- REJECT -->
+              <!-- RESUBMISSION -->
 
               <button
                 type="button"
                 class="btn-reject"
                 *ngIf="
-                  document.uploadedDocument?.status === 'UPLOADED' ||
-                  document.uploadedDocument?.status === 'UNDER_VERIFICATION'
+                  document.uploadedDocument?.status === 'UPLOADED'
                 "
                 (click)="openRejectModal(document)"
               >
-                <i class="bi bi-x-circle"></i>
-                Reject
+
+                <i class="bi bi-arrow-repeat"></i>
+
+                Resubmission
+
               </button>
 
             </div>
@@ -731,8 +791,239 @@
 
   </div>
 
+
   <!-- ===================================================== -->
-  <!-- REJECT DOCUMENT MODAL -->
+  <!-- DOCUMENT PREVIEW MODAL -->
+  <!-- ===================================================== -->
+
+  <div
+    class="document-preview-modal-overlay"
+    *ngIf="showDocumentPreview"
+    (click)="closeDocumentPreview()"
+  >
+
+    <div
+      class="document-preview-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- ================= MODAL HEADER ================= -->
+
+      <div class="document-preview-modal-header">
+
+        <div class="document-preview-title">
+
+          <div class="document-preview-title-icon">
+
+            <i
+              class="bi"
+              [ngClass]="
+                previewType === 'pdf'
+                  ? 'bi-file-earmark-pdf-fill'
+                  : previewType === 'image'
+                    ? 'bi-file-earmark-image'
+                    : 'bi-file-earmark'
+              "
+            ></i>
+
+          </div>
+
+          <div>
+
+            <h3>
+              {{
+                previewDocument?.documentName ||
+                "Document Preview"
+              }}
+            </h3>
+
+            <span>
+              {{ getFileName(previewDocument) }}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="document-preview-close"
+          (click)="closeDocumentPreview()"
+          aria-label="Close"
+        >
+
+          <i class="bi bi-x-lg"></i>
+
+        </button>
+
+      </div>
+
+
+      <!-- ================= MODAL BODY ================= -->
+
+      <div class="document-preview-modal-body">
+
+        <!-- LOADING -->
+
+        <div
+          class="document-preview-loading"
+          *ngIf="previewLoading"
+        >
+
+          <i class="bi bi-arrow-repeat spin"></i>
+
+          <span>
+            Loading document...
+          </span>
+
+        </div>
+
+
+        <!-- IMAGE -->
+
+        <div
+          class="document-full-image"
+          *ngIf="
+            !previewLoading &&
+            previewType === 'image'
+          "
+        >
+
+          <img
+            [src]="previewUrl"
+            [alt]="
+              previewDocument?.documentName ||
+              'Document'
+            "
+          />
+
+        </div>
+
+
+        <!-- PDF -->
+
+        <div
+          class="document-full-pdf"
+          *ngIf="
+            !previewLoading &&
+            previewType === 'pdf'
+          "
+        >
+
+          <iframe
+            [src]="previewSafeUrl"
+            title="PDF Document Preview"
+          ></iframe>
+
+        </div>
+
+
+        <!-- OTHER FILE -->
+
+        <div
+          class="document-full-file"
+          *ngIf="
+            !previewLoading &&
+            previewType === 'file'
+          "
+        >
+
+          <div class="file-preview-large">
+
+            <i class="bi bi-file-earmark-fill"></i>
+
+            <h4>
+              {{ getFileName(previewDocument) }}
+            </h4>
+
+            <p>
+              Preview is not available for this file type.
+            </p>
+
+            <button
+              type="button"
+              class="preview-download-btn"
+              (click)="downloadDocument(previewDocument)"
+            >
+
+              <i class="bi bi-download"></i>
+
+              Download File
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= MODAL FOOTER ================= -->
+
+      <div class="document-preview-modal-footer">
+
+        <div class="preview-file-info">
+
+          <span>
+            File Type
+          </span>
+
+          <strong>
+            {{
+              previewDocument?.uploadedDocument?.fileType || "-"
+            }}
+          </strong>
+
+          <span>
+            Size
+          </span>
+
+          <strong>
+            {{
+              formatFileSize(
+                previewDocument?.uploadedDocument?.fileSize
+              )
+            }}
+          </strong>
+
+        </div>
+
+
+        <div class="preview-footer-actions">
+
+          <button
+            type="button"
+            class="preview-close-btn"
+            (click)="closeDocumentPreview()"
+          >
+            Close
+          </button>
+
+          <button
+            type="button"
+            class="preview-download-btn"
+            (click)="downloadDocument(previewDocument)"
+          >
+
+            <i class="bi bi-download"></i>
+
+            Download
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- REQUEST RESUBMISSION MODAL -->
   <!-- ===================================================== -->
 
   <div
@@ -747,8 +1038,9 @@
       <div class="reject-modal-header">
 
         <div>
+
           <h3>
-            Reject Document
+            Request Resubmission
           </h3>
 
           <p>
@@ -757,6 +1049,7 @@
               "Document"
             }}
           </p>
+
         </div>
 
         <button
@@ -765,18 +1058,24 @@
           (click)="closeRejectModal()"
           aria-label="Close"
         >
+
           <i class="bi bi-x-lg"></i>
+
         </button>
 
       </div>
+
 
       <!-- MODAL BODY -->
 
       <div class="reject-modal-body">
 
         <label for="rejectionReason">
-          Rejection Reason
+
+          Resubmission Reason
+
           <span>*</span>
+
         </label>
 
         <textarea
@@ -784,7 +1083,7 @@
           class="rejection-reason-input"
           rows="5"
           [(ngModel)]="rejectionReason"
-          placeholder="Enter reason for rejecting this document..."
+          placeholder="Enter reason for resubmission..."
         ></textarea>
 
         <small>
@@ -793,6 +1092,7 @@
         </small>
 
       </div>
+
 
       <!-- MODAL FOOTER -->
 
@@ -812,8 +1112,11 @@
           [disabled]="!rejectionReason.trim()"
           (click)="rejectDocument()"
         >
-          <i class="bi bi-x-circle"></i>
-          Reject Document
+
+          <i class="bi bi-arrow-repeat"></i>
+
+          Request Resubmission
+
         </button>
 
       </div>

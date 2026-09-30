@@ -1,59 +1,39 @@
 <main id="main" class="complaint-wrapper">
-
   <!-- ================= HEADER ================= -->
 
   <header class="top-header">
-
     <div class="header-left">
-
       <button
         type="button"
         class="back-btn"
         (click)="goBack()"
         aria-label="Go back"
       >
-        <img
-          src="assets/img/back-icon.svg"
-          alt="Back"
-        />
+        <img src="assets/img/back-icon.svg" alt="view" />
       </button>
 
       <div class="divider"></div>
 
       <div class="title-box">
-
         <div class="title-icon">
-          <img
-            src="assets/img/Plus.svg"
-            alt="Service"
-          />
+          <img src="assets/img/Plus.svg" alt="view" />
         </div>
 
         <div class="title-text">
+          <h4>View Service</h4>
 
-          <h4>
-            View Service
-          </h4>
-
-          <p>
-            Service details
-          </p>
-
+          <p>Service details</p>
         </div>
-
       </div>
-
     </div>
-
   </header>
-
 
   <!-- ================= TABS ================= -->
 
   <div class="service-tabs">
+    <!-- TAB OPTIONS -->
 
     <div class="service-tab-options">
-
       <button
         type="button"
         [class.active]="activeTab === 'request'"
@@ -69,42 +49,45 @@
       >
         Submitted Documents
       </button>
-
     </div>
 
-  </div>
+    <!-- COMMON EDIT BUTTON -->
 
+    <button
+      type="button"
+      class="tab-edit-btn"
+      *ngIf="activeTab === 'request'"
+      (click)="editServiceRequest()"
+    >
+      <i class="bi bi-pencil-square"></i>
+
+      <span> Edit </span>
+    </button>
+  </div>
 
   <!-- ================= TAB CONTENT ================= -->
 
   <div class="service-tab-content">
-
     <!-- =====================================================
          SERVICE REQUEST
          ===================================================== -->
 
     <div *ngIf="activeTab === 'request'">
-
-      <app-document-request-list
-        [serviceId]="serviceId">
-      </app-document-request-list>
-
+      <app-add-document-request
+        [documentRequestId]="documentRequestId"
+        [forceViewMode]="true"
+        [embedded]="true"
+      >
+      </app-add-document-request>
     </div>
-
 
     <!-- =====================================================
          SUBMITTED DOCUMENTS
          ===================================================== -->
 
     <div *ngIf="activeTab === 'submitted'">
-
-      <!-- Keep this temporarily until we check
-           submitted-documents.component.ts -->
-
-      <p>Submitted Documents content will be added here.</p>
-
+      <app-submitted-documents [serviceId]="serviceId" [embedded]="true">
+      </app-submitted-documents>
     </div>
-
   </div>
-
 </main>
