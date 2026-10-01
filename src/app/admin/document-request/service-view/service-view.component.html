@@ -1,39 +1,63 @@
 <main id="main" class="complaint-wrapper">
+
   <!-- ================= HEADER ================= -->
 
   <header class="top-header">
+
     <div class="header-left">
+
       <button
         type="button"
         class="back-btn"
         (click)="goBack()"
         aria-label="Go back"
       >
-        <img src="assets/img/back-icon.svg" alt="view" />
+        <img
+          src="assets/img/back-icon.svg"
+          alt="view"
+        />
       </button>
 
       <div class="divider"></div>
 
       <div class="title-box">
+
         <div class="title-icon">
-          <img src="assets/img/Plus.svg" alt="view" />
+          <img
+            src="assets/img/Plus.svg"
+            alt="view"
+          />
         </div>
 
         <div class="title-text">
-          <h4>View Service</h4>
 
-          <p>Service details</p>
+          <h4>
+            View Service
+          </h4>
+
+          <p>
+            Service details
+          </p>
+
         </div>
+
       </div>
+
     </div>
+
   </header>
+
 
   <!-- ================= TABS ================= -->
 
   <div class="service-tabs">
+
     <!-- TAB OPTIONS -->
 
     <div class="service-tab-options">
+
+      <!-- SERVICE REQUEST -->
+
       <button
         type="button"
         [class.active]="activeTab === 'request'"
@@ -42,6 +66,9 @@
         Service Request
       </button>
 
+
+      <!-- SUBMITTED DOCUMENTS -->
+
       <button
         type="button"
         [class.active]="activeTab === 'submitted'"
@@ -49,45 +76,785 @@
       >
         Submitted Documents
       </button>
+
+
+      <!-- FINAL DOCUMENTS -->
+
+      <button
+        type="button"
+        [class.active]="activeTab === 'final'"
+        (click)="setTab('final')"
+      >
+        Final Documents
+
+        <span
+          class="final-document-tab-count"
+          *ngIf="savedFinalDocuments.length > 0"
+        >
+          {{ savedFinalDocuments.length }}
+        </span>
+
+      </button>
+
     </div>
 
-    <!-- COMMON EDIT BUTTON -->
 
-    <button
-      type="button"
-      class="tab-edit-btn"
+    <!-- ================= ACTION BUTTONS ================= -->
+
+    <div
+      class="tab-action-buttons"
       *ngIf="activeTab === 'request'"
-      (click)="editServiceRequest()"
     >
-      <i class="bi bi-pencil-square"></i>
 
-      <span> Edit </span>
-    </button>
+      <!-- EDIT -->
+
+      <button
+        type="button"
+        class="tab-edit-btn"
+        *ngIf="
+          requestData?.documentRequest?.status !== 'COMPLETED'
+        "
+        (click)="editServiceRequest()"
+      >
+        <i class="bi bi-pencil-square"></i>
+
+        <span>
+          Edit
+        </span>
+
+      </button>
+
+
+      <!-- COMPLETE SERVICE REQUEST -->
+
+      <button
+        type="button"
+        class="tab-edit-btn complete-btn"
+        *ngIf="
+          requestData?.documentRequest?.status !== 'COMPLETED'
+        "
+        (click)="openCompleteModal()"
+      >
+        <i class="bi bi-check-circle"></i>
+
+        <span>
+          Complete Service Request
+        </span>
+
+      </button>
+
+    </div>
+
   </div>
+
 
   <!-- ================= TAB CONTENT ================= -->
 
   <div class="service-tab-content">
+
+
     <!-- =====================================================
          SERVICE REQUEST
          ===================================================== -->
 
     <div *ngIf="activeTab === 'request'">
+
       <app-add-document-request
         [documentRequestId]="documentRequestId"
         [forceViewMode]="true"
         [embedded]="true"
       >
       </app-add-document-request>
+
     </div>
+
 
     <!-- =====================================================
          SUBMITTED DOCUMENTS
          ===================================================== -->
 
     <div *ngIf="activeTab === 'submitted'">
-      <app-submitted-documents [serviceId]="serviceId" [embedded]="true">
+
+      <app-submitted-documents
+        [serviceId]="serviceId"
+        [serviceRequestId]="documentRequestId"
+        [embedded]="true"
+      >
       </app-submitted-documents>
+
     </div>
+
+
+    <!-- =====================================================
+         FINAL DOCUMENTS
+         ===================================================== -->
+
+    <div *ngIf="activeTab === 'final'">
+
+
+      <!-- ================= FINAL DOCUMENTS AVAILABLE ================= -->
+
+      <div
+        class="final-saved-documents-section"
+        *ngIf="savedFinalDocuments.length > 0"
+      >
+
+
+        <!-- ================= SECTION HEADER ================= -->
+
+        <div class="final-saved-documents-header">
+
+          <div class="final-saved-title">
+
+            <div class="final-saved-icon">
+
+              <i class="bi bi-file-earmark-check"></i>
+
+            </div>
+
+            <div>
+
+              <h3>
+                Final Documents
+              </h3>
+
+              <p>
+                Documents submitted by the CA after completing
+                this service request.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- COMPLETED STATUS -->
+
+          <div class="final-completed-badge">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+            <span>
+              Completed
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- ================= DOCUMENT LIST ================= -->
+
+        <div class="final-saved-document-list">
+
+          <div
+            class="final-saved-document-card"
+            *ngFor="
+              let document of savedFinalDocuments
+            "
+          >
+
+
+            <!-- DOCUMENT ICON -->
+
+            <div class="final-document-icon">
+
+              <i class="bi bi-file-earmark-text"></i>
+
+            </div>
+
+
+            <!-- DOCUMENT INFORMATION -->
+
+            <div class="final-document-info">
+
+              <h4>
+
+                {{
+                  document.originalFileName ||
+                  document.fileName
+                }}
+
+              </h4>
+
+
+              <div class="final-document-meta">
+
+
+                <!-- FILE TYPE -->
+
+                <span
+                  *ngIf="document.fileType"
+                >
+                  {{ document.fileType }}
+                </span>
+
+
+                <!-- FILE SIZE -->
+
+                <span
+                  *ngIf="document.fileSize"
+                >
+
+                  {{
+                    document.fileSize / 1024 / 1024
+                      | number:'1.2-2'
+                  }}
+
+                  MB
+
+                </span>
+
+
+                <!-- CREATED DATE -->
+
+                <span
+                  *ngIf="document.createdAt"
+                >
+
+                  {{
+                    document.createdAt
+                      | date:'dd MMM yyyy, hh:mm a'
+                  }}
+
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- ================= ACTIONS ================= -->
+
+            <div class="final-document-actions">
+
+
+              <!-- VIEW -->
+
+              <button
+                type="button"
+                class="final-view-btn"
+                *ngIf="document.fileUrl"
+                (click)="viewFinalDocument(document)"
+              >
+
+                <i class="bi bi-eye"></i>
+
+                <span>
+                  View
+                </span>
+
+              </button>
+
+
+              <!-- DOWNLOAD -->
+
+              <button
+                type="button"
+                class="final-download-btn"
+                *ngIf="document.fileUrl"
+                (click)="downloadFinalDocument(document)"
+              >
+
+                <i class="bi bi-download"></i>
+
+                <span>
+                  Download
+                </span>
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             COMPLETION REMARK
+             ================================================= -->
+
+        <div
+          class="final-completion-remark"
+          *ngIf="
+            savedFinalDocuments.length > 0 &&
+            savedFinalDocuments[0].remark
+          "
+        >
+
+          <div class="final-remark-header">
+
+            <i class="bi bi-chat-left-text"></i>
+
+            <span>
+              Completion Remark
+            </span>
+
+          </div>
+
+
+          <div class="final-remark-content">
+
+            {{ savedFinalDocuments[0].remark }}
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= NO FINAL DOCUMENTS ================= -->
+
+      <div
+        class="final-documents-empty"
+        *ngIf="savedFinalDocuments.length === 0"
+      >
+
+        <div class="final-empty-icon">
+
+          <i class="bi bi-file-earmark-x"></i>
+
+        </div>
+
+        <h4>
+          No Final Documents
+        </h4>
+
+        <p>
+          Final documents will appear here after the
+          service request is completed.
+        </p>
+
+      </div>
+
+    </div>
+
   </div>
+
+
+  <!-- =====================================================
+       FINAL DOCUMENT PREVIEW MODAL
+       ===================================================== -->
+
+  <div
+    class="document-preview-modal-backdrop"
+    *ngIf="showFinalDocumentPreview"
+    (click)="closeFinalDocumentPreview()"
+  >
+
+    <div
+      class="document-preview-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- ================= PREVIEW HEADER ================= -->
+
+      <div class="document-preview-modal-header">
+
+        <div class="document-preview-modal-title">
+
+          <i class="bi bi-file-earmark"></i>
+
+          <div>
+
+            <h4>
+              {{
+                previewFinalDocument?.originalFileName ||
+                previewFinalDocument?.fileName ||
+                'Document Preview'
+              }}
+            </h4>
+
+            <p>
+              Final Document
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="document-preview-close"
+          (click)="closeFinalDocumentPreview()"
+          aria-label="Close preview"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+      </div>
+
+
+      <!-- ================= PREVIEW BODY ================= -->
+
+      <div class="document-preview-modal-body">
+
+
+        <!-- LOADING -->
+
+        <div
+          class="document-preview-loading"
+          *ngIf="previewFinalLoading"
+        >
+
+          <span class="preview-spinner"></span>
+
+          <span>
+            Loading document...
+          </span>
+
+        </div>
+
+
+        <!-- IMAGE PREVIEW -->
+
+        <div
+          class="document-preview-image-wrapper"
+          *ngIf="
+            !previewFinalLoading &&
+            previewFinalType === 'image'
+          "
+        >
+
+          <img
+            [src]="previewFinalUrl"
+            [alt]="
+              previewFinalDocument?.originalFileName ||
+              'Final document'
+            "
+            class="document-preview-image"
+          />
+
+        </div>
+
+
+        <!-- PDF PREVIEW -->
+
+        <div
+          class="document-preview-pdf-wrapper"
+          *ngIf="
+            !previewFinalLoading &&
+            previewFinalType === 'pdf'
+          "
+        >
+
+          <iframe
+            [src]="previewFinalSafeUrl"
+            class="document-preview-pdf"
+            frameborder="0"
+          >
+          </iframe>
+
+        </div>
+
+
+        <!-- OTHER FILE -->
+
+        <div
+          class="document-preview-file-wrapper"
+          *ngIf="
+            !previewFinalLoading &&
+            previewFinalType === 'file'
+          "
+        >
+
+          <div class="document-preview-file-icon">
+
+            <i class="bi bi-file-earmark"></i>
+
+          </div>
+
+          <h4>
+            {{
+              previewFinalDocument?.originalFileName ||
+              previewFinalDocument?.fileName
+            }}
+          </h4>
+
+          <p>
+            Preview is not available for this file type.
+          </p>
+
+          <button
+            type="button"
+            class="final-download-btn"
+            (click)="downloadFinalDocument(previewFinalDocument)"
+          >
+
+            <i class="bi bi-download"></i>
+
+            Download Document
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       COMPLETE SERVICE REQUEST MODAL
+       ===================================================== -->
+
+  <div
+    class="complete-modal-backdrop"
+    *ngIf="showCompleteModal"
+    (click)="closeCompleteModal()"
+  >
+
+    <div
+      class="complete-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+
+      <!-- ================= MODAL HEADER ================= -->
+
+      <div class="complete-modal-header">
+
+        <div class="complete-modal-title">
+
+          <div class="complete-modal-icon">
+
+            <i class="bi bi-check-circle"></i>
+
+          </div>
+
+          <div>
+
+            <h4>
+              Complete Service Request
+            </h4>
+
+            <p>
+              Upload final documents and add completion remark
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="complete-modal-close"
+          [disabled]="finalUploading"
+          (click)="closeCompleteModal()"
+          aria-label="Close"
+        >
+
+          <i class="bi bi-x-lg"></i>
+
+        </button>
+
+      </div>
+
+
+      <!-- ================= MODAL BODY ================= -->
+
+      <div class="complete-modal-body">
+
+
+        <!-- =================================================
+             FINAL DOCUMENTS
+             ================================================= -->
+
+        <div class="complete-form-group">
+
+          <label class="complete-label">
+
+            Final Documents
+
+            <span class="required-star">
+              *
+            </span>
+
+          </label>
+
+
+          <p class="complete-help-text">
+
+            Upload the final documents for this completed
+            service request. PDF and image files are supported.
+
+          </p>
+
+
+          <!-- ================= UPLOADER ================= -->
+
+          <div class="final-document-uploader-wrapper">
+
+            <lib-image-uploader-lib
+              [imageUrls]="[]"
+              [maxImages]="maxFinalDocuments"
+              [layoutMode]="'grid'"
+              [allowDrag]="!finalUploading"
+              [allowEdit]="!finalUploading"
+              [allowDelete]="!finalUploading"
+              [allowReplace]="!finalUploading"
+
+              (imagesChange)="
+                handleFinalDocumentsChange($event)
+              "
+
+              (imageUpload)="
+                onFinalDocumentUpload($event)
+              "
+
+              (imageReplace)="
+                onFinalDocumentReplace($event)
+              "
+
+              (imageDelete)="
+                onFinalDocumentDelete($event)
+              "
+            >
+            </lib-image-uploader-lib>
+
+          </div>
+
+
+          <!-- ================= FILE INFO ================= -->
+
+          <div
+            class="final-document-count"
+            *ngIf="finalDocuments.length > 0"
+          >
+
+            <i class="bi bi-files"></i>
+
+            <span>
+
+              {{ finalDocuments.length }}
+
+              final document{{
+
+                finalDocuments.length > 1
+                  ? "s"
+                  : ""
+
+              }}
+
+              selected
+
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             COMPLETION REMARK
+             ================================================= -->
+
+        <div class="complete-form-group">
+
+          <label
+            for="completionRemark"
+            class="complete-label"
+          >
+
+            Completion Remark
+
+            <span class="required-star">
+              *
+            </span>
+
+          </label>
+
+
+          <textarea
+            id="completionRemark"
+            class="complete-remark-input"
+            rows="5"
+            maxlength="1000"
+            placeholder="Enter completion remark..."
+            [(ngModel)]="completionRemark"
+            [disabled]="finalUploading"
+          >
+          </textarea>
+
+
+          <div class="remark-footer">
+
+            <span>
+              Remark is required
+            </span>
+
+            <span>
+              {{ completionRemark.length }}/1000
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= MODAL FOOTER ================= -->
+
+      <div class="complete-modal-footer">
+
+        <button
+          type="button"
+          class="complete-cancel-btn"
+          [disabled]="finalUploading"
+          (click)="closeCompleteModal()"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          type="button"
+          class="complete-submit-btn"
+          [disabled]="
+            finalUploading ||
+            finalDocuments.length === 0 ||
+            !completionRemark.trim()
+          "
+          (click)="completeServiceRequest()"
+        >
+
+          <span
+            class="status-spinner-small"
+            *ngIf="finalUploading"
+          >
+          </span>
+
+
+          <i
+            class="bi bi-check-circle"
+            *ngIf="!finalUploading"
+          >
+          </i>
+
+
+          <span>
+
+            {{
+              finalUploading
+                ? "Completing..."
+                : "Complete Service Request"
+            }}
+
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </main>

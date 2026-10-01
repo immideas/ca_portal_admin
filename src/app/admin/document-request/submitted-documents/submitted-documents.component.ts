@@ -32,6 +32,7 @@ export class SubmittedDocumentsComponent implements OnInit {
 
   documentRequestId: number | null = null;
   @Input() serviceId!: number;
+  @Input() serviceRequestId!: number;
   @Input() embedded = false;
   documentRequest: any = null;
 
@@ -197,56 +198,59 @@ export class SubmittedDocumentsComponent implements OnInit {
   // LOAD SUBMITTED DOCUMENTS BY SERVICE
   // =====================================================
 
-  loadSubmittedDocumentsByService(): void {
-    if (!this.serviceId) {
-      return;
-    }
+ loadSubmittedDocumentsByService(): void {
+  if (!this.serviceRequestId) {
+    return;
+  }
 
-    this.loading = true;
+  this.loading = true;
 
-    this.ngxLoader.start();
+  this.ngxLoader.start();
 
-    this.documentRequestService
-      .getSubmittedDocumentsByService(this.serviceId)
-      .subscribe({
-        next: (response: any) => {
-          this.loading = false;
+  this.documentRequestService
+    .getSubmittedDocuments(this.serviceRequestId)
+    .subscribe({
+      next: (response: any) => {
+        this.loading = false;
 
-          this.ngxLoader.stop();
+        this.ngxLoader.stop();
 
-          if (!response?.success) {
-            this.toastr.error(
-              response?.message || "Failed to load submitted documents",
-              "Error",
-            );
-
-            return;
-          }
-
-          const data = response?.data || {};
-
-          this.documentRequest = {
-            serviceId: data.serviceId,
-            serviceName: data.serviceName,
-          };
-
-          this.documents = Array.isArray(data.documents) ? data.documents : [];
-        },
-
-        error: (error: any) => {
-          this.loading = false;
-
-          this.ngxLoader.stop();
-
-          console.error("SUBMITTED DOCUMENTS BY SERVICE API ERROR:", error);
-
+        if (!response?.success) {
           this.toastr.error(
-            error?.error?.message || "Failed to load submitted documents",
+            response?.message || "Failed to load submitted documents",
             "Error",
           );
-        },
-      });
-  }
+
+          return;
+        }
+
+        const data = response?.data || {};
+
+        this.documentRequest = {
+          requestId: data.requestId,
+          requestCode: data.requestCode,
+          requestStatus: data.requestStatus,
+        };
+
+        this.documents = Array.isArray(data.documents)
+          ? data.documents
+          : [];
+      },
+
+      error: (error: any) => {
+        this.loading = false;
+
+        this.ngxLoader.stop();
+
+        console.error("SUBMITTED DOCUMENTS API ERROR:", error);
+
+        this.toastr.error(
+          error?.error?.message || "Failed to load submitted documents",
+          "Error",
+        );
+      },
+    });
+}
 
   // =====================================================
   // BACK

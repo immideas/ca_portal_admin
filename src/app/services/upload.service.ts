@@ -33,6 +33,8 @@ export class UploadService {
   [UploadType.REOPEN_TICKET]:'reopen_ticket/images',
   [UploadType.CLIENT_KYC]: 'clients/kyc',
   [UploadType.DOCUMENT_PREVIEW]: 'documents/previews',
+    [UploadType.SERVICE_REQUEST_FINAL_DOCUMENT]:
+    'service-request-final-documents',
   };
 
   private getFolder(type: UploadType): string {
@@ -79,41 +81,43 @@ export class UploadService {
     }
   }
 
-  async upload(
-    file: File,
-    type: UploadType,
-    customFileName?: string,
-  ): Promise<UploadResult> {
-    await this.initializeS3();
+ async upload(
+  file: File,
+  type: UploadType,
+  customFileName?: string,
+  customFolder?: string,
+): Promise<UploadResult> {
+  await this.initializeS3();
 
-    const folder = this.getFolder(type);
+  // Use custom folder if provided,
+  // otherwise use the default folder from folderMap
+  const folder = customFolder || this.getFolder(type);
 
-    const response = await this.s3Helper.uploadImage(
-      file,
-      folder,
-      customFileName,
-    );
+  const response = await this.s3Helper.uploadImage(
+    file,
+    folder,
+    customFileName,
+  );
 
-    if (!response.success || !response.key) {
-      throw new Error(response.error || 'Upload failed');
-    }
-
-    const registerResponse = await firstValueFrom(
-      this.authService.registerTemporaryImage({
-        file_key: response.key,
-        upload_type: type,
-      }),
-    );
-
-    const signedUrlResponse = await this.s3Helper.generateSignedUrl(
-      response.key,
-    );
-
-    return {
-      key: response.key,
-      previewUrl: signedUrlResponse.url || '',
-    };
+  if (!response.success || !response.key) {
+    throw new Error(response.error || 'Upload failed');
   }
+
+  await firstValueFrom(
+    this.authService.registerTemporaryImage({
+      file_key: response.key,
+      upload_type: type,
+    }),
+  );
+
+  const signedUrlResponse =
+    await this.s3Helper.generateSignedUrl(response.key);
+
+  return {
+    key: response.key,
+    previewUrl: signedUrlResponse.url || '',
+  };
+}
 
   async delete(key: string): Promise<void> {
     await this.initializeS3();

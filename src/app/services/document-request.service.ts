@@ -64,6 +64,19 @@ export class DocumentRequestService {
     { headers: this.getHeaders() }
   );
 }
+// =====================================================
+// COMPLETE SERVICE REQUEST
+// =====================================================
+
+completeServiceRequest(payload: any): Observable<any> {
+  return this.http.post(
+    `${this.base}/complete`,
+    payload,
+    {
+      headers: this.getHeaders()
+    }
+  );
+}
     // =====================================================
   // APPROVE SUBMITTED DOCUMENT
   // =====================================================
