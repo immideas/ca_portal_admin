@@ -44,7 +44,19 @@ export class ServiceViewComponent implements OnInit {
 
   loading = false;
 
-  activeTab: "request" | "submitted" | "final" = "request";
+  // UPDATED: added payment tab
+  activeTab:
+    | "request"
+    | "submitted"
+    | "final"
+    | "payment" = "request";
+
+  // =========================================================
+  // PAYMENT
+  // =========================================================
+
+  // Payment information returned from backend
+  serviceRequestPayment: any = null;
 
   // =========================================================
   // COMPLETE SERVICE REQUEST
@@ -176,6 +188,13 @@ export class ServiceViewComponent implements OnInit {
           this.savedFinalDocuments =
             this.requestData?.finalDocuments || [];
 
+          // =====================================================
+          // LOAD PAYMENT
+          // =====================================================
+
+          this.serviceRequestPayment =
+            this.requestData?.payment || null;
+
           if (
             this.requestData?.documentRequest?.serviceId
           ) {
@@ -192,6 +211,11 @@ export class ServiceViewComponent implements OnInit {
           console.log(
             "Service ID:",
             this.serviceId,
+          );
+
+          console.log(
+            "Service Request Payment:",
+            this.serviceRequestPayment,
           );
 
           console.log(
@@ -218,7 +242,11 @@ export class ServiceViewComponent implements OnInit {
   // =========================================================
 
   setTab(
-    tab: "request" | "submitted" | "final",
+    tab:
+      | "request"
+      | "submitted"
+      | "final"
+      | "payment",
   ): void {
     this.activeTab = tab;
   }
@@ -1246,6 +1274,75 @@ export class ServiceViewComponent implements OnInit {
         },
       });
   }
+generateInvoice(): void {
+  if (
+    this.requestData?.documentRequest?.status !== "COMPLETED" ||
+    !this.serviceRequestPayment
+  ) {
+    return;
+  }
+
+  if (!this.documentRequestId) {
+    this.toastr.error(
+      "Service request ID is missing.",
+      "Error"
+    );
+    return;
+  }
+
+  console.log(
+    "Generating invoice for:",
+    this.serviceRequestPayment.invoiceNumber
+  );
+
+  this.loading = true;
+
+  this.documentRequestService
+    .generateInvoice(this.documentRequestId)
+    .subscribe({
+      next: (response: any) => {
+        this.loading = false;
+
+        console.log(
+          "Generate Invoice API Response:",
+          response
+        );
+
+        if (!response?.success) {
+          this.toastr.error(
+            response?.message ||
+              "Failed to generate invoice.",
+            "Error"
+          );
+          return;
+        }
+
+        this.toastr.success(
+          response?.message ||
+            "Invoice generated successfully.",
+          "Success"
+        );
+
+        // Reload existing service request data
+        this.loadDocumentRequest();
+      },
+
+      error: (error: any) => {
+        this.loading = false;
+
+        console.error(
+          "Generate Invoice API Error:",
+          error
+        );
+
+        this.toastr.error(
+          error?.error?.message ||
+            "Failed to generate invoice.",
+          "Error"
+        );
+      }
+    });
+}
 
   // =========================================================
   // BACK

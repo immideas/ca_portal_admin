@@ -77,6 +77,21 @@ completeServiceRequest(payload: any): Observable<any> {
     }
   );
 }
+// =====================================================
+// GENERATE INVOICE
+// =====================================================
+
+generateInvoice(
+  documentRequestId: number | string
+): Observable<any> {
+  return this.http.post(
+    `${this.base}/generate-invoice`,
+    { documentRequestId },
+    {
+      headers: this.getHeaders()
+    }
+  );
+}
     // =====================================================
   // APPROVE SUBMITTED DOCUMENT
   // =====================================================

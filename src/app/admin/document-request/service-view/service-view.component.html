@@ -96,6 +96,19 @@
 
       </button>
 
+
+      <!-- =================================================
+           NEW: PAYMENT TAB
+           ================================================= -->
+
+      <button
+        type="button"
+        [class.active]="activeTab === 'payment'"
+        (click)="setTab('payment')"
+      >
+        Payment
+      </button>
+
     </div>
 
 
@@ -431,6 +444,320 @@
 
     </div>
 
+
+    <!-- =====================================================
+         NEW: PAYMENT
+         ===================================================== -->
+
+    <div *ngIf="activeTab === 'payment'">
+
+ <div class="payment-tab-container">
+
+  <!-- ================= PAYMENT HEADER ================= -->
+
+  <div class="payment-tab-header">
+
+    <div class="payment-tab-title">
+
+      <div class="payment-tab-icon">
+        <i class="bi bi-receipt"></i>
+      </div>
+
+      <div>
+        <h3>Payment Details</h3>
+
+        <p>
+          Invoice and payment information for this
+          service request.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       PAYMENT NOT AVAILABLE
+       ================================================= -->
+
+  <div
+    class="payment-empty-state"
+    *ngIf="
+      requestData?.documentRequest?.status !== 'COMPLETED'
+    "
+  >
+
+    <div class="payment-empty-icon">
+      <i class="bi bi-lock"></i>
+    </div>
+
+    <h4>Payment Not Available</h4>
+
+    <p>
+      Payment details will be available after the
+      service request is completed.
+    </p>
+
+  </div>
+
+
+  <!-- =================================================
+       PAYMENT RECORD NOT FOUND
+       ================================================= -->
+
+  <div
+    class="payment-empty-state"
+    *ngIf="
+      requestData?.documentRequest?.status === 'COMPLETED' &&
+      !serviceRequestPayment
+    "
+  >
+
+    <div class="payment-empty-icon">
+      <i class="bi bi-receipt"></i>
+    </div>
+
+    <h4>Payment Not Generated</h4>
+
+    <p>
+      No payment record has been generated for this
+      service request yet.
+    </p>
+
+  </div>
+
+
+  <!-- =================================================
+       PAYMENT DETAILS
+       ================================================= -->
+
+  <div
+    class="payment-details-card"
+    *ngIf="
+      requestData?.documentRequest?.status === 'COMPLETED' &&
+      serviceRequestPayment
+    "
+  >
+
+    <!-- ================= INVOICE TOP ================= -->
+
+    <div class="payment-invoice-header">
+
+      <div class="payment-invoice-info">
+
+        <span class="payment-section-label">
+          INVOICE
+        </span>
+
+        <h2>
+          {{
+            serviceRequestPayment.invoiceNumber ||
+            'N/A'
+          }}
+        </h2>
+
+      </div>
+
+
+      <!-- PAYMENT STATUS -->
+
+      <span class="payment-status-badge">
+
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="
+            serviceRequestPayment.status === 'paid'
+          "
+          [class.bi-clock]="
+            serviceRequestPayment.status !== 'paid'
+          "
+        ></i>
+
+        {{
+          serviceRequestPayment.status
+            | titlecase
+        }}
+
+      </span>
+
+    </div>
+
+
+    <!-- ================= AMOUNT SUMMARY ================= -->
+
+    <div class="payment-summary-grid">
+
+      <!-- SUBTOTAL -->
+
+      <div class="payment-summary-item">
+
+        <div class="payment-summary-icon subtotal-icon">
+          <i class="bi bi-calculator"></i>
+        </div>
+
+        <div>
+
+          <span>Subtotal</span>
+
+          <strong>
+            {{
+              serviceRequestPayment.subtotal
+                | currency:'INR':'symbol':'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- CGST -->
+
+      <div class="payment-summary-item">
+
+        <div class="payment-summary-icon tax-icon">
+          <i class="bi bi-percent"></i>
+        </div>
+
+        <div>
+
+          <span>CGST</span>
+
+          <strong>
+            {{
+              serviceRequestPayment.cgst
+                | currency:'INR':'symbol':'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- SGST -->
+
+      <div class="payment-summary-item">
+
+        <div class="payment-summary-icon tax-icon">
+          <i class="bi bi-percent"></i>
+        </div>
+
+        <div>
+
+          <span>SGST</span>
+
+          <strong>
+            {{
+              serviceRequestPayment.sgst
+                | currency:'INR':'symbol':'1.2-2'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= TOTAL ================= -->
+
+    <div class="payment-total-section">
+
+      <div>
+
+        <span>Total Amount</span>
+
+        <small>
+          Including applicable taxes
+        </small>
+
+      </div>
+
+      <strong>
+        {{
+          serviceRequestPayment.amount
+            | currency:'INR':'symbol':'1.2-2'
+        }}
+      </strong>
+
+    </div>
+
+
+    <!-- ================= INVOICE STATUS ================= -->
+
+    <div class="payment-invoice-status">
+
+      <div class="payment-invoice-status-left">
+
+        <div class="invoice-status-icon">
+
+          <i
+            class="bi"
+            [class.bi-check-circle-fill]="
+              serviceRequestPayment.invoiceGenerated
+            "
+            [class.bi-file-earmark-pdf]="
+              !serviceRequestPayment.invoiceGenerated
+            "
+          ></i>
+
+        </div>
+
+        <div>
+
+          <strong>Invoice</strong>
+
+          <span>
+            {{
+              serviceRequestPayment.invoiceGenerated
+                ? 'Invoice has been generated'
+                : 'Invoice has not been generated yet'
+            }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- INVOICE STATUS BADGE -->
+
+      <span
+        class="invoice-status-badge"
+        [class.generated]="
+          serviceRequestPayment.invoiceGenerated
+        "
+      >
+
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="
+            serviceRequestPayment.invoiceGenerated
+          "
+          [class.bi-clock]="
+            !serviceRequestPayment.invoiceGenerated
+          "
+        ></i>
+
+        {{
+          serviceRequestPayment.invoiceGenerated
+            ? 'Generated'
+            : 'Not Generated'
+        }}
+
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+    </div>
+
   </div>
 
 
@@ -482,7 +809,9 @@
           (click)="closeFinalDocumentPreview()"
           aria-label="Close preview"
         >
+
           <i class="bi bi-x-lg"></i>
+
         </button>
 
       </div>
@@ -856,5 +1185,6 @@
     </div>
 
   </div>
+
 
 </main>

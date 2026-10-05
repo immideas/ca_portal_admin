@@ -1663,3 +1663,964 @@
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
+/* =========================================================
+   PAYMENT TAB
+   ========================================================= */
+
+.payment-tab-container {
+  width: 100%;
+  padding: 24px;
+}
+
+
+/* =========================================================
+   PAYMENT HEADER
+   ========================================================= */
+
+.payment-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.payment-tab-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.payment-tab-icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef4ff;
+  border-radius: 10px;
+  color: #2563eb;
+  font-size: 21px;
+}
+
+.payment-tab-title h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.payment-tab-title p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+
+/* =========================================================
+   PAYMENT EMPTY STATE
+   ========================================================= */
+
+.payment-empty-state {
+  width: 100%;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 40px 24px;
+}
+
+.payment-empty-icon {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  background: #f3f4f6;
+  border-radius: 50%;
+
+  color: #9ca3af;
+  font-size: 25px;
+}
+
+.payment-empty-state h4 {
+  margin: 0 0 8px;
+
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.payment-empty-state p {
+  max-width: 450px;
+
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.6;
+  color: #6b7280;
+}
+
+
+/* =========================================================
+   PAYMENT DETAILS CARD
+   ========================================================= */
+
+.payment-details-card {
+  width: 100%;
+  max-width: 850px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   PAYMENT ROW
+   ========================================================= */
+
+.payment-row {
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 15px 20px;
+
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.payment-row:last-child {
+  border-bottom: none;
+}
+
+.payment-row > span:first-child {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.payment-row > strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: right;
+}
+
+
+/* =========================================================
+   INVOICE NUMBER
+   ========================================================= */
+
+.payment-row:first-child strong {
+  color: #2563eb;
+}
+
+
+/* =========================================================
+   TOTAL AMOUNT
+   ========================================================= */
+
+.payment-total-row {
+  margin-top: 4px;
+
+  background: #f8fafc;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.payment-total-row > span {
+  font-size: 14px !important;
+  font-weight: 600;
+
+  color: #374151 !important;
+}
+
+.payment-total-row > strong {
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+
+/* =========================================================
+   PAYMENT STATUS BADGE
+   ========================================================= */
+
+.payment-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 85px;
+
+  padding: 5px 12px;
+
+  border-radius: 20px;
+
+  background: #fff7ed;
+  color: #c2410c;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+
+
+/* =========================================================
+   STATUS COLORS
+   ========================================================= */
+
+/* Pending */
+
+.payment-row .payment-status-badge {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+
+/* Paid */
+
+.payment-row .payment-status-badge.paid {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+
+/* Failed */
+
+.payment-row .payment-status-badge.failed {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+
+/* Cancelled */
+
+.payment-row .payment-status-badge.cancelled {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .payment-tab-container {
+    padding: 16px;
+  }
+
+  .payment-tab-header {
+    margin-bottom: 18px;
+  }
+
+  .payment-tab-title {
+    gap: 10px;
+  }
+
+  .payment-tab-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    font-size: 18px;
+  }
+
+  .payment-tab-title h3 {
+    font-size: 16px;
+  }
+
+  .payment-tab-title p {
+    font-size: 12px;
+  }
+
+  .payment-row {
+    padding: 14px 16px;
+  }
+
+  .payment-row > span:first-child {
+    font-size: 12px;
+  }
+
+  .payment-row > strong {
+    font-size: 13px;
+  }
+
+  .payment-total-row > strong {
+    font-size: 16px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .payment-tab-container {
+    padding: 12px;
+  }
+
+  .payment-row {
+    gap: 10px;
+  }
+
+  .payment-row > span:first-child {
+    flex: 1;
+  }
+
+  .payment-row > strong,
+  .payment-status-badge {
+    flex-shrink: 0;
+  }
+}
+/* ================= GENERATE INVOICE BUTTON ================= */
+
+.generate-invoice-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 42px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.generate-invoice-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+}
+
+.generate-invoice-btn:active {
+  transform: translateY(1px);
+}
+
+.generate-invoice-btn i {
+  font-size: 15px;
+}
+/* =========================================================
+   PAYMENT TAB
+   ========================================================= */
+
+.payment-tab-container {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAYMENT HEADER
+   ========================================================= */
+
+.payment-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+  margin-bottom: 22px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #e8ebf0;
+}
+
+.payment-tab-title {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.payment-tab-icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: #eef4ff;
+  color: #2563eb;
+
+  font-size: 21px;
+}
+
+.payment-tab-title h3 {
+  margin: 0 0 4px;
+
+  color: #1f2937;
+
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.payment-tab-title p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   GENERATE INVOICE BUTTON
+   ========================================================= */
+
+.generate-invoice-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 40px;
+
+  padding: 9px 16px;
+
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.generate-invoice-btn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+
+  box-shadow:
+    0 4px 12px rgba(37, 99, 235, 0.20);
+}
+
+.generate-invoice-btn:active {
+  transform: translateY(1px);
+}
+
+.generate-invoice-btn i {
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.payment-empty-state {
+  width: 100%;
+  min-height: 280px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  padding: 40px 24px;
+
+  background: #ffffff;
+
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+
+  text-align: center;
+
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.payment-empty-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 50%;
+
+  background: #f1f5f9;
+  color: #94a3b8;
+
+  font-size: 24px;
+}
+
+.payment-empty-state h4 {
+  margin: 0 0 7px;
+
+  color: #344054;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.payment-empty-state p {
+  max-width: 430px;
+
+  margin: 0;
+
+  color: #667085;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   PAYMENT CARD
+   ========================================================= */
+
+.payment-details-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 3px 12px rgba(15, 23, 42, 0.05);
+}
+
+
+/* =========================================================
+   INVOICE HEADER
+   ========================================================= */
+
+.payment-invoice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 22px 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fbff 0%,
+      #ffffff 100%
+    );
+
+  border-bottom: 1px solid #edf0f4;
+}
+
+.payment-section-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.payment-invoice-info h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+
+/* =========================================================
+   PAYMENT STATUS
+   ========================================================= */
+
+.payment-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  min-width: 90px;
+
+  padding: 7px 12px;
+
+  border: 1px solid #fed7aa;
+  border-radius: 20px;
+
+  background: #fff7ed;
+  color: #c2410c;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.payment-status-badge i {
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   SUMMARY GRID
+   ========================================================= */
+
+.payment-summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 14px;
+
+  padding: 20px 24px;
+}
+
+.payment-summary-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 76px;
+
+  padding: 13px 14px;
+
+  background: #fafbfc;
+
+  border: 1px solid #edf0f4;
+  border-radius: 10px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.payment-summary-item:hover {
+  background: #ffffff;
+
+  border-color: #dce3ed;
+
+  transform: translateY(-1px);
+}
+
+.payment-summary-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  font-size: 16px;
+}
+
+.subtotal-icon {
+  background: #eef4ff;
+  color: #2563eb;
+}
+
+.tax-icon {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.payment-summary-item span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+.payment-summary-item strong {
+  display: block;
+
+  color: #1f2937;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   TOTAL SECTION
+   ========================================================= */
+
+.payment-total-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin: 0 24px;
+
+  padding: 18px 0;
+
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.payment-total-section span {
+  display: block;
+
+  color: #374151;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.payment-total-section small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+.payment-total-section > strong {
+  color: #111827;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   INVOICE STATUS
+   ========================================================= */
+
+.payment-invoice-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-top: 0;
+
+  padding: 18px 24px;
+
+  background: #fafbfc;
+}
+
+.payment-invoice-status-left {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.invoice-status-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: #f1f5f9;
+  color: #64748b;
+
+  font-size: 17px;
+}
+
+.payment-invoice-status-left strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.payment-invoice-status-left span {
+  display: block;
+
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   INVOICE STATUS BADGE
+   ========================================================= */
+
+.invoice-status-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 11px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+
+  background: #f8fafc;
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.invoice-status-badge.generated {
+  background: #ecfdf3;
+  color: #15803d;
+
+  border-color: #bbf7d0;
+}
+
+.invoice-status-badge i {
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .payment-tab-container {
+    padding: 18px;
+  }
+
+  .payment-tab-header {
+    align-items: flex-start;
+  }
+
+  .payment-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-invoice-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .payment-total-section {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .payment-total-section > strong {
+    font-size: 20px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .payment-tab-container {
+    padding: 14px;
+  }
+
+  .payment-tab-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .generate-invoice-btn {
+    width: 100%;
+  }
+
+  .payment-summary-grid {
+    padding: 16px;
+  }
+
+  .payment-invoice-header {
+    padding: 18px;
+  }
+
+  .payment-total-section {
+    margin: 0 16px;
+  }
+
+  .payment-invoice-status {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+}
