@@ -47,7 +47,7 @@ import { ManageAdminUsersComponent } from "./admin/manage-admin-users/manage-adm
 import { ManageSubadminPermissionsComponent } from "./admin/manage-subadmin-permissions/manage-subadmin-permissions.component";
 
 import { ForgotPasswordComponent } from "./admin/forgot-password/forgot-password.component";
-
+import { AdminConfigComponent } from "./admin/admin-config/admin-config.component";
 import { AddClientGroupComponent } from "./admin/client-group/add-client-group/add-client-group.component";
 import { ClientGroupListComponent } from "./admin/client-group/client-group-list/client-group-list.component";
 
@@ -299,6 +299,14 @@ export const routes: Routes = [
         component: AdminDashboardComponent,
         canActivate: [AdminAuthGuard, paymentStatusGuard],
       },
+      {
+  path: "admin-config",
+  component: AdminConfigComponent,
+  canActivate: [
+    AdminAuthGuard,
+    paymentStatusGuard,
+  ],
+},
       {
         path: "forgot-password",
         component: ForgotPasswordComponent,
