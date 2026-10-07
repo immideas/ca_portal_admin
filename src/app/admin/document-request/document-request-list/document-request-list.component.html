@@ -259,16 +259,26 @@
                   </td> -->
 
                   <!-- ================= PRIORITY ================= -->
+<td>
+  <span
+    *ngIf="request.priority"
+    class="request-priority"
+    [ngClass]="{
+      'priority-low': request.priority === 'LOW',
+      'priority-medium': request.priority === 'MEDIUM',
+      'priority-high': request.priority === 'HIGH'
+    }"
+  >
+    {{ request.priority }}
+  </span>
 
-                  <td>
-                    <span *ngIf="request.priority">
-                      {{ request.priority }}
-                    </span>
-
-                    <span *ngIf="!request.priority" class="text-muted">
-                      —
-                    </span>
-                  </td>
+  <span
+    *ngIf="!request.priority"
+    class="text-muted"
+  >
+    —
+  </span>
+</td>
 
                   <!-- ================= PERIOD ================= -->
 

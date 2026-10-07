@@ -1,61 +1,39 @@
 <main id="main" class="complaint-wrapper">
-
   <!-- ================= HEADER ================= -->
 
   <header class="top-header">
-
     <div class="header-left">
-
       <button
         type="button"
         class="back-btn"
         (click)="goBack()"
         aria-label="Go back"
       >
-        <img
-          src="assets/img/back-icon.svg"
-          alt="view"
-        />
+        <img src="assets/img/back-icon.svg" alt="view" />
       </button>
 
       <div class="divider"></div>
 
       <div class="title-box">
-
         <div class="title-icon">
-          <img
-            src="assets/img/Plus.svg"
-            alt="view"
-          />
+          <img src="assets/img/Plus.svg" alt="view" />
         </div>
 
         <div class="title-text">
+          <h4>View Service</h4>
 
-          <h4>
-            View Service
-          </h4>
-
-          <p>
-            Service details
-          </p>
-
+          <p>Service details</p>
         </div>
-
       </div>
-
     </div>
-
   </header>
-
 
   <!-- ================= TABS ================= -->
 
   <div class="service-tabs">
-
     <!-- TAB OPTIONS -->
 
     <div class="service-tab-options">
-
       <!-- SERVICE REQUEST -->
 
       <button
@@ -65,7 +43,6 @@
       >
         Service Request
       </button>
-
 
       <!-- SUBMITTED DOCUMENTS -->
 
@@ -77,7 +54,6 @@
         Submitted Documents
       </button>
 
-
       <!-- FINAL DOCUMENTS -->
 
       <button
@@ -87,15 +63,13 @@
       >
         Final Documents
 
-        <span
+        <!-- <span
           class="final-document-tab-count"
           *ngIf="savedFinalDocuments.length > 0"
         >
           {{ savedFinalDocuments.length }}
-        </span>
-
+        </span> -->
       </button>
-
 
       <!-- =================================================
            NEW: PAYMENT TAB
@@ -108,240 +82,152 @@
       >
         Payment
       </button>
-
     </div>
-
 
     <!-- ================= ACTION BUTTONS ================= -->
 
-    <div
-      class="tab-action-buttons"
-      *ngIf="activeTab === 'request'"
-    >
-
+    <div class="tab-action-buttons" *ngIf="activeTab === 'request'">
       <!-- EDIT -->
 
       <button
         type="button"
         class="tab-edit-btn"
-        *ngIf="
-          requestData?.documentRequest?.status !== 'COMPLETED'
-        "
+        *ngIf="requestData?.documentRequest?.status !== 'COMPLETED'"
         (click)="editServiceRequest()"
       >
         <i class="bi bi-pencil-square"></i>
 
-        <span>
-          Edit
-        </span>
-
+        <span> Edit </span>
       </button>
-
 
       <!-- COMPLETE SERVICE REQUEST -->
 
       <button
         type="button"
         class="tab-edit-btn complete-btn"
-        *ngIf="
-          requestData?.documentRequest?.status !== 'COMPLETED'
-        "
+        *ngIf="requestData?.documentRequest?.status !== 'COMPLETED'"
         (click)="openCompleteModal()"
       >
         <i class="bi bi-check-circle"></i>
 
-        <span>
-          Complete Service Request
-        </span>
-
+        <span> Complete Service Request </span>
       </button>
-
     </div>
-
   </div>
-
 
   <!-- ================= TAB CONTENT ================= -->
 
   <div class="service-tab-content">
-
-
     <!-- =====================================================
          SERVICE REQUEST
          ===================================================== -->
 
     <div *ngIf="activeTab === 'request'">
-
       <app-add-document-request
         [documentRequestId]="documentRequestId"
         [forceViewMode]="true"
         [embedded]="true"
       >
       </app-add-document-request>
-
     </div>
-
 
     <!-- =====================================================
          SUBMITTED DOCUMENTS
          ===================================================== -->
 
     <div *ngIf="activeTab === 'submitted'">
-
       <app-submitted-documents
         [serviceId]="serviceId"
         [serviceRequestId]="documentRequestId"
         [embedded]="true"
       >
       </app-submitted-documents>
-
     </div>
-
 
     <!-- =====================================================
          FINAL DOCUMENTS
          ===================================================== -->
 
     <div *ngIf="activeTab === 'final'">
-
-
       <!-- ================= FINAL DOCUMENTS AVAILABLE ================= -->
 
       <div
         class="final-saved-documents-section"
         *ngIf="savedFinalDocuments.length > 0"
       >
-
-
         <!-- ================= SECTION HEADER ================= -->
 
         <div class="final-saved-documents-header">
-
           <div class="final-saved-title">
-
             <div class="final-saved-icon">
-
               <i class="bi bi-file-earmark-check"></i>
-
             </div>
 
             <div>
-
-              <h3>
-                Final Documents
-              </h3>
+              <h3>Final Documents</h3>
 
               <p>
-                Documents submitted by the CA after completing
-                this service request.
+                Documents submitted by the CA after completing this service
+                request.
               </p>
-
             </div>
-
           </div>
-
 
           <!-- COMPLETED STATUS -->
 
           <div class="final-completed-badge">
-
             <i class="bi bi-check-circle-fill"></i>
 
-            <span>
-              Completed
-            </span>
-
+            <span> Completed </span>
           </div>
-
         </div>
-
 
         <!-- ================= DOCUMENT LIST ================= -->
 
         <div class="final-saved-document-list">
-
           <div
             class="final-saved-document-card"
-            *ngFor="
-              let document of savedFinalDocuments
-            "
+            *ngFor="let document of savedFinalDocuments"
           >
-
-
             <!-- DOCUMENT ICON -->
 
             <div class="final-document-icon">
-
               <i class="bi bi-file-earmark-text"></i>
-
             </div>
-
 
             <!-- DOCUMENT INFORMATION -->
 
             <div class="final-document-info">
-
               <h4>
-
-                {{
-                  document.originalFileName ||
-                  document.fileName
-                }}
-
+                {{ document.originalFileName || document.fileName }}
               </h4>
 
-
               <div class="final-document-meta">
-
-
                 <!-- FILE TYPE -->
 
-                <span
-                  *ngIf="document.fileType"
-                >
+                <span *ngIf="document.fileType">
                   {{ document.fileType }}
                 </span>
 
-
                 <!-- FILE SIZE -->
 
-                <span
-                  *ngIf="document.fileSize"
-                >
-
-                  {{
-                    document.fileSize / 1024 / 1024
-                      | number:'1.2-2'
-                  }}
+                <span *ngIf="document.fileSize">
+                  {{ document.fileSize / 1024 / 1024 | number: "1.2-2" }}
 
                   MB
-
                 </span>
-
 
                 <!-- CREATED DATE -->
 
-                <span
-                  *ngIf="document.createdAt"
-                >
-
-                  {{
-                    document.createdAt
-                      | date:'dd MMM yyyy, hh:mm a'
-                  }}
-
+                <span *ngIf="document.createdAt">
+                  {{ document.createdAt | date: "dd MMM yyyy, hh:mm a" }}
                 </span>
-
               </div>
-
             </div>
-
 
             <!-- ================= ACTIONS ================= -->
 
             <div class="final-document-actions">
-
-
               <!-- VIEW -->
 
               <button
@@ -350,15 +236,10 @@
                 *ngIf="document.fileUrl"
                 (click)="viewFinalDocument(document)"
               >
-
                 <i class="bi bi-eye"></i>
 
-                <span>
-                  View
-                </span>
-
+                <span> View </span>
               </button>
-
 
               <!-- DOWNLOAD -->
 
@@ -368,21 +249,13 @@
                 *ngIf="document.fileUrl"
                 (click)="downloadFinalDocument(document)"
               >
-
                 <i class="bi bi-download"></i>
 
-                <span>
-                  Download
-                </span>
-
+                <span> Download </span>
               </button>
-
             </div>
-
           </div>
-
         </div>
-
 
         <!-- =================================================
              COMPLETION REMARK
@@ -391,32 +264,20 @@
         <div
           class="final-completion-remark"
           *ngIf="
-            savedFinalDocuments.length > 0 &&
-            savedFinalDocuments[0].remark
+            savedFinalDocuments.length > 0 && savedFinalDocuments[0].remark
           "
         >
-
           <div class="final-remark-header">
-
             <i class="bi bi-chat-left-text"></i>
 
-            <span>
-              Completion Remark
-            </span>
-
+            <span> Completion Remark </span>
           </div>
-
 
           <div class="final-remark-content">
-
             {{ savedFinalDocuments[0].remark }}
-
           </div>
-
         </div>
-
       </div>
-
 
       <!-- ================= NO FINAL DOCUMENTS ================= -->
 
@@ -424,348 +285,360 @@
         class="final-documents-empty"
         *ngIf="savedFinalDocuments.length === 0"
       >
-
         <div class="final-empty-icon">
-
           <i class="bi bi-file-earmark-x"></i>
-
         </div>
 
-        <h4>
-          No Final Documents
-        </h4>
+        <h4>No Final Documents</h4>
 
         <p>
-          Final documents will appear here after the
-          service request is completed.
+          Final documents will appear here after the service request is
+          completed.
         </p>
-
       </div>
-
     </div>
-
 
     <!-- =====================================================
          NEW: PAYMENT
          ===================================================== -->
 
     <div *ngIf="activeTab === 'payment'">
+      <div class="payment-tab-container">
+        <!-- ================= PAYMENT HEADER ================= -->
 
- <div class="payment-tab-container">
+        <div class="payment-tab-header">
+          <div class="payment-tab-title">
+            <div class="payment-tab-icon">
+              <i class="bi bi-receipt"></i>
+            </div>
 
-  <!-- ================= PAYMENT HEADER ================= -->
+            <div>
+              <h3>Payment Details</h3>
 
-  <div class="payment-tab-header">
+              <p>Invoice and payment information for this service request.</p>
+            </div>
+          </div>
+        </div>
 
-    <div class="payment-tab-title">
-
-      <div class="payment-tab-icon">
-        <i class="bi bi-receipt"></i>
-      </div>
-
-      <div>
-        <h3>Payment Details</h3>
-
-        <p>
-          Invoice and payment information for this
-          service request.
-        </p>
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- =================================================
+        <!-- =================================================
        PAYMENT NOT AVAILABLE
        ================================================= -->
 
-  <div
-    class="payment-empty-state"
-    *ngIf="
-      requestData?.documentRequest?.status !== 'COMPLETED'
-    "
-  >
+        <div
+          class="payment-empty-state"
+          *ngIf="requestData?.documentRequest?.status !== 'COMPLETED'"
+        >
+          <div class="payment-empty-icon">
+            <i class="bi bi-lock"></i>
+          </div>
 
-    <div class="payment-empty-icon">
-      <i class="bi bi-lock"></i>
-    </div>
+          <h4>Payment Not Available</h4>
 
-    <h4>Payment Not Available</h4>
+          <p>
+            Payment details will be available after the service request is
+            completed.
+          </p>
+        </div>
 
-    <p>
-      Payment details will be available after the
-      service request is completed.
-    </p>
-
-  </div>
-
-
-  <!-- =================================================
+        <!-- =================================================
        PAYMENT RECORD NOT FOUND
        ================================================= -->
 
-  <div
-    class="payment-empty-state"
-    *ngIf="
-      requestData?.documentRequest?.status === 'COMPLETED' &&
-      !serviceRequestPayment
-    "
-  >
+        <div
+          class="payment-empty-state"
+          *ngIf="
+            requestData?.documentRequest?.status === 'COMPLETED' &&
+            !serviceRequestPayment
+          "
+        >
+          <div class="payment-empty-icon">
+            <i class="bi bi-receipt"></i>
+          </div>
 
-    <div class="payment-empty-icon">
-      <i class="bi bi-receipt"></i>
-    </div>
+          <h4>Payment Not Generated</h4>
 
-    <h4>Payment Not Generated</h4>
+          <p>
+            No payment record has been generated for this service request yet.
+          </p>
+        </div>
 
-    <p>
-      No payment record has been generated for this
-      service request yet.
-    </p>
-
-  </div>
-
-
-  <!-- =================================================
+        <!-- =================================================
        PAYMENT DETAILS
        ================================================= -->
 
-  <div
-    class="payment-details-card"
-    *ngIf="
-      requestData?.documentRequest?.status === 'COMPLETED' &&
-      serviceRequestPayment
-    "
-  >
+        <!-- ================= INVOICE ================= -->
 
-    <!-- ================= INVOICE TOP ================= -->
+        <div class="invoice-wrapper">
+          <div class="invoice-sheet" id="invoice-print-area">
+            <!-- ================= COLOURED BAND ================= -->
 
-    <div class="payment-invoice-header">
+            <div class="inv-band">
+              <div class="inv-band-brand">
+                <div class="inv-band-logo">
+                  <i class="bi bi-receipt-cutoff"></i>
+                </div>
 
-      <div class="payment-invoice-info">
+                <div>
+                  <div class="inv-brand">CA Desk</div>
+                  <span class="inv-brand-sub">Client Portal</span>
+                </div>
+              </div>
 
-        <span class="payment-section-label">
-          INVOICE
-        </span>
+              <div class="inv-band-title">
+                <span>TAX INVOICE</span>
 
-        <h2>
-          {{
-            serviceRequestPayment.invoiceNumber ||
-            'N/A'
-          }}
-        </h2>
+                <strong>
+                  {{ serviceRequestPayment.invoiceNumber || "—" }}
+                </strong>
+              </div>
+            </div>
 
+            <div class="inv-body">
+              <!-- ================= BILLED TO + DETAILS ================= -->
+
+              <div class="inv-info-grid">
+                <!-- BILLED TO -->
+
+                <div class="inv-card">
+                  <span class="inv-label">BILLED TO</span>
+
+                  <div class="inv-person">
+                    {{
+                      requestData?.client?.clientName ||
+                        requestData?.clientName ||
+                        "N/A"
+                    }}
+                  </div>
+
+                  <div class="inv-contact" *ngIf="requestData?.client?.email">
+                    <i class="bi bi-envelope"></i>
+                    {{ requestData?.client?.email || requestData?.email }}
+                  </div>
+
+                  <div class="inv-contact" *ngIf="requestData?.client?.phone">
+                    <i class="bi bi-telephone"></i>
+                    {{ requestData?.client?.phone || requestData?.phone }}
+                  </div>
+                </div>
+
+                <!-- INVOICE DETAILS -->
+
+                <div class="inv-card">
+                  <div class="inv-details-grid">
+                    <div class="inv-detail">
+                      <span>Invoice date</span>
+
+                      <strong>
+                        {{
+                          getInvoiceDate(serviceRequestPayment)
+                            ? (getInvoiceDate(serviceRequestPayment)
+                              | date: "dd MMM yyyy")
+                            : "—"
+                        }}
+                      </strong>
+                    </div>
+
+                    <div class="inv-detail">
+                      <span>Invoice Number</span>
+
+                      <strong>
+                        {{ serviceRequestPayment.invoiceNumber || "—" }}
+                      </strong>
+                    </div>
+
+                    <div class="inv-detail">
+                      <span>Request no.</span>
+
+                      <strong>
+                        {{
+                          requestData?.documentRequest?.requestCode ||
+                            requestData?.requestCode ||
+                            "—"
+                        }}
+                      </strong>
+                    </div>
+
+                    <div class="inv-detail">
+                      <span>Status</span>
+
+                      <strong
+                        class="inv-pill"
+                        [class.inv-pill--paid]="
+                          serviceRequestPayment.status === 'paid'
+                        "
+                      >
+                        <i
+                          class="bi"
+                          [class.bi-check-circle-fill]="
+                            serviceRequestPayment.status === 'paid'
+                          "
+                          [class.bi-clock-fill]="
+                            serviceRequestPayment.status !== 'paid'
+                          "
+                        ></i>
+
+                        {{
+                          serviceRequestPayment.status === "paid"
+                            ? "Paid"
+                            : "Pending"
+                        }}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ================= ITEMS TABLE ================= -->
+
+              <div class="inv-table-wrap">
+                <table class="inv-table">
+                  <thead>
+                    <tr>
+                      <th class="col-no">#</th>
+                      <th>Description</th>
+                      <th class="col-num">Amount</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let item of invoiceItems; let i = index">
+                      <td class="col-no">
+                        {{ i + 1 }}
+                      </td>
+
+                      <td>
+                        <div class="inv-item-name">
+                          {{ item.description }}
+                        </div>
+
+                        <div class="inv-item-code" *ngIf="item.code">
+                          {{ item.code }}
+                        </div>
+                      </td>
+
+                      <td class="col-num">
+                        {{ item.amount | currency: "INR" : "symbol" : "1.2-2" }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- ================= PAYMENT + TOTAL ================= -->
+
+              <div class="inv-bottom">
+                <!-- PAYMENT INFORMATION -->
+
+                <div class="inv-payment-info">
+                  <span class="inv-label"> PAYMENT INFORMATION </span>
+
+                  <div class="inv-meta-row">
+                    <span>Status</span>
+
+                    <strong
+                      [class.paid-text]="
+                        serviceRequestPayment.status === 'paid'
+                      "
+                    >
+                      {{ serviceRequestPayment.status | titlecase }}
+                    </strong>
+                  </div>
+
+                  <div
+                    class="inv-meta-row"
+                    *ngIf="serviceRequestPayment.transactionId"
+                  >
+                    <span>Transaction ID</span>
+
+                    <strong class="transaction-id">
+                      {{ serviceRequestPayment.transactionId }}
+                    </strong>
+                  </div>
+
+                  <div
+                    class="inv-meta-row"
+                    *ngIf="
+                      serviceRequestPayment.paidAt ||
+                      serviceRequestPayment.paymentDate
+                    "
+                  >
+                    <span>Paid On</span>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.paidAt ||
+                          serviceRequestPayment.paymentDate
+                          | date: "dd MMM yyyy, hh:mm a"
+                      }}
+                    </strong>
+                  </div>
+                </div>
+
+                <!-- TOTALS -->
+
+                <div class="inv-totals">
+                  <div class="inv-total-row">
+                    <span>Subtotal</span>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.subtotal
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+
+                  <div class="inv-total-row">
+                    <span>
+                      CGST ({{ getTaxPercent(serviceRequestPayment, "cgst") }}%)
+                    </span>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.cgst
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+
+                  <div class="inv-total-row">
+                    <span>
+                      SGST ({{ getTaxPercent(serviceRequestPayment, "sgst") }}%)
+                    </span>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.sgst
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+
+                  <div class="inv-grand-total">
+                    <span>Total Amount</span>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.amount
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ================= FOOTER ================= -->
+
+              <div class="inv-footer">
+                <span>Thank you for choosing CA Desk.</span>
+                <span>Customer Portal</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-
-      <!-- PAYMENT STATUS -->
-
-      <span class="payment-status-badge">
-
-        <i
-          class="bi"
-          [class.bi-check-circle-fill]="
-            serviceRequestPayment.status === 'paid'
-          "
-          [class.bi-clock]="
-            serviceRequestPayment.status !== 'paid'
-          "
-        ></i>
-
-        {{
-          serviceRequestPayment.status
-            | titlecase
-        }}
-
-      </span>
-
     </div>
-
-
-    <!-- ================= AMOUNT SUMMARY ================= -->
-
-    <div class="payment-summary-grid">
-
-      <!-- SUBTOTAL -->
-
-      <div class="payment-summary-item">
-
-        <div class="payment-summary-icon subtotal-icon">
-          <i class="bi bi-calculator"></i>
-        </div>
-
-        <div>
-
-          <span>Subtotal</span>
-
-          <strong>
-            {{
-              serviceRequestPayment.subtotal
-                | currency:'INR':'symbol':'1.2-2'
-            }}
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <!-- CGST -->
-
-      <div class="payment-summary-item">
-
-        <div class="payment-summary-icon tax-icon">
-          <i class="bi bi-percent"></i>
-        </div>
-
-        <div>
-
-          
-          <span>
-  CGST ({{ serviceRequestPayment.cgstPercentage }}%)
-</span>
-
-          <strong>
-            {{
-              serviceRequestPayment.cgst
-                | currency:'INR':'symbol':'1.2-2'
-            }}
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <!-- SGST -->
-
-      <div class="payment-summary-item">
-
-        <div class="payment-summary-icon tax-icon">
-          <i class="bi bi-percent"></i>
-        </div>
-
-        <div>
-
-      
-          <span>
-  SGST ({{ serviceRequestPayment.sgstPercentage }}%)
-</span>
-
-          <strong>
-            {{
-              serviceRequestPayment.sgst
-                | currency:'INR':'symbol':'1.2-2'
-            }}
-          </strong>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ================= TOTAL ================= -->
-
-    <div class="payment-total-section">
-
-      <div>
-
-        <span>Total Amount</span>
-
-        <small>
-          Including applicable taxes
-        </small>
-
-      </div>
-
-      <strong>
-        {{
-          serviceRequestPayment.amount
-            | currency:'INR':'symbol':'1.2-2'
-        }}
-      </strong>
-
-    </div>
-
-
-    <!-- ================= INVOICE STATUS ================= -->
-
-    <div class="payment-invoice-status">
-
-      <div class="payment-invoice-status-left">
-
-        <div class="invoice-status-icon">
-
-          <i
-            class="bi"
-            [class.bi-check-circle-fill]="
-              serviceRequestPayment.invoiceGenerated
-            "
-            [class.bi-file-earmark-pdf]="
-              !serviceRequestPayment.invoiceGenerated
-            "
-          ></i>
-
-        </div>
-
-        <div>
-
-          <strong>Invoice</strong>
-
-          <span>
-            {{
-              serviceRequestPayment.invoiceGenerated
-                ? 'Invoice has been generated'
-                : 'Invoice has not been generated yet'
-            }}
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- INVOICE STATUS BADGE -->
-
-      <span
-        class="invoice-status-badge"
-        [class.generated]="
-          serviceRequestPayment.invoiceGenerated
-        "
-      >
-
-        <i
-          class="bi"
-          [class.bi-check-circle-fill]="
-            serviceRequestPayment.invoiceGenerated
-          "
-          [class.bi-clock]="
-            !serviceRequestPayment.invoiceGenerated
-          "
-        ></i>
-
-        {{
-          serviceRequestPayment.invoiceGenerated
-            ? 'Generated'
-            : 'Not Generated'
-        }}
-
-      </span>
-
-    </div>
-
   </div>
-
-</div>
-
-    </div>
-
-  </div>
-
 
   <!-- =====================================================
        FINAL DOCUMENT PREVIEW MODAL
@@ -776,38 +649,25 @@
     *ngIf="showFinalDocumentPreview"
     (click)="closeFinalDocumentPreview()"
   >
-
-    <div
-      class="document-preview-modal"
-      (click)="$event.stopPropagation()"
-    >
-
+    <div class="document-preview-modal" (click)="$event.stopPropagation()">
       <!-- ================= PREVIEW HEADER ================= -->
 
       <div class="document-preview-modal-header">
-
         <div class="document-preview-modal-title">
-
           <i class="bi bi-file-earmark"></i>
 
           <div>
-
             <h4>
               {{
                 previewFinalDocument?.originalFileName ||
-                previewFinalDocument?.fileName ||
-                'Document Preview'
+                  previewFinalDocument?.fileName ||
+                  "Document Preview"
               }}
             </h4>
 
-            <p>
-              Final Document
-            </p>
-
+            <p>Final Document</p>
           </div>
-
         </div>
-
 
         <button
           type="button"
@@ -815,124 +675,80 @@
           (click)="closeFinalDocumentPreview()"
           aria-label="Close preview"
         >
-
           <i class="bi bi-x-lg"></i>
-
         </button>
-
       </div>
-
 
       <!-- ================= PREVIEW BODY ================= -->
 
       <div class="document-preview-modal-body">
-
-
         <!-- LOADING -->
 
-        <div
-          class="document-preview-loading"
-          *ngIf="previewFinalLoading"
-        >
-
+        <div class="document-preview-loading" *ngIf="previewFinalLoading">
           <span class="preview-spinner"></span>
 
-          <span>
-            Loading document...
-          </span>
-
+          <span> Loading document... </span>
         </div>
-
 
         <!-- IMAGE PREVIEW -->
 
         <div
           class="document-preview-image-wrapper"
-          *ngIf="
-            !previewFinalLoading &&
-            previewFinalType === 'image'
-          "
+          *ngIf="!previewFinalLoading && previewFinalType === 'image'"
         >
-
           <img
             [src]="previewFinalUrl"
-            [alt]="
-              previewFinalDocument?.originalFileName ||
-              'Final document'
-            "
+            [alt]="previewFinalDocument?.originalFileName || 'Final document'"
             class="document-preview-image"
           />
-
         </div>
-
 
         <!-- PDF PREVIEW -->
 
         <div
           class="document-preview-pdf-wrapper"
-          *ngIf="
-            !previewFinalLoading &&
-            previewFinalType === 'pdf'
-          "
+          *ngIf="!previewFinalLoading && previewFinalType === 'pdf'"
         >
-
           <iframe
             [src]="previewFinalSafeUrl"
             class="document-preview-pdf"
             frameborder="0"
           >
           </iframe>
-
         </div>
-
 
         <!-- OTHER FILE -->
 
         <div
           class="document-preview-file-wrapper"
-          *ngIf="
-            !previewFinalLoading &&
-            previewFinalType === 'file'
-          "
+          *ngIf="!previewFinalLoading && previewFinalType === 'file'"
         >
-
           <div class="document-preview-file-icon">
-
             <i class="bi bi-file-earmark"></i>
-
           </div>
 
           <h4>
             {{
               previewFinalDocument?.originalFileName ||
-              previewFinalDocument?.fileName
+                previewFinalDocument?.fileName
             }}
           </h4>
 
-          <p>
-            Preview is not available for this file type.
-          </p>
+          <p>Preview is not available for this file type.</p>
 
           <button
             type="button"
             class="final-download-btn"
             (click)="downloadFinalDocument(previewFinalDocument)"
           >
-
             <i class="bi bi-download"></i>
 
             Download Document
-
           </button>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
-
 
   <!-- =====================================================
        COMPLETE SERVICE REQUEST MODAL
@@ -943,39 +759,21 @@
     *ngIf="showCompleteModal"
     (click)="closeCompleteModal()"
   >
-
-    <div
-      class="complete-modal"
-      (click)="$event.stopPropagation()"
-    >
-
-
+    <div class="complete-modal" (click)="$event.stopPropagation()">
       <!-- ================= MODAL HEADER ================= -->
 
       <div class="complete-modal-header">
-
         <div class="complete-modal-title">
-
           <div class="complete-modal-icon">
-
             <i class="bi bi-check-circle"></i>
-
           </div>
 
           <div>
+            <h4>Complete Service Request</h4>
 
-            <h4>
-              Complete Service Request
-            </h4>
-
-            <p>
-              Upload final documents and add completion remark
-            </p>
-
+            <p>Upload final documents and add completion remark</p>
           </div>
-
         </div>
-
 
         <button
           type="button"
@@ -984,48 +782,32 @@
           (click)="closeCompleteModal()"
           aria-label="Close"
         >
-
           <i class="bi bi-x-lg"></i>
-
         </button>
-
       </div>
-
 
       <!-- ================= MODAL BODY ================= -->
 
       <div class="complete-modal-body">
-
-
         <!-- =================================================
              FINAL DOCUMENTS
              ================================================= -->
 
         <div class="complete-form-group">
-
           <label class="complete-label">
-
             Final Documents
 
-            <span class="required-star">
-              *
-            </span>
-
+            <span class="required-star"> * </span>
           </label>
 
-
           <p class="complete-help-text">
-
-            Upload the final documents for this completed
-            service request. PDF and image files are supported.
-
+            Upload the final documents for this completed service request. PDF
+            and image files are supported.
           </p>
-
 
           <!-- ================= UPLOADER ================= -->
 
           <div class="final-document-uploader-wrapper">
-
             <lib-image-uploader-lib
               [imageUrls]="[]"
               [maxImages]="maxFinalDocuments"
@@ -1034,77 +816,39 @@
               [allowEdit]="!finalUploading"
               [allowDelete]="!finalUploading"
               [allowReplace]="!finalUploading"
-
-              (imagesChange)="
-                handleFinalDocumentsChange($event)
-              "
-
-              (imageUpload)="
-                onFinalDocumentUpload($event)
-              "
-
-              (imageReplace)="
-                onFinalDocumentReplace($event)
-              "
-
-              (imageDelete)="
-                onFinalDocumentDelete($event)
-              "
+              (imagesChange)="handleFinalDocumentsChange($event)"
+              (imageUpload)="onFinalDocumentUpload($event)"
+              (imageReplace)="onFinalDocumentReplace($event)"
+              (imageDelete)="onFinalDocumentDelete($event)"
             >
             </lib-image-uploader-lib>
-
           </div>
-
 
           <!-- ================= FILE INFO ================= -->
 
-          <div
-            class="final-document-count"
-            *ngIf="finalDocuments.length > 0"
-          >
-
+          <div class="final-document-count" *ngIf="finalDocuments.length > 0">
             <i class="bi bi-files"></i>
 
             <span>
-
               {{ finalDocuments.length }}
 
-              final document{{
-
-                finalDocuments.length > 1
-                  ? "s"
-                  : ""
-
-              }}
+              final document{{ finalDocuments.length > 1 ? "s" : "" }}
 
               selected
-
             </span>
-
           </div>
-
         </div>
-
 
         <!-- =================================================
              COMPLETION REMARK
              ================================================= -->
 
         <div class="complete-form-group">
-
-          <label
-            for="completionRemark"
-            class="complete-label"
-          >
-
+          <label for="completionRemark" class="complete-label">
             Completion Remark
 
-            <span class="required-star">
-              *
-            </span>
-
+            <span class="required-star"> * </span>
           </label>
-
 
           <textarea
             id="completionRemark"
@@ -1117,28 +861,17 @@
           >
           </textarea>
 
-
           <div class="remark-footer">
+            <span> Remark is required </span>
 
-            <span>
-              Remark is required
-            </span>
-
-            <span>
-              {{ completionRemark.length }}/1000
-            </span>
-
+            <span> {{ completionRemark.length }}/1000 </span>
           </div>
-
         </div>
-
       </div>
-
 
       <!-- ================= MODAL FOOTER ================= -->
 
       <div class="complete-modal-footer">
-
         <button
           type="button"
           class="complete-cancel-btn"
@@ -1147,7 +880,6 @@
         >
           Cancel
         </button>
-
 
         <button
           type="button"
@@ -1159,38 +891,15 @@
           "
           (click)="completeServiceRequest()"
         >
+          <span class="status-spinner-small" *ngIf="finalUploading"> </span>
 
-          <span
-            class="status-spinner-small"
-            *ngIf="finalUploading"
-          >
-          </span>
-
-
-          <i
-            class="bi bi-check-circle"
-            *ngIf="!finalUploading"
-          >
-          </i>
-
+          <i class="bi bi-check-circle" *ngIf="!finalUploading"> </i>
 
           <span>
-
-            {{
-              finalUploading
-                ? "Completing..."
-                : "Complete Service Request"
-            }}
-
+            {{ finalUploading ? "Completing..." : "Complete Service Request" }}
           </span>
-
         </button>
-
       </div>
-
     </div>
-
   </div>
-
-
 </main>
