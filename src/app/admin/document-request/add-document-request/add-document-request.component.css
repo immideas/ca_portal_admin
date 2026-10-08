@@ -979,3 +979,192 @@ input:disabled
   padding-left: 18px;
   padding-right: 14px;
 }
+/* =====================================================
+   REQUEST PRICING CARD
+   ===================================================== */
+
+.pricing-card {
+  .form-padding-wrap {
+    padding: 20px;
+  }
+}
+
+/* Pricing row */
+
+.pricing-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.pricing-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  small {
+    font-size: 11px;
+    color: #888;
+  }
+}
+
+.pricing-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Discount */
+
+.discount-row {
+  .discount-amount {
+    color: #dc3545;
+  }
+}
+
+/* Divider */
+
+.pricing-divider {
+  height: 1px;
+  background: #e5e5e5;
+  margin: 10px 0;
+}
+
+/* Total */
+
+.total-row {
+  padding-top: 14px;
+  padding-bottom: 0;
+
+  .pricing-label span {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .total-amount {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+/* Form fields */
+
+.pricing-card {
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-controler {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 767px) {
+  .pricing-summary-row {
+    align-items: flex-start;
+  }
+
+  .pricing-amount {
+    font-size: 14px;
+  }
+
+  .total-row .total-amount {
+    font-size: 16px;
+  }
+}
+/* =====================================================
+   PRICING & DISCOUNT CARD
+   ===================================================== */
+
+.pricing-card {
+  overflow: hidden;
+}
+
+.pricing-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #eef0f4;
+}
+
+.pricing-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pricing-label span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.pricing-label small,
+.pricing-total-row small {
+  font-size: 11px;
+  color: #8a94a6;
+}
+
+.pricing-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.service-cost-row {
+  padding-top: 4px;
+}
+
+/* Discount should be RED */
+.discount-row .discount-value {
+  color: #dc3545 !important;
+}
+
+/* Final amount */
+.pricing-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 18px;
+  padding: 16px 18px;
+
+  border-radius: 10px;
+  background: #f7f8fc;
+}
+
+.pricing-total-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pricing-total-row > div > span {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.pricing-total-row strong {
+  font-size: 20px;
+  font-weight: 800;
+}

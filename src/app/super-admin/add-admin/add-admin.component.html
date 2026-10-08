@@ -331,6 +331,94 @@
           </div>
         </div>
       </div>
+      <!-- Platform Fee -->
+<div class="row mb-3">
+  <div class="col-md-6 form-group">
+    <label for="platformFeeType">
+      Platform Fee Type
+      <img
+        src="assets/img/star.svg"
+        class="required-icon"
+        alt="required"
+      />
+    </label>
+
+    <div
+      class="field-wrap"
+      style="--field-icon: url('assets/img/category-sub.svg')"
+    >
+      <select
+        id="platformFeeType"
+        formControlName="platformFeeType"
+        class="form-controler"
+        [disabled]="isViewMode"
+      >
+        <option value="FIXED">Fixed Amount</option>
+        <option value="PERCENTAGE">Percentage</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="col-md-6 form-group mt-3 mt-md-0">
+    <label for="platformFeeValue">
+      Platform Fee
+      <img
+        src="assets/img/star.svg"
+        class="required-icon"
+        alt="required"
+      />
+    </label>
+
+    <div
+      class="field-wrap"
+      style="--field-icon: url('assets/img/category-sub.svg')"
+    >
+      <input
+        id="platformFeeValue"
+        type="number"
+        formControlName="platformFeeValue"
+        class="form-controler"
+        min="0"
+        [max]="
+          adminForm.get('platformFeeType')?.value === 'PERCENTAGE'
+            ? 100
+            : null
+        "
+        [placeholder]="
+          adminForm.get('platformFeeType')?.value === 'PERCENTAGE'
+            ? 'Enter percentage'
+            : 'Enter amount'
+        "
+        [readonly]="isViewMode"
+      />
+    </div>
+
+    <div
+      class="text-danger mt-1"
+      style="font-size: 11px"
+      *ngIf="
+        adminForm.get('platformFeeValue')?.invalid &&
+        adminForm.get('platformFeeValue')?.touched
+      "
+    >
+      <span *ngIf="adminForm.get('platformFeeValue')?.errors?.['required']">
+        Platform fee is required.
+      </span>
+
+      <span *ngIf="adminForm.get('platformFeeValue')?.errors?.['min']">
+        Platform fee cannot be negative.
+      </span>
+
+      <span
+        *ngIf="
+          adminForm.get('platformFeeValue')?.errors?.['max']
+        "
+      >
+        Platform fee percentage cannot exceed 100%.
+      </span>
+    </div>
+  </div>
+</div>
 
       <!-- <div class="row mb-3">
         <div class="col-md-6 form-group">

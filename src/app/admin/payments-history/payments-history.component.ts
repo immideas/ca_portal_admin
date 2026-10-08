@@ -1,7 +1,14 @@
-import { Component, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+} from "@angular/core";
 
+import { CommonModule } from "@angular/common";
+
+import { FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
 import {
   PaginationFooterComponent,
   PageChangeEvent,
@@ -9,21 +16,19 @@ import {
 
 import { DocumentRequestService } from "../../services/document-request.service";
 
+import { Subject, debounceTime, distinctUntilChanged } from "rxjs";
+
 @Component({
   selector: "app-payments-history",
   standalone: true,
 
-  imports: [
-    CommonModule,
-    FormsModule,
-    PaginationFooterComponent,
-  ],
+  imports: [CommonModule, FormsModule, PaginationFooterComponent],
 
   templateUrl: "./payments-history.component.html",
+
   styleUrls: ["./payments-history.component.scss"],
 })
-export class PaymentsHistoryComponent implements OnInit {
-
+export class PaymentsHistoryComponent implements OnInit, OnDestroy {
   // ============================================================
   // PAYMENT DATA
   // ============================================================
@@ -34,13 +39,22 @@ export class PaymentsHistoryComponent implements OnInit {
 
   loading = false;
 
-
   // ============================================================
   // SEARCH
   // ============================================================
 
   search = "";
 
+  statusFilter = "";
+
+  paymentDateFrom = "";
+
+  paymentDateTo = "";
+
+  /**
+   * Search debounce subject
+   */
+  private searchSubject = new Subject<string>();
 
   // ============================================================
   // PAGINATION
@@ -51,7 +65,6 @@ export class PaymentsHistoryComponent implements OnInit {
   currentPage = 1;
 
   totalItems = 0;
-
 
   // ============================================================
   // SUMMARY CARDS
@@ -65,7 +78,6 @@ export class PaymentsHistoryComponent implements OnInit {
 
   paymentDue = 0;
 
-
   // ============================================================
   // INVOICE
   // ============================================================
@@ -73,87 +85,157 @@ export class PaymentsHistoryComponent implements OnInit {
   selectedPayment: any = null;
 
   showInvoice = false;
-
+  showFilters = false;
 
   // ============================================================
   // CONSTRUCTOR
   // ============================================================
 
-  constructor(
-    private documentRequestService: DocumentRequestService
-  ) {}
-
+constructor(
+  private documentRequestService: DocumentRequestService,
+  private router: Router
+) {}
 
   // ============================================================
   // LIFECYCLE
   // ============================================================
 
   ngOnInit(): void {
+    /*
+     * ========================================================
+     * SEARCH DEBOUNCE
+     * ========================================================
+     */
+
+    this.searchSubject
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((searchValue: string) => {
+        this.search = searchValue;
+
+        this.currentPage = 1;
+
+        this.loadPayments();
+      });
+
+    /*
+     * ========================================================
+     * INITIAL LOAD
+     * ========================================================
+     */
+
     this.loadPayments();
   }
-
 
   // ============================================================
   // LOAD PAYMENTS
   // ============================================================
 
   loadPayments(): void {
-
     this.loading = true;
 
+    /*
+     * ========================================================
+     * BACKEND REQUEST
+     * ========================================================
+     */
+
+    const payload = {
+      page: this.currentPage,
+
+      pageSize: this.pageSize,
+
+      search: this.search.trim(),
+
+      status: this.statusFilter,
+
+      paymentDateFrom: this.paymentDateFrom || null,
+
+      paymentDateTo: this.paymentDateTo || null,
+    };
+
+    console.log("Payment History Request:", payload);
+
     this.documentRequestService
-      .getAllServiceRequestPayments()
+      .getAllServiceRequestPayments(payload)
       .subscribe({
-
         next: (response: any) => {
-
-          console.log(
-            "Service Request Payments Response:",
-            response
-          );
+          console.log("Service Request Payments Response:", response);
 
           if (response?.success) {
+            /*
+             * ==================================================
+             * PAYMENT DATA
+             * ==================================================
+             */
 
-            this.payments =
-              Array.isArray(response.data)
-                ? response.data
-                : [];
+            this.payments = Array.isArray(response.data) ? response.data : [];
+
+            /*
+             * ==================================================
+             * BACKEND ALREADY FILTERED
+             * AND PAGINATED
+             * ==================================================
+             */
+
+            this.filteredPayments = this.payments;
+
+            /*
+             * ==================================================
+             * TOTAL ITEMS
+             * ==================================================
+             */
+
+            this.totalItems = Number(response.totalItems || 0);
+
+            /*
+             * ==================================================
+             * KEEP EXISTING SUMMARY LOGIC
+             * ==================================================
+             */
 
             this.calculateSummary();
-
-            this.applyFilters();
-
           } else {
-
             this.resetPayments();
-
           }
 
           this.loading = false;
         },
 
         error: (error: any) => {
-
           this.loading = false;
 
-          console.error(
-            "Error fetching service request payments:",
-            error
-          );
+          console.error("Error fetching service request payments:", error);
 
           this.resetPayments();
         },
-
       });
   }
+openInvoicePayment(payment: any): void {
+  console.log("Clicked Payment Object:", payment);
 
+  const documentRequestId =
+    payment?.documentRequestId ??
+    payment?.document_request_id;
 
+  if (!documentRequestId) {
+    console.error("Document Request ID missing:", payment);
+    return;
+  }
+
+  this.router.navigate(
+    ["/service-view", documentRequestId],
+    {
+      queryParams: {
+        tab: "payment"
+      }
+    }
+  );
+}
   // ============================================================
   // RESET
   // ============================================================
 
   resetPayments(): void {
-
     this.payments = [];
 
     this.filteredPayments = [];
@@ -169,479 +251,282 @@ export class PaymentsHistoryComponent implements OnInit {
     this.paymentDue = 0;
   }
 
-
   // ============================================================
   // SUMMARY
   // ============================================================
 
   calculateSummary(): void {
-
     /*
+     * ========================================================
      * TOTAL RECEIVED
+     * ========================================================
      */
 
-    this.totalReceived =
-      this.payments
-        .filter(
-          (payment: any) =>
-            String(
-              payment?.status || ""
-            ).toUpperCase() === "PAID"
-        )
-        .reduce(
-          (
-            total: number,
-            payment: any
-          ) => {
+    this.totalReceived = this.payments
 
-            return (
-              total +
-              Number(
-                payment?.amount || 0
-              )
-            );
-
-          },
-          0
-        );
-
-
-    /*
-     * TRANSACTIONS
-     */
-
-    this.transactionCount =
-      this.payments.filter(
+      .filter(
         (payment: any) =>
-          String(
-            payment?.status || ""
-          ).toUpperCase() === "PAID"
-      ).length;
+          String(payment?.status || "").toUpperCase() === "PAID",
+      )
 
+      .reduce((total: number, payment: any) => {
+        return total + Number(payment?.amount || 0);
+      }, 0);
 
     /*
+     * ========================================================
+     * TRANSACTIONS
+     * ========================================================
+     */
+
+    this.transactionCount = this.payments.filter(
+      (payment: any) => String(payment?.status || "").toUpperCase() === "PAID",
+    ).length;
+
+    /*
+     * ========================================================
      * THIS MONTH
+     * ========================================================
      */
 
     const now = new Date();
 
-    this.thisMonthReceived =
-      this.payments
-        .filter(
-          (payment: any) => {
+    this.thisMonthReceived = this.payments
 
-            const status =
-              String(
-                payment?.status || ""
-              ).toUpperCase();
+      .filter((payment: any) => {
+        const status = String(payment?.status || "").toUpperCase();
 
-            if (status !== "PAID") {
-              return false;
-            }
+        if (status !== "PAID") {
+          return false;
+        }
 
-            if (!payment?.paidAt) {
-              return false;
-            }
+        if (!payment?.paidAt) {
+          return false;
+        }
 
-            const paymentDate =
-              new Date(
-                payment.paidAt
-              );
+        const paymentDate = new Date(payment.paidAt);
 
-            if (
-              isNaN(
-                paymentDate.getTime()
-              )
-            ) {
-              return false;
-            }
+        if (isNaN(paymentDate.getTime())) {
+          return false;
+        }
 
-            return (
-              paymentDate.getMonth() ===
-                now.getMonth() &&
-              paymentDate.getFullYear() ===
-                now.getFullYear()
-            );
-          }
-        )
-        .reduce(
-          (
-            total: number,
-            payment: any
-          ) => {
-
-            return (
-              total +
-              Number(
-                payment?.amount || 0
-              )
-            );
-
-          },
-          0
+        return (
+          paymentDate.getMonth() === now.getMonth() &&
+          paymentDate.getFullYear() === now.getFullYear()
         );
+      })
 
+      .reduce((total: number, payment: any) => {
+        return total + Number(payment?.amount || 0);
+      }, 0);
 
     /*
+     * ========================================================
      * PAYMENT DUE
+     * ========================================================
      */
 
-    this.paymentDue =
-      this.payments
-        .filter(
-          (payment: any) => {
+    this.paymentDue = this.payments
 
-            const status =
-              String(
-                payment?.status || ""
-              ).toUpperCase();
+      .filter((payment: any) => {
+        const status = String(payment?.status || "").toUpperCase();
 
-            return (
-              status === "PENDING" ||
-              status === "PAYMENT_DUE"
-            );
-          }
-        )
-        .reduce(
-          (
-            total: number,
-            payment: any
-          ) => {
+        return status === "PENDING" || status === "PAYMENT_DUE";
+      })
 
-            return (
-              total +
-              Number(
-                payment?.amount || 0
-              )
-            );
-
-          },
-          0
-        );
+      .reduce((total: number, payment: any) => {
+        return total + Number(payment?.amount || 0);
+      }, 0);
   }
-
 
   // ============================================================
   // SEARCH
   // ============================================================
 
   onSearchChange(): void {
+    /*
+     * Send search value to debounce subject.
+     *
+     * API will be called only after
+     * user stops typing for 500ms.
+     */
 
+    this.searchSubject.next(this.search);
+  }
+
+  // ============================================================
+  // FILTER
+  // ============================================================
+
+  onFilterChange(): void {
     this.currentPage = 1;
 
-    this.applyFilters();
+    this.loadPayments();
+  }
+  getActiveFilterCount(): number {
+  let count = 0;
+
+  if (this.statusFilter) {
+    count++;
   }
 
-
-  // ============================================================
-  // APPLY SEARCH + PAGINATION
-  // ============================================================
-
-  applyFilters(): void {
-
-    let data =
-      [...this.payments];
-
-    const searchValue =
-      this.search
-        .trim()
-        .toLowerCase();
-
-
-    if (searchValue) {
-
-      data =
-        data.filter(
-          (payment: any) => {
-
-            const invoiceNumber =
-              String(
-                payment?.invoiceNumber || ""
-              ).toLowerCase();
-
-            const requestCode =
-              String(
-                payment?.requestCode || ""
-              ).toLowerCase();
-
-            const clientName =
-              String(
-                payment?.client?.clientName ||
-                payment?.clientName ||
-                ""
-              ).toLowerCase();
-
-            const fileNo =
-              String(
-                payment?.client?.fileNo ||
-                ""
-              ).toLowerCase();
-
-            const taskName =
-              String(
-                payment?.taskName || ""
-              ).toLowerCase();
-
-            const serviceName =
-              String(
-                payment?.service?.serviceName ||
-                payment?.serviceName ||
-                ""
-              ).toLowerCase();
-
-            const paymentMethod =
-              String(
-                payment?.paymentMethod || ""
-              ).toLowerCase();
-
-            const transactionId =
-              String(
-                payment?.transactionId || ""
-              ).toLowerCase();
-
-
-            return (
-              invoiceNumber.includes(searchValue) ||
-              requestCode.includes(searchValue) ||
-              clientName.includes(searchValue) ||
-              fileNo.includes(searchValue) ||
-              taskName.includes(searchValue) ||
-              serviceName.includes(searchValue) ||
-              paymentMethod.includes(searchValue) ||
-              transactionId.includes(searchValue)
-            );
-          }
-        );
-    }
-
-
-    /*
-     * TOTAL FILTERED ITEMS
-     */
-
-    this.totalItems =
-      data.length;
-
-
-    /*
-     * PAGINATION
-     */
-
-    const startIndex =
-      (this.currentPage - 1) *
-      this.pageSize;
-
-    const endIndex =
-      startIndex +
-      this.pageSize;
-
-
-    this.filteredPayments =
-      data.slice(
-        startIndex,
-        endIndex
-      );
+  if (this.paymentDateFrom) {
+    count++;
   }
 
+  if (this.paymentDateTo) {
+    count++;
+  }
 
+  return count;
+}
+resetFilters(): void {
+  this.statusFilter = "";
+  this.paymentDateFrom = "";
+  this.paymentDateTo = "";
+
+  this.currentPage = 1;
+  this.loadPayments();
+}
+toggleFilters(event: MouseEvent): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.showFilters = !this.showFilters;
+}
+
+closeFilters(): void {
+  this.showFilters = false;
+}
+
+applyFilters(): void {
+  this.currentPage = 1;
+  this.loadPayments();
+  this.showFilters = false;
+}
   // ============================================================
   // PAGINATION
   // ============================================================
 
-  onPageChange(
-    event: PageChangeEvent | any
-  ): void {
-
+  onPageChange(event: PageChangeEvent | any): void {
     /*
-     * Same logic used by
-     * DocumentRequestListComponent.
+     * Same event handling logic
+     * as your previous implementation.
      */
 
-    if (
-      event &&
-      typeof event === "object" &&
-      "page" in event
-    ) {
+    if (event && typeof event === "object" && "page" in event) {
+      this.currentPage = event.page;
 
-      this.currentPage =
-        event.page;
-
-      this.pageSize =
-        event.pageSize;
-
+      this.pageSize = event.pageSize;
     } else {
-
-      this.currentPage =
-        event;
+      this.currentPage = event;
     }
 
+    /*
+     * Backend pagination
+     */
 
-    this.applyFilters();
+    this.loadPayments();
   }
-
 
   // ============================================================
   // PAGE SIZE
   // ============================================================
 
-  onPageSizeChange(
-    event: Event
-  ): void {
+  onPageSizeChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
 
-    const selectElement =
-      event.target as HTMLSelectElement;
-
-    this.pageSize =
-      Number(
-        selectElement.value
-      );
+    this.pageSize = Number(selectElement.value);
 
     this.currentPage = 1;
 
-    this.applyFilters();
-  }
+    /*
+     * Backend pagination
+     */
 
+    this.loadPayments();
+  }
 
   // ============================================================
   // SERVICES
   // ============================================================
 
-  getServices(
-    payment: any
-  ): any[] {
-
-    if (
-      Array.isArray(
-        payment?.services
-      ) &&
-      payment.services.length > 0
-    ) {
-
+  getServices(payment: any): any[] {
+    if (Array.isArray(payment?.services) && payment.services.length > 0) {
       return payment.services;
     }
 
-
     if (payment?.service) {
-
-      return [
-        payment.service
-      ];
+      return [payment.service];
     }
-
 
     return [];
   }
-
 
   // ============================================================
   // PRIMARY SERVICE
   // ============================================================
 
-  getPrimaryService(
-    payment: any
-  ): any {
+  getPrimaryService(payment: any): any {
+    const services = this.getServices(payment);
 
-    const services =
-      this.getServices(
-        payment
-      );
-
-    return services.length
-      ? services[0]
-      : null;
+    return services.length ? services[0] : null;
   }
-
 
   // ============================================================
   // ADDITIONAL SERVICES
   // ============================================================
 
-  getAdditionalServices(
-    payment: any
-  ): any[] {
+  getAdditionalServices(payment: any): any[] {
+    const services = this.getServices(payment);
 
-    const services =
-      this.getServices(
-        payment
-      );
-
-    return services.length > 1
-      ? services.slice(1)
-      : [];
+    return services.length > 1 ? services.slice(1) : [];
   }
-
 
   // ============================================================
   // FORMAT AMOUNT
   // ============================================================
 
-  formatAmount(
-    amount: any
-  ): string {
+  formatAmount(amount: any): string {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
 
-    return new Intl.NumberFormat(
-      "en-IN",
-      {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 2,
-      }
-    ).format(
-      Number(
-        amount || 0
-      )
-    );
+      currency: "INR",
+
+      maximumFractionDigits: 2,
+    }).format(Number(amount || 0));
   }
-
 
   // ============================================================
   // FORMAT DATE
   // ============================================================
 
-  formatDate(
-    date: any
-  ): string {
-
+  formatDate(date: any): string {
     if (!date) {
       return "—";
     }
 
-    const parsedDate =
-      new Date(date);
+    const parsedDate = new Date(date);
 
-    if (
-      isNaN(
-        parsedDate.getTime()
-      )
-    ) {
+    if (isNaN(parsedDate.getTime())) {
       return "—";
     }
 
-    return parsedDate.toLocaleDateString(
-      "en-IN",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  }
+    return parsedDate.toLocaleDateString("en-IN", {
+      day: "2-digit",
 
+      month: "short",
+
+      year: "numeric",
+    });
+  }
 
   // ============================================================
   // STATUS CLASS
   // ============================================================
 
-  getStatusClass(
-    status: string
-  ): string {
-
-    switch (
-      String(
-        status || ""
-      ).toUpperCase()
-    ) {
-
+  getStatusClass(status: string): string {
+    switch (String(status || "").toUpperCase()) {
       case "PAID":
         return "status-paid";
 
@@ -661,56 +546,43 @@ export class PaymentsHistoryComponent implements OnInit {
     }
   }
 
-
   // ============================================================
   // VIEW INVOICE
   // ============================================================
 
-  viewInvoice(
-    payment: any
-  ): void {
+  viewInvoice(payment: any): void {
+    this.selectedPayment = payment;
 
-    this.selectedPayment =
-      payment;
+    this.showInvoice = true;
 
-    this.showInvoice =
-      true;
-
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
   }
-
 
   // ============================================================
   // CLOSE INVOICE
   // ============================================================
 
   closeInvoice(): void {
+    this.showInvoice = false;
 
-    this.showInvoice =
-      false;
+    this.selectedPayment = null;
 
-    this.selectedPayment =
-      null;
-
-    document.body.style.overflow =
-      "";
+    document.body.style.overflow = "";
   }
-
 
   // ============================================================
   // TRACK BY
   // ============================================================
 
-  trackByPayment(
-    index: number,
-    payment: any
-  ): any {
-
-    return (
-      payment?.id ||
-      index
-    );
+  trackByPayment(index: number, payment: any): any {
+    return payment?.id || index;
   }
 
+  // ============================================================
+  // DESTROY
+  // ============================================================
+
+  ngOnDestroy(): void {
+    this.searchSubject.complete();
+  }
 }

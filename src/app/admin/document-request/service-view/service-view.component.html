@@ -92,10 +92,10 @@
       <button
         type="button"
         class="tab-edit-btn"
-       *ngIf="
-  requestData?.documentRequest?.status !== 'COMPLETED' &&
-  requestData?.documentRequest?.status !== 'PAYMENT_DUE'
-"
+        *ngIf="
+          requestData?.documentRequest?.status !== 'COMPLETED' &&
+          requestData?.documentRequest?.status !== 'PAYMENT_DUE'
+        "
         (click)="editServiceRequest()"
       >
         <i class="bi bi-pencil-square"></i>
@@ -108,10 +108,10 @@
       <button
         type="button"
         class="tab-edit-btn complete-btn"
-       *ngIf="
-  requestData?.documentRequest?.status !== 'COMPLETED' &&
-  requestData?.documentRequest?.status !== 'PAYMENT_DUE'
-"
+        *ngIf="
+          requestData?.documentRequest?.status !== 'COMPLETED' &&
+          requestData?.documentRequest?.status !== 'PAYMENT_DUE'
+        "
         (click)="openCompleteModal()"
       >
         <i class="bi bi-check-circle"></i>
@@ -332,10 +332,10 @@
 
         <div
           class="payment-empty-state"
-*ngIf="
-  requestData?.documentRequest?.status !== 'PAYMENT_DUE' &&
-  requestData?.documentRequest?.status !== 'COMPLETED'
-"
+          *ngIf="
+            requestData?.documentRequest?.status !== 'PAYMENT_DUE' &&
+            requestData?.documentRequest?.status !== 'COMPLETED'
+          "
         >
           <div class="payment-empty-icon">
             <i class="bi bi-lock"></i>
@@ -355,11 +355,11 @@
 
         <div
           class="payment-empty-state"
-         *ngIf="
-  (requestData?.documentRequest?.status === 'PAYMENT_DUE' ||
-   requestData?.documentRequest?.status === 'COMPLETED') &&
-  !serviceRequestPayment
-"
+          *ngIf="
+            (requestData?.documentRequest?.status === 'PAYMENT_DUE' ||
+              requestData?.documentRequest?.status === 'COMPLETED') &&
+            !serviceRequestPayment
+          "
         >
           <div class="payment-empty-icon">
             <i class="bi bi-receipt"></i>
@@ -378,11 +378,13 @@
 
         <!-- ================= INVOICE ================= -->
 
-        <div class="invoice-wrapper"
+        <div
+          class="invoice-wrapper"
           *ngIf="
-    requestData?.documentRequest?.status === 'PAYMENT_DUE' ||
-    requestData?.documentRequest?.status === 'COMPLETED'
-  ">
+            requestData?.documentRequest?.status === 'PAYMENT_DUE' ||
+            requestData?.documentRequest?.status === 'COMPLETED'
+          "
+        >
           <div class="invoice-sheet" id="invoice-print-area">
             <!-- ================= COLOURED BAND ================= -->
 
@@ -590,55 +592,98 @@
 
                 <!-- TOTALS -->
 
-                <div class="inv-totals">
-                  <div class="inv-total-row">
-                    <span>Subtotal</span>
+               <div class="inv-totals">
 
-                    <strong>
-                      {{
-                        serviceRequestPayment.subtotal
-                          | currency: "INR" : "symbol" : "1.2-2"
-                      }}
-                    </strong>
-                  </div>
+  <!-- SERVICE COST -->
+  <div class="inv-total-row">
+    <span>Service Cost</span>
 
-                  <div class="inv-total-row">
-                    <span>
-                      CGST ({{ getTaxPercent(serviceRequestPayment, "cgst") }}%)
-                    </span>
+    <strong>
+      {{
+        serviceRequestPayment.serviceCost
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
 
-                    <strong>
-                      {{
-                        serviceRequestPayment.cgst
-                          | currency: "INR" : "symbol" : "1.2-2"
-                      }}
-                    </strong>
-                  </div>
 
-                  <div class="inv-total-row">
-                    <span>
-                      SGST ({{ getTaxPercent(serviceRequestPayment, "sgst") }}%)
-                    </span>
 
-                    <strong>
-                      {{
-                        serviceRequestPayment.sgst
-                          | currency: "INR" : "symbol" : "1.2-2"
-                      }}
-                    </strong>
-                  </div>
+  <!-- PLATFORM FEE -->
+  <div class="inv-total-row">
+    <span>Platform Fee</span>
 
-                  <div class="inv-grand-total">
-                    <span>Total Amount</span>
+    <strong>
+      {{
+        serviceRequestPayment.platformFeeAmount
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
+    <!-- DISCOUNT -->
+  <div class="inv-total-row">
+    <span>Discount</span>
 
-                    <strong>
-                      {{
-                        serviceRequestPayment.amount
-                          | currency: "INR" : "symbol" : "1.2-2"
-                      }}
-                    </strong>
-                  </div>
-                </div>
+    <strong class="discount-amount">
+      - {{
+        serviceRequestPayment.discountAmount
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
+
+  <!-- SUBTOTAL -->
+  <div class="inv-total-row">
+    <span>Subtotal</span>
+
+    <strong>
+      {{
+        serviceRequestPayment.subtotal
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
+
+  <!-- CGST -->
+  <div class="inv-total-row">
+    <span>
+      CGST ({{ getTaxPercent(serviceRequestPayment, "cgst") }}%)
+    </span>
+
+    <strong>
+      {{
+        serviceRequestPayment.cgst
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
+
+  <!-- SGST -->
+  <div class="inv-total-row">
+    <span>
+      SGST ({{ getTaxPercent(serviceRequestPayment, "sgst") }}%)
+    </span>
+
+    <strong>
+      {{
+        serviceRequestPayment.sgst
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="inv-grand-total">
+    <span>Total Amount</span>
+
+    <strong>
+      {{
+        serviceRequestPayment.amount
+          | currency: "INR" : "symbol" : "1.2-2"
+      }}
+    </strong>
+  </div>
+
+</div>
               </div>
 
               <!-- ================= FOOTER ================= -->
@@ -811,7 +856,7 @@
           <label class="complete-label">
             Final Documents
 
-  <span class="optional-label">(Optional)</span>
+            <span class="optional-label">(Optional)</span>
           </label>
 
           <p class="complete-help-text">
@@ -898,10 +943,7 @@
         <button
           type="button"
           class="complete-submit-btn"
-          [disabled]="
-            finalUploading ||
-            !completionRemark.trim()
-          "
+          [disabled]="finalUploading || !completionRemark.trim()"
           (click)="completeServiceRequest()"
         >
           <span class="status-spinner-small" *ngIf="finalUploading"> </span>

@@ -37,14 +37,17 @@
 .payment-summary-card {
   position: relative;
   min-height: 112px;
-  padding: 18px 18px;
+  padding: 18px;
   border: 1px solid #ececf2;
   border-radius: 10px;
   background: #ffffff;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   overflow: hidden;
+
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease,
@@ -102,9 +105,11 @@
   height: 40px;
   min-width: 40px;
   border-radius: 9px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   font-size: 17px;
   margin-left: 12px;
 }
@@ -139,7 +144,14 @@
   background: #ffffff;
   border: 1px solid #ececf2;
   border-radius: 10px;
-  overflow: hidden;
+
+  /*
+   * IMPORTANT:
+   * Must be visible so the filter popup is not clipped.
+   */
+  overflow: visible;
+
+  position: relative;
 }
 
 .data-table-scroll {
@@ -157,9 +169,11 @@
   padding: 13px 14px;
   background: #fafafd;
   border-bottom: 1px solid #ececf2;
+
   color: #6f7483;
   font-size: 10px;
   font-weight: 700;
+
   text-align: left;
   white-space: nowrap;
 }
@@ -167,6 +181,7 @@
 .data-table tbody td {
   padding: 13px 14px;
   border-bottom: 1px solid #f0f0f4;
+
   color: #555b6b;
   font-size: 11px;
   vertical-align: middle;
@@ -187,17 +202,25 @@
 
 
 /* ============================================================
-   TOOLBAR
+   PAYMENT HISTORY TOOLBAR
 ============================================================ */
 
 .page-top-toolbar {
+  position: relative;
+  z-index: 20;
+
   min-height: 60px;
   padding: 12px 14px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 15px;
+
   border-bottom: 1px solid #ececf2;
+
+  background: #ffffff;
 }
 
 .toolbar-left,
@@ -206,11 +229,20 @@
   align-items: center;
 }
 
+.toolbar-right {
+  position: relative;
+  z-index: 30;
+
+  gap: 10px;
+  margin-left: auto;
+}
+
 .entries-label {
   margin: 0;
   color: #777d8d;
   font-size: 11px;
   font-weight: 500;
+
   display: flex;
   align-items: center;
   gap: 5px;
@@ -225,13 +257,17 @@
   min-width: 52px;
   height: 30px;
   padding: 0 8px;
+
   border: 1px solid #dedfe7;
   border-radius: 5px;
+
   background: #ffffff;
   color: #4f5565;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 6px;
   font-size: 11px;
 }
@@ -243,52 +279,457 @@
 .entries-select-native {
   position: absolute;
   inset: 0;
+
   width: 100%;
   height: 100%;
+
   opacity: 0;
   cursor: pointer;
 }
 
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
 .search-input-wrap {
   position: relative;
-  width: 230px;
-}
 
-.search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9da2af;
+  width: 280px;
+  height: 40px;
+
   display: flex;
   align-items: center;
-  pointer-events: none;
 }
 
 .search-input {
   width: 100%;
-  height: 32px;
-  padding: 0 12px 0 32px;
-  border: 1px solid #dedfe7;
-  border-radius: 6px;
-  outline: none;
-  color: #3d4250;
-  font-size: 11px;
+  height: 40px;
+
+  padding: 0 14px 0 40px;
+
+  border: 1px solid #e1e5eb;
+  border-radius: 8px;
+
   background: #ffffff;
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 400;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .search-input::placeholder {
-  color: #a4a8b3;
+  color: #9ca3af;
+}
+
+.search-input:hover {
+  border-color: #cbd1da;
 }
 
 .search-input:focus {
-  border-color: #bdb8f5;
-  box-shadow: 0 0 0 3px rgba(91, 82, 232, 0.07);
+  border-color: #635bff;
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.08);
+}
+
+.search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+
+  color: #8b95a5;
+
+  pointer-events: none;
 }
 
 
 /* ============================================================
-   INVOICE CELL
+   FILTER WRAPPER
+============================================================ */
+.filter-wrapper {
+  position: relative;
+  z-index: 100;
+}
+
+
+
+/* ============================================================
+   FILTER BUTTON
+============================================================ */
+
+.filter-btn {
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+  padding: 0 14px;
+
+  border: 1px solid #dfe3ea;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.filter-btn svg {
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: #635bff;
+  background: #fafaff;
+  color: #635bff;
+}
+
+.filter-btn:hover svg {
+  color: #635bff;
+}
+
+.filter-btn:focus {
+  outline: none;
+  border-color: #635bff;
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.08);
+}
+
+
+/* ============================================================
+   ACTIVE FILTER COUNT
+============================================================ */
+
+.filter-count {
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 5px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #635bff;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+
+/* ============================================================
+   FILTER POPUP
+============================================================ */
+
+.filter-panel {
+  position: absolute !important;
+
+  top: calc(100% + 9px) !important;
+
+  /* IMPORTANT: open toward LEFT */
+  right: 0 !important;
+  left: auto !important;
+
+  width: 390px;
+  max-width: calc(100vw - 30px);
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow:
+    0 15px 35px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.05);
+
+  z-index: 99999 !important;
+
+  overflow: hidden;
+
+  transform-origin: top right;
+
+  animation: filterPanelIn 0.16s ease-out;
+}
+
+@keyframes filterPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* ============================================================
+   FILTER HEADER
+============================================================ */
+
+.filter-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 18px;
+
+  border-bottom: 1px solid #eef0f3;
+}
+
+.filter-panel-header strong {
+  display: block;
+
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.filter-panel-header small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.filter-reset {
+  border: none;
+  background: transparent;
+
+  padding: 4px 6px;
+
+  color: #635bff;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+  border-radius: 5px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.filter-reset:hover {
+  background: #f3f2ff;
+  color: #5148d9;
+}
+
+
+/* ============================================================
+   FILTER BODY
+============================================================ */
+
+.filter-panel-body {
+  padding: 18px;
+}
+
+.filter-field {
+  margin-bottom: 18px;
+}
+
+.filter-field:last-child {
+  margin-bottom: 0;
+}
+
+.filter-field label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #4b5563;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   FILTER CONTROL
+============================================================ */
+
+.filter-control {
+  width: 100%;
+  height: 40px;
+
+  padding: 0 12px;
+
+  border: 1px solid #dfe3ea;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.filter-control:hover {
+  border-color: #cbd1da;
+}
+
+.filter-control:focus {
+  border-color: #635bff;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 91, 255, 0.08);
+}
+
+
+/* ============================================================
+   DATE RANGE
+============================================================ */
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.date-input-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.date-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #9ca3af;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.date-separator {
+  margin-top: 18px;
+
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   FILTER FOOTER
+============================================================ */
+
+.filter-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  padding: 12px 18px;
+
+  border-top: 1px solid #eef0f3;
+
+  background: #fafbfc;
+}
+
+
+/* ============================================================
+   CANCEL BUTTON
+============================================================ */
+
+.filter-cancel-btn {
+  height: 36px;
+
+  padding: 0 15px;
+
+  border: 1px solid #dfe3ea;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #4b5563;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.filter-cancel-btn:hover {
+  background: #f8f9fb;
+  border-color: #cbd1da;
+}
+
+
+/* ============================================================
+   APPLY BUTTON
+============================================================ */
+
+.filter-apply-btn {
+  height: 36px;
+
+  padding: 0 17px;
+
+  border: 1px solid #635bff;
+  border-radius: 7px;
+
+  background: #635bff;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.filter-apply-btn:hover {
+  background: #554dd9;
+  border-color: #554dd9;
+
+  box-shadow:
+    0 4px 10px rgba(99, 91, 255, 0.18);
+}
+
+
+/* ============================================================
+   PAYMENT / SERVICE / STATUS
 ============================================================ */
 
 .invoice-cell {
@@ -308,11 +749,6 @@
   font-size: 9px;
 }
 
-
-/* ============================================================
-   CLIENT
-============================================================ */
-
 .client-cell {
   display: flex;
   flex-direction: column;
@@ -330,30 +766,32 @@
   font-size: 9px;
 }
 
-
-/* ============================================================
-   SERVICE
-============================================================ */
-
 .service-cell {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px;
+
   max-width: 230px;
 }
 
 .service-pill {
   display: inline-flex;
   align-items: center;
+
   max-width: 170px;
+
   padding: 5px 9px;
+
   border: 1px solid #ddd9ff;
   border-radius: 6px;
+
   background: #f7f6ff;
   color: #5b52c7;
+
   font-size: 9px;
   font-weight: 600;
+
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -362,18 +800,17 @@
 .more-services {
   display: inline-flex;
   align-items: center;
+
   padding: 4px 7px;
+
   border-radius: 5px;
+
   background: #f0f1f5;
   color: #737988;
+
   font-size: 9px;
   font-weight: 600;
 }
-
-
-/* ============================================================
-   PAYMENT
-============================================================ */
 
 .payment-amount {
   color: #202536;
@@ -403,11 +840,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   min-width: 48px;
+
   padding: 5px 9px;
+
   border-radius: 999px;
+
   font-size: 9px;
   font-weight: 600;
+
   text-transform: uppercase;
 }
 
@@ -445,10 +887,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 5px;
 
   min-width: 105px;
   height: 29px;
+
   padding: 0 9px;
 
   border: 1px solid #ddd9ff;
@@ -484,12 +928,14 @@
 .sk-line {
   height: 9px;
   border-radius: 4px;
+
   background: linear-gradient(
     90deg,
     #f0f1f5 25%,
     #e6e7ed 50%,
     #f0f1f5 75%
   );
+
   background-size: 200% 100%;
   animation: paymentSkeleton 1.4s infinite;
 }
@@ -515,8 +961,11 @@
 .sk-avatar {
   width: 30px;
   height: 30px;
+
   border-radius: 50%;
+
   background: #eef0f4;
+
   animation: paymentSkeleton 1.4s infinite;
 }
 
@@ -529,16 +978,22 @@
 .sk-status {
   width: 55px;
   height: 20px;
+
   border-radius: 999px;
+
   background: #eef0f4;
+
   animation: paymentSkeleton 1.4s infinite;
 }
 
 .sk-action {
   width: 80px;
   height: 28px;
+
   border-radius: 6px;
+
   background: #eef0f4;
+
   animation: paymentSkeleton 1.4s infinite;
 }
 
@@ -565,13 +1020,18 @@
 .empty-payment-icon {
   width: 44px;
   height: 44px;
+
   margin: 0 auto 10px;
+
   border-radius: 50%;
+
   background: #f3f2ff;
   color: #5b52e8;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   font-size: 18px;
 }
 
@@ -583,6 +1043,7 @@
 
 .empty-payment-text {
   margin-top: 4px;
+
   color: #969ba8;
   font-size: 10px;
 }
@@ -595,6 +1056,7 @@
 .invoice-modal-backdrop {
   position: fixed;
   inset: 0;
+
   z-index: 9999;
 
   display: flex;
@@ -609,7 +1071,6 @@
 
   overflow-y: auto;
 }
-
 
 .invoice-modal {
   width: min(1100px, 96vw);
@@ -628,11 +1089,6 @@
   overflow: hidden;
 }
 
-
-/* ============================================================
-   MODAL HEADER
-============================================================ */
-
 .invoice-modal-header {
   flex: 0 0 auto;
 
@@ -646,10 +1102,8 @@
   gap: 15px;
 
   background: #ffffff;
-
   border-bottom: 1px solid #e6e9ef;
 }
-
 
 .invoice-modal-header h3 {
   margin: 0 0 3px;
@@ -660,13 +1114,10 @@
   font-weight: 700;
 }
 
-
 .invoice-modal-header span {
   color: #9297a5;
-
   font-size: 10px;
 }
-
 
 .invoice-close-btn {
   width: 34px;
@@ -692,12 +1143,9 @@
     transform 0.18s ease;
 }
 
-
 .invoice-close-btn:hover {
   background: #e9eaf0;
-
   color: #303548;
-
   transform: translateY(-1px);
 }
 
@@ -712,14 +1160,12 @@
   min-height: 0;
 
   margin: 0;
-
   padding: 20px;
 
   overflow-y: auto;
 
   background: #f5f6f9;
 }
-
 
 .invoice-modal .invoice-sheet {
   width: 100%;
@@ -729,7 +1175,6 @@
   background: #ffffff;
 
   border: 1px solid #e3e6ed;
-
   border-radius: 14px;
 
   overflow: hidden;
@@ -744,7 +1189,6 @@
 
 .invoice-modal .inv-band {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -753,26 +1197,20 @@
   padding: 25px 30px;
 
   background: var(--accent, #5b52e8);
-
   color: #ffffff;
 }
 
-
 .invoice-modal .inv-band-brand {
   display: flex;
-
   align-items: center;
-
   gap: 12px;
 }
-
 
 .invoice-modal .inv-band-logo {
   width: 42px;
   height: 42px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -783,13 +1221,10 @@
   font-size: 19px;
 }
 
-
 .invoice-modal .inv-brand {
   font-size: 18px;
-
   font-weight: 700;
 }
-
 
 .invoice-modal .inv-brand-sub {
   display: block;
@@ -797,28 +1232,22 @@
   margin-top: 2px;
 
   font-size: 11px;
-
   opacity: 0.82;
 }
-
 
 .invoice-modal .inv-band-title {
   text-align: right;
 }
 
-
 .invoice-modal .inv-band-title span {
   display: block;
 
   font-size: 10px;
-
   font-weight: 600;
 
   letter-spacing: 0.08em;
-
   opacity: 0.8;
 }
-
 
 .invoice-modal .inv-band-title strong {
   display: block;
@@ -826,7 +1255,6 @@
   margin-top: 3px;
 
   font-size: 19px;
-
   font-weight: 700;
 }
 
@@ -837,34 +1265,23 @@
 
 .invoice-modal .inv-body {
   padding: 26px 30px 8px;
-
   background: #ffffff;
 }
 
-
-/* ============================================================
-   INFO CARDS
-============================================================ */
-
 .invoice-modal .inv-info-grid {
   display: grid;
-
   grid-template-columns: 1fr 1fr;
-
   gap: 14px;
 }
-
 
 .invoice-modal .inv-card {
   padding: 15px 17px;
 
   border: 1px solid #eceef3;
-
   border-radius: 10px;
 
   background: #fafbfc;
 }
-
 
 .invoice-modal .inv-label {
   display: block;
@@ -874,74 +1291,54 @@
   color: #8a90a0;
 
   font-size: 10px;
-
   font-weight: 700;
 
   letter-spacing: 0.05em;
-
   text-transform: uppercase;
 }
-
 
 .invoice-modal .inv-person {
   color: #252938;
 
   font-size: 14px;
-
   font-weight: 700;
 }
 
-
 .invoice-modal .inv-contact {
   display: flex;
-
   align-items: center;
 
   gap: 6px;
-
   margin-top: 5px;
 
   color: #6f7483;
-
   font-size: 11px;
 }
-
 
 .invoice-modal .inv-contact i {
   color: #9298a6;
 }
 
-
 .invoice-modal .inv-details-grid {
   display: grid;
-
   grid-template-columns: 1fr 1fr;
-
   gap: 12px;
 }
 
-
 .invoice-modal .inv-detail {
   display: flex;
-
   flex-direction: column;
-
   gap: 3px;
 }
 
-
 .invoice-modal .inv-detail span {
   color: #9298a6;
-
   font-size: 10px;
 }
 
-
 .invoice-modal .inv-detail strong {
   color: #303548;
-
   font-size: 12px;
-
   font-weight: 700;
 }
 
@@ -952,7 +1349,6 @@
 
 .invoice-modal .inv-pill {
   display: inline-flex;
-
   align-items: center;
 
   width: fit-content;
@@ -962,18 +1358,14 @@
   border-radius: 999px;
 
   background: #fff5e6;
-
   color: #c77b16 !important;
 
   font-size: 10px !important;
-
   font-weight: 700 !important;
 }
 
-
 .invoice-modal .inv-pill--paid {
   background: #eaf8f0;
-
   color: #168653 !important;
 }
 
@@ -990,19 +1382,15 @@
   overflow-x: auto;
 
   border: 1px solid #e6e9ef;
-
   border-radius: 10px;
 }
 
-
 .invoice-modal .inv-table {
   width: 100%;
-
   min-width: 500px;
 
   border-collapse: collapse;
 }
-
 
 .invoice-modal .inv-table thead th {
   padding: 11px 14px;
@@ -1014,16 +1402,13 @@
   color: #6f7483;
 
   font-size: 9px;
-
   font-weight: 700;
 
   text-align: left;
 
   text-transform: uppercase;
-
   white-space: nowrap;
 }
-
 
 .invoice-modal .inv-table tbody td {
   padding: 13px 14px;
@@ -1033,46 +1418,36 @@
   color: #555b6b;
 
   font-size: 11px;
-
   vertical-align: middle;
 }
-
 
 .invoice-modal .inv-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
-
 .invoice-modal .inv-table .col-no {
   width: 45px;
-
   text-align: center;
 }
-
 
 .invoice-modal .inv-table .col-num {
   width: 140px;
 
   text-align: right;
-
   white-space: nowrap;
 }
-
 
 .invoice-modal .inv-item-name {
   color: #303548;
 
   font-size: 11px;
-
   font-weight: 600;
 }
-
 
 .invoice-modal .inv-item-code {
   margin-top: 3px;
 
   color: #969cab;
-
   font-size: 9px;
 }
 
@@ -1093,10 +1468,8 @@
   margin-top: 20px;
 }
 
-
 .invoice-modal .inv-payment-info {
   display: flex;
-
   flex-direction: column;
 
   gap: 8px;
@@ -1104,121 +1477,93 @@
   padding: 14px 16px;
 
   border: 1px dashed #d5d9e2;
-
   border-radius: 10px;
 
   background: #ffffff;
 }
 
-
 .invoice-modal .inv-meta-row {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   gap: 15px;
 
   color: #7b8190;
-
   font-size: 11px;
 }
-
 
 .invoice-modal .inv-meta-row strong {
   color: #303548;
 
   font-size: 11px;
-
   font-weight: 600;
 
   text-align: right;
 }
 
-
 .invoice-modal .paid-text {
   color: #168653 !important;
 }
-
 
 .invoice-modal .transaction-id {
   max-width: 190px;
 
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
 
   font-family: monospace;
-
   font-size: 10px !important;
 }
 
-
 .invoice-modal .inv-totals {
   display: flex;
-
   flex-direction: column;
 }
 
-
 .invoice-modal .inv-total-row {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   padding: 7px 0;
 
   color: #737989;
-
   font-size: 11px;
 }
-
 
 .invoice-modal .inv-total-row strong {
   color: #303548;
 
   font-weight: 600;
-
   white-space: nowrap;
 }
 
-
 .invoice-modal .inv-grand-total {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   gap: 15px;
 
   margin-top: 6px;
-
   padding-top: 13px;
 
   border-top: 1px solid #e6e9ef;
 }
 
-
 .invoice-modal .inv-grand-total span {
   color: #252938;
 
   font-size: 13px;
-
   font-weight: 700;
 }
-
 
 .invoice-modal .inv-grand-total strong {
   color: var(--accent, #5b52e8);
 
   font-size: 20px;
-
   font-weight: 800;
 
   white-space: nowrap;
@@ -1231,9 +1576,7 @@
 
 .invoice-modal .inv-footer {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   gap: 15px;
@@ -1245,7 +1588,6 @@
   border-top: 1px solid #ececf2;
 
   color: #9298a6;
-
   font-size: 9px;
 }
 
@@ -1258,9 +1600,7 @@
   flex: 0 0 auto;
 
   display: flex;
-
   align-items: center;
-
   justify-content: flex-end;
 
   gap: 8px;
@@ -1272,14 +1612,11 @@
   border-top: 1px solid #e6e9ef;
 }
 
-
 .invoice-modal .invoice-action-button {
   height: 34px;
 
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
 
   gap: 6px;
@@ -1289,7 +1626,6 @@
   border-radius: 6px;
 
   font-size: 10px;
-
   font-weight: 600;
 
   cursor: pointer;
@@ -1297,154 +1633,49 @@
   transition: all 0.18s ease;
 }
 
-
 .invoice-modal .invoice-download-button {
   border: 1px solid #ddd9ff;
 
   background: #f8f7ff;
-
   color: #5b52e8;
 }
 
-
 .invoice-modal .invoice-download-button:hover {
   border-color: #c9c5ff;
-
   background: #eeecff;
 }
 
 
 /* ============================================================
-   RESPONSIVE
-============================================================ */
-
-@media (max-width: 900px) {
-
-  .invoice-modal {
-    width: 96vw;
-  }
-
-  .invoice-modal .inv-bottom {
-    grid-template-columns: 1fr;
-  }
-
-}
-
-
-@media (max-width: 768px) {
-
-  .invoice-modal-backdrop {
-    padding: 10px;
-  }
-
-
-  .invoice-modal {
-    width: 100%;
-
-    max-height: 96vh;
-
-    border-radius: 10px;
-  }
-
-
-  .invoice-modal .invoice-wrapper {
-    padding: 12px;
-  }
-
-
-  .invoice-modal .inv-band {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    padding: 20px;
-  }
-
-
-  .invoice-modal .inv-band-title {
-    width: 100%;
-
-    text-align: left;
-  }
-
-
-  .invoice-modal .inv-body {
-    padding: 20px 16px 8px;
-  }
-
-
-  .invoice-modal .inv-info-grid {
-    grid-template-columns: 1fr;
-  }
-
-
-  .invoice-modal .inv-footer {
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    padding: 14px 16px;
-  }
-
-
-  .invoice-modal .invoice-actions {
-    justify-content: stretch;
-  }
-
-
-  .invoice-modal .invoice-action-button {
-    flex: 1;
-  }
-
-}
-
-
-@media (max-width: 480px) {
-
-  .invoice-modal .inv-details-grid {
-    grid-template-columns: 1fr;
-  }
-
-
-  .invoice-modal .inv-table {
-    min-width: 500px;
-  }
-
-
-  .invoice-modal .inv-meta-row {
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 3px;
-  }
-
-
-  .invoice-modal .inv-meta-row strong {
-    text-align: left;
-  }
-
-
-  .invoice-modal .inv-grand-total strong {
-    font-size: 18px;
-  }
-
-}
-
-/* ============================================================
-   RESPONSIVE
+   RESPONSIVE - SUMMARY
 ============================================================ */
 
 @media (max-width: 1200px) {
-
   .payment-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .search-input-wrap {
+    width: 240px;
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE - TOOLBAR
+============================================================ */
+
+@media (max-width: 992px) {
+  .toolbar-right {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 12px;
+
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 768px) {
-
   .payment-summary-grid {
     grid-template-columns: 1fr;
   }
@@ -1459,12 +1690,605 @@
     width: 100%;
   }
 
+  .toolbar-right {
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
   .search-input-wrap {
-    width: 100%;
+    flex: 1;
+    width: auto;
+  }
+
+  .filter-panel {
+    right: 0;
+    width: 360px;
+    max-width: calc(100vw - 30px);
   }
 
   .invoice-modal-backdrop {
     padding: 10px;
   }
 
+  .invoice-modal {
+    width: 100%;
+    max-height: 96vh;
+    border-radius: 10px;
+  }
+
+  .invoice-modal .invoice-wrapper {
+    padding: 12px;
+  }
+
+  .invoice-modal .inv-band {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .invoice-modal .inv-band-title {
+    width: 100%;
+    text-align: left;
+  }
+
+  .invoice-modal .inv-body {
+    padding: 20px 16px 8px;
+  }
+
+  .invoice-modal .inv-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-modal .inv-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-modal .inv-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+
+  .invoice-modal .invoice-actions {
+    justify-content: stretch;
+  }
+
+  .invoice-modal .invoice-action-button {
+    flex: 1;
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE - MOBILE
+============================================================ */
+
+@media (max-width: 480px) {
+  .toolbar-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input-wrap {
+    width: 100%;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+
+  .filter-panel {
+    position: fixed;
+
+    top: 80px;
+    left: 15px;
+    right: 15px;
+
+    width: auto;
+    max-width: none;
+  }
+
+  .date-range {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .date-separator {
+    display: none;
+  }
+
+  .invoice-modal .inv-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-modal .inv-table {
+    min-width: 500px;
+  }
+
+  .invoice-modal .inv-meta-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .invoice-modal .inv-meta-row strong {
+    text-align: left;
+  }
+
+  .invoice-modal .inv-grand-total strong {
+    font-size: 18px;
+  }
+}
+/* ============================================================
+   INLINE FILTER PANEL
+============================================================ */
+
+.inline-filter-panel {
+  width: 100%;
+  padding: 14px 16px;
+
+  background: #fafbfc;
+  border-bottom: 1px solid #e7e9ee;
+
+  animation: inlineFilterOpen 0.18s ease-out;
+}
+
+@keyframes inlineFilterOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ============================================================
+   FILTER CONTENT
+============================================================ */
+
+.inline-filter-content {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-end;
+
+  gap: 14px;
+}
+
+
+/* ============================================================
+   FILTER FIELD
+============================================================ */
+
+.inline-filter-field {
+  min-width: 170px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.inline-filter-field label {
+  color: #6f7483;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   FILTER INPUT / SELECT
+============================================================ */
+
+.inline-filter-control {
+  width: 100%;
+  height: 36px;
+
+  padding: 0 10px;
+
+  border: 1px solid #dfe3ea;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 12px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.inline-filter-control:hover {
+  border-color: #cbd1da;
+}
+
+.inline-filter-control:focus {
+  border-color: #635bff;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 91, 255, 0.07);
+}
+
+
+/* ============================================================
+   FILTER ACTIONS
+============================================================ */
+
+.inline-filter-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-left: auto;
+}
+
+
+/* ============================================================
+   CLEAR BUTTON
+============================================================ */
+
+.inline-clear-btn {
+  height: 36px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dfe3ea;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #606775;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.15s ease;
+}
+
+.inline-clear-btn:hover {
+  background: #f5f6f8;
+  border-color: #cbd1da;
+}
+
+
+/* ============================================================
+   APPLY BUTTON
+============================================================ */
+
+.inline-apply-btn {
+  height: 36px;
+
+  padding: 0 15px;
+
+  border: 1px solid #635bff;
+  border-radius: 6px;
+
+  background: #635bff;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.15s ease;
+}
+
+.inline-apply-btn:hover {
+  background: #554dd9;
+  border-color: #554dd9;
+
+  box-shadow:
+    0 3px 8px rgba(99, 91, 255, 0.16);
+}
+
+
+/* ============================================================
+   FILTER BUTTON
+============================================================ */
+
+.filter-btn {
+  height: 40px;
+
+  padding: 0 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: 1px solid #dfe3ea;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.filter-btn:hover {
+  border-color: #635bff;
+  color: #635bff;
+  background: #fafaff;
+}
+
+.filter-btn:focus {
+  outline: none;
+
+  border-color: #635bff;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 91, 255, 0.08);
+}
+
+.filter-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+
+/* ============================================================
+   ACTIVE FILTER COUNT
+============================================================ */
+
+.filter-count {
+  min-width: 19px;
+  height: 19px;
+
+  padding: 0 5px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #635bff;
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  line-height: 1;
+}
+
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+
+.page-top-toolbar {
+  position: relative;
+  z-index: 20;
+
+  min-height: 60px;
+
+  padding: 12px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #ececf2;
+}
+
+
+/* ============================================================
+   TOOLBAR RIGHT
+============================================================ */
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-left: auto;
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.search-input-wrap {
+  position: relative;
+
+  width: 270px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  height: 40px;
+
+  padding: 0 14px 0 40px;
+
+  border: 1px solid #e1e5eb;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-input:hover {
+  border-color: #cbd1da;
+}
+
+.search-input:focus {
+  border-color: #635bff;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 91, 255, 0.08);
+}
+
+.search-icon {
+  position: absolute;
+
+  left: 13px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+
+  color: #8b95a5;
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.data-table-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #ececf2;
+  border-radius: 10px;
+
+  overflow: visible;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .inline-filter-content {
+    flex-wrap: wrap;
+  }
+
+  .inline-filter-field {
+    flex: 1 1 180px;
+  }
+
+  .inline-filter-actions {
+    margin-left: 0;
+  }
+}
+
+
+@media (max-width: 768px) {
+
+  .page-top-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-right {
+    width: 100%;
+  }
+
+  .search-input-wrap {
+    flex: 1;
+    width: auto;
+  }
+
+  .inline-filter-content {
+    flex-wrap: wrap;
+  }
+
+  .inline-filter-field {
+    flex: 1 1 calc(50% - 7px);
+    min-width: 0;
+  }
+
+  .inline-filter-actions {
+    width: 100%;
+    margin-left: 0;
+
+    justify-content: flex-end;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .toolbar-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input-wrap {
+    width: 100%;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+
+  .inline-filter-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-filter-field {
+    width: 100%;
+  }
+
+  .inline-filter-actions {
+    width: 100%;
+  }
+
+  .inline-clear-btn,
+  .inline-apply-btn {
+    flex: 1;
+  }
+}
+.invoice-link {
+  color: #635bff;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.invoice-link:hover {
+  color: #4f46e5;
+  text-decoration: underline;
 }

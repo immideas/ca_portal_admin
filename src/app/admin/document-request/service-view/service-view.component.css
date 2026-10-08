@@ -3317,3 +3317,6 @@ color: var(--primary-color, #4f46e5);
     border-radius: 0 !important;
   }
 }
+.inv-totals .discount-amount {
+  color: #dc3545 !important;
+}

@@ -100,76 +100,221 @@
       <div class="data-table-wrapper">
         <!-- TOOLBAR -->
 
-        <div class="page-top-toolbar">
-          <div class="toolbar-left">
-            <label class="entries-label">
-              Show
+    <div class="page-top-toolbar">
 
-              <span class="entries-select-wrap">
-                <div class="entries-select-box">
-                  <span class="entries-number">
-                    {{ pageSize }}
-                  </span>
+  <div class="toolbar-left">
+    <label class="entries-label">
+      Show
 
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path
-                      d="M3 4.5L6 7.5L9 4.5"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </div>
+      <span class="entries-select-wrap">
+        <div class="entries-select-box">
+          <span class="entries-number">
+            {{ pageSize }}
+          </span>
 
-                <select
-                  class="entries-select-native"
-                  [value]="pageSize"
-                  (change)="onPageSizeChange($event)"
-                >
-                  <option *ngFor="let size of [10, 25, 50, 100]" [value]="size">
-                    {{ size }}
-                  </option>
-                </select>
-              </span>
-
-              entries
-            </label>
-          </div>
-
-          <!-- SEARCH -->
-
-          <div class="toolbar-right">
-            <div class="search-input-wrap">
-              <span class="search-icon">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="7"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  />
-
-                  <path
-                    d="M16.5 16.5L21 21"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </span>
-
-              <input
-                class="search-input"
-                type="text"
-                placeholder="Search..."
-                [(ngModel)]="search"
-                (input)="onSearchChange()"
-              />
-            </div>
-          </div>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+          >
+            <path
+              d="M3 4.5L6 7.5L9 4.5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </div>
+
+        <select
+          class="entries-select-native"
+          [value]="pageSize"
+          (change)="onPageSizeChange($event)"
+        >
+          <option
+            *ngFor="let size of [10, 25, 50, 100]"
+            [value]="size"
+          >
+            {{ size }}
+          </option>
+        </select>
+      </span>
+
+      entries
+    </label>
+  </div>
+
+
+  <!-- SEARCH + FILTER BUTTON -->
+  <div class="toolbar-right">
+
+    <!-- SEARCH -->
+    <div class="search-input-wrap">
+
+      <span class="search-icon">
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <circle
+            cx="11"
+            cy="11"
+            r="7"
+            stroke="currentColor"
+            stroke-width="2"
+          />
+
+          <path
+            d="M16.5 16.5L21 21"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </span>
+
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search invoice, client, request..."
+        [(ngModel)]="search"
+        (input)="onSearchChange()"
+      />
+
+    </div>
+
+
+    <!-- FILTER BUTTON -->
+    <button
+      type="button"
+      class="filter-btn"
+      (click)="toggleFilters($event)"
+    >
+
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="4" y1="6" x2="20" y2="6"></line>
+        <line x1="7" y1="12" x2="17" y2="12"></line>
+        <line x1="10" y1="18" x2="14" y2="18"></line>
+      </svg>
+
+      <span>
+        {{ showFilters ? 'Hide Filters' : 'Filters' }}
+      </span>
+
+      <span
+        class="filter-count"
+        *ngIf="getActiveFilterCount() > 0"
+      >
+        {{ getActiveFilterCount() }}
+      </span>
+
+    </button>
+
+  </div>
+
+</div>
+<!-- =====================================================
+     INLINE FILTERS
+====================================================== -->
+
+<div
+  class="inline-filter-panel"
+  *ngIf="showFilters"
+>
+
+  <div class="inline-filter-content">
+
+    <!-- STATUS -->
+    <div class="inline-filter-field">
+
+      <label>
+        Payment Status
+      </label>
+
+      <select
+        class="inline-filter-control"
+        [(ngModel)]="statusFilter"
+      >
+        <option value="">All Status</option>
+        <option value="paid">Paid</option>
+        <option value="pending">Pending</option>
+        <option value="payment_due">Payment Due</option>
+        <option value="failed">Failed</option>
+        <option value="refunded">Refunded</option>
+      </select>
+
+    </div>
+
+
+    <!-- FROM DATE -->
+    <div class="inline-filter-field">
+
+      <label>
+        From Date
+      </label>
+
+      <input
+        type="date"
+        class="inline-filter-control"
+        [(ngModel)]="paymentDateFrom"
+      />
+
+    </div>
+
+
+    <!-- TO DATE -->
+    <div class="inline-filter-field">
+
+      <label>
+        To Date
+      </label>
+
+      <input
+        type="date"
+        class="inline-filter-control"
+        [(ngModel)]="paymentDateTo"
+      />
+
+    </div>
+
+
+    <!-- ACTIONS -->
+    <div class="inline-filter-actions">
+
+      <button
+        type="button"
+        class="inline-clear-btn"
+        (click)="resetFilters()"
+      >
+        Clear
+      </button>
+
+      <button
+        type="button"
+        class="inline-apply-btn"
+        (click)="applyFilters()"
+      >
+        Apply Filters
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
         <!-- TABLE -->
 
@@ -279,9 +424,20 @@
 
                   <td>
                     <div class="invoice-cell">
-                      <span class="invoice-number">
-                        {{ payment.invoiceNumber || "—" }}
-                      </span>
+                    <span
+  class="invoice-number invoice-link"
+  *ngIf="payment.invoiceNumber"
+  (click)="openInvoicePayment(payment)"
+>
+  {{ payment.invoiceNumber }}
+</span>
+
+<span
+  class="invoice-number"
+  *ngIf="!payment.invoiceNumber"
+>
+  —
+</span>
 
                       <span class="request-code">
                         {{ payment.requestCode || "—" }}
@@ -342,7 +498,7 @@
 
                   <td>
                     <span class="payment-date">
-                      {{ formatDate(payment.paidAt) }}
+                      {{ formatDate(payment.paidAt || payment.createdAt) }}
                     </span>
                   </td>
 
@@ -366,7 +522,7 @@
                   </td>
 
                   <!-- ACTION -->
-<!-- 
+                  <!-- 
                   <td class="col-action">
                     <button
                       type="button"
@@ -591,13 +747,14 @@
                     </div>
                   </td>
 
-              <td class="col-num">
-  {{
-    service?.amount != null
-      ? (service.amount | currency: "INR" : "symbol" : "1.2-2")
-      : "—"
-  }}
-</td>
+                  <td class="col-num">
+                    {{
+                      service?.amount != null
+                        ? (service.amount
+                          | currency: "INR" : "symbol" : "1.2-2")
+                        : "—"
+                    }}
+                  </td>
                 </tr>
 
                 <!-- FALLBACK WHEN SERVICE IS NOT AVAILABLE -->

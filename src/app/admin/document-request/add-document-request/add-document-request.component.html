@@ -578,10 +578,211 @@
               />
             </div>
           </div>
+          
         </div>
       </div>
     </article>
+    
+<!-- ===================================================== -->
+<!-- PRICING & DISCOUNT -->
+<!-- ===================================================== -->
 
+<article class="card complaint-card mb-4 pricing-card">
+
+  <!-- HEADER -->
+  <div class="section-title">
+    <div class="item-icon">
+      <i class="bi bi-percent"></i>
+    </div>
+
+    <div class="header-content">
+      <span class="header-text">
+        Pricing & Discount
+      </span>
+
+      <span class="header-subtext">
+        Review service cost and apply a discount to this request.
+      </span>
+    </div>
+  </div>
+
+  <div class="form-padding-wrap">
+
+    <!-- SERVICE COST -->
+    <div class="pricing-summary-row service-cost-row">
+
+      <div class="pricing-label">
+        <span>Service Cost</span>
+
+        <small>
+          Total cost of selected services
+        </small>
+      </div>
+
+      <strong class="pricing-value">
+        {{
+          getServiceCost()
+            | currency: "INR" : "symbol" : "1.2-2"
+        }}
+      </strong>
+
+    </div>
+
+
+    <!-- DISCOUNT INPUT -->
+    <div class="row mt-3">
+
+      <!-- DISCOUNT TYPE -->
+      <div class="col-md-6 form-group">
+
+        <label for="discountType">
+          Discount Type
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url('assets/img/category-sub.svg')"
+        >
+
+          <select
+            id="discountType"
+            formControlName="discountType"
+            class="form-controler"
+            [disabled]="isViewMode"
+          >
+
+            <option [ngValue]="'FIXED'">
+              Fixed Amount
+            </option>
+
+            <option [ngValue]="'PERCENTAGE'">
+              Percentage
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- DISCOUNT VALUE -->
+      <div class="col-md-6 form-group">
+
+        <label for="discountValue">
+          Discount
+        </label>
+
+        <div
+          class="field-wrap"
+          style="--field-icon: url('assets/img/category-sub.svg')"
+        >
+
+          <input
+            type="number"
+            id="discountValue"
+            formControlName="discountValue"
+            class="form-controler"
+            min="0"
+
+            [max]="
+              documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
+                ? 100
+                : getServiceCost()
+            "
+
+            [placeholder]="
+              documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
+                ? 'Enter percentage'
+                : 'Enter discount amount'
+            "
+
+            autocomplete="off"
+            [disabled]="isViewMode"
+          />
+
+        </div>
+
+        <!-- PERCENTAGE HELP -->
+        <div
+          class="text-muted mt-1"
+          style="font-size: 11px"
+          *ngIf="
+            documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
+          "
+        >
+          Enter percentage between 0% and 100%.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- CALCULATED DISCOUNT -->
+    <div class="pricing-summary-row discount-row">
+
+      <div class="pricing-label">
+
+        <span>
+          Discount
+
+          <ng-container
+            *ngIf="
+              documentRequestForm.get('discountType')?.value ===
+              'PERCENTAGE'
+            "
+          >
+            ({{ documentRequestForm.get('discountValue')?.value || 0 }}%)
+          </ng-container>
+        </span>
+
+        <small>
+          Discount applied to service cost
+        </small>
+
+      </div>
+
+      <strong class="pricing-value discount-value">
+
+        -
+        {{
+          getDiscountAmount()
+            | currency: "INR" : "symbol" : "1.2-2"
+        }}
+
+      </strong>
+
+    </div>
+
+
+    <!-- AMOUNT AFTER DISCOUNT -->
+    <div class="pricing-total-row">
+
+      <div>
+
+        <span>
+          Amount After Discount
+        </span>
+
+        <small>
+          Before platform fee and taxes
+        </small>
+
+      </div>
+
+      <strong>
+        {{
+          getTotalAfterDiscount()
+            | currency: "INR" : "symbol" : "1.2-2"
+        }}
+      </strong>
+
+    </div>
+
+  </div>
+
+</article>
     <!-- ===================================================== -->
     <!-- SELECTED SERVICES SUMMARY -->
     <!-- ===================================================== -->

@@ -127,10 +127,10 @@ generateInvoice(
       }
     );
   }
-  getAllServiceRequestPayments(): Observable<any> {
+getAllServiceRequestPayments(payload: any = {}): Observable<any> {
   return this.http.post(
     `${this.base}/payments`,
-    {},
+    payload,
     {
       headers: this.getHeaders()
     }

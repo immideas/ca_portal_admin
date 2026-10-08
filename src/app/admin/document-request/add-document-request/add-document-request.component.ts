@@ -221,8 +221,18 @@ export class AddDocumentRequestComponent implements OnInit {
       period: ["", [Validators.maxLength(100)]],
 
       dueDate: [null],
+      discountType: ["FIXED"],
+
+discountValue: [
+  0,
+  [
+    Validators.min(0),
+  ],
+],
     });
+    
   }
+
 
   // =====================================================
   // INIT
@@ -364,6 +374,8 @@ export class AddDocumentRequestComponent implements OnInit {
           period: request.period ?? "",
 
           dueDate: request.dueDate ?? null,
+            discountType: request.discountType ?? "FIXED",
+  discountValue: request.discountValue ?? 0,
         });
 
         // =================================================
@@ -1627,6 +1639,18 @@ export class AddDocumentRequestComponent implements OnInit {
       period: formValue.period?.trim() || null,
 
       dueDate: formValue.dueDate || null,
+      discountType:
+  formValue.discountType === "FIXED" ||
+  formValue.discountType === "PERCENTAGE"
+    ? formValue.discountType
+    : null,
+
+discountValue:
+  formValue.discountValue !== null &&
+  formValue.discountValue !== undefined &&
+  formValue.discountValue !== ""
+    ? Number(formValue.discountValue)
+    : 0,
 
       /*
        * All selected documents.
@@ -1754,6 +1778,82 @@ export class AddDocumentRequestComponent implements OnInit {
       },
     });
   }
+  // =====================================================
+// REQUEST PRICING
+// =====================================================
+
+// =====================================================
+// REQUEST PRICING
+// =====================================================
+
+getServiceCost(): number {
+  if (!Array.isArray(this.selectedServices)) {
+    return 0;
+  }
+
+  return this.selectedServices.reduce((total: number, service: any) => {
+    const price = Number(
+      service.billingAmount ??
+      service.billing_amount ??
+      service.service?.billingAmount ??
+      service.service?.billing_amount ??
+      service.servicePrice ??
+      service.service_price ??
+      service.service?.servicePrice ??
+      service.service?.service_price ??
+      service.price ??
+      service.amount ??
+      0
+    );
+
+    return total + (Number.isFinite(price) ? price : 0);
+  }, 0);
+}
+
+
+// =====================================================
+// DISCOUNT AMOUNT
+// =====================================================
+
+getDiscountAmount(): number {
+  const serviceCost = this.getServiceCost();
+
+  const discountType =
+    this.documentRequestForm.get("discountType")?.value;
+
+  const discountValue = Number(
+    this.documentRequestForm.get("discountValue")?.value || 0
+  );
+
+  if (serviceCost <= 0 || discountValue <= 0) {
+    return 0;
+  }
+
+  let discountAmount = 0;
+
+  if (discountType === "FIXED") {
+    discountAmount = discountValue;
+  }
+
+  if (discountType === "PERCENTAGE") {
+    discountAmount = (serviceCost * discountValue) / 100;
+  }
+
+  // Discount cannot be greater than service cost
+  return Math.min(discountAmount, serviceCost);
+}
+
+
+// =====================================================
+// TOTAL AFTER DISCOUNT
+// =====================================================
+
+getTotalAfterDiscount(): number {
+  const serviceCost = this.getServiceCost();
+  const discountAmount = this.getDiscountAmount();
+
+  return Math.max(serviceCost - discountAmount, 0);
+}
 
   // =====================================================
   // CANCEL

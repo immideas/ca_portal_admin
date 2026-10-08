@@ -103,6 +103,14 @@ export class AddAdminComponent implements OnInit, OnDestroy {
       Validators.required,
     ],
   ],
+  platformFeeType: ['FIXED', Validators.required],
+platformFeeValue: [
+  0,
+  [
+    Validators.required,
+    Validators.min(0),
+  ],
+],
       role: ['', Validators.required],
       // password: [''],
       plan: [null, Validators.required],
@@ -245,6 +253,8 @@ export class AddAdminComponent implements OnInit, OnDestroy {
             phone: admin.phone,
            firmName: admin.firmName || '',
            firmType: admin.firmType || '',
+           platformFeeType: admin.platformFeeType || 'FIXED',
+  platformFeeValue: admin.platformFeeValue ?? 0,
             role: admin.role || this.adminForm.get('role')?.value,
             plan: admin.assigned_plan_id,
             allow_trial: admin.allow_trial,
@@ -320,8 +330,11 @@ export class AddAdminComponent implements OnInit, OnDestroy {
         name: formValue.name,
         email: formValue.email,
         phone: formValue.phone,
+
           firmName: formValue.firmName?.trim() || null,
   firmType: formValue.firmType?.trim() || null,
+  platformFeeType: formValue.platformFeeType,
+platformFeeValue: Number(formValue.platformFeeValue),
         role: formValue.role,
         // backend stores the user's plan in `assigned_plan_id`.
         // Keep `plan` as well for backwards compatibility.
@@ -341,6 +354,9 @@ export class AddAdminComponent implements OnInit, OnDestroy {
           
 
           console.debug('saveAdmin payload (update):', payload);
+          console.log('FORM PLATFORM FEE TYPE:', formValue.platformFeeType);
+console.log('FORM PLATFORM FEE VALUE:', formValue.platformFeeValue);
+console.log('FINAL UPDATE PAYLOAD:', payload);
           await firstValueFrom(this.http.post(`${environment.apiUrl}/users/updateUser`, payload, { headers }));
           await this.flushPendingDeletes();
           this.ngxLoader.stop();
@@ -443,6 +459,27 @@ export class AddAdminComponent implements OnInit, OnDestroy {
       return url.split('?')[0];
     }
   }
+  private updatePlatformFeeValidation(): void {
+  const typeControl = this.adminForm.get('platformFeeType');
+  const valueControl = this.adminForm.get('platformFeeValue');
+
+  if (!typeControl || !valueControl) return;
+
+  if (typeControl.value === 'PERCENTAGE') {
+    valueControl.setValidators([
+      Validators.required,
+      Validators.min(0),
+      Validators.max(100),
+    ]);
+  } else {
+    valueControl.setValidators([
+      Validators.required,
+      Validators.min(0),
+    ]);
+  }
+
+  valueControl.updateValueAndValidity();
+}
 
   async onImageUpload(image: any): Promise<void> {
     if (this.isViewMode || !image?.file) return;
