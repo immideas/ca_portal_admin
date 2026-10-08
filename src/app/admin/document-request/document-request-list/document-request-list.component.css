@@ -83,3 +83,8 @@
   color: #b91c1c;
   background: #fee2e2;
 }
+.status-payment-due {
+  background: #fff4d6;
+  color: #a96800;
+  border: 1px solid #f0d28a;
+}

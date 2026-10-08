@@ -92,7 +92,10 @@
       <button
         type="button"
         class="tab-edit-btn"
-        *ngIf="requestData?.documentRequest?.status !== 'COMPLETED'"
+       *ngIf="
+  requestData?.documentRequest?.status !== 'COMPLETED' &&
+  requestData?.documentRequest?.status !== 'PAYMENT_DUE'
+"
         (click)="editServiceRequest()"
       >
         <i class="bi bi-pencil-square"></i>
@@ -105,7 +108,10 @@
       <button
         type="button"
         class="tab-edit-btn complete-btn"
-        *ngIf="requestData?.documentRequest?.status !== 'COMPLETED'"
+       *ngIf="
+  requestData?.documentRequest?.status !== 'COMPLETED' &&
+  requestData?.documentRequest?.status !== 'PAYMENT_DUE'
+"
         (click)="openCompleteModal()"
       >
         <i class="bi bi-check-circle"></i>
@@ -326,7 +332,10 @@
 
         <div
           class="payment-empty-state"
-          *ngIf="requestData?.documentRequest?.status !== 'COMPLETED'"
+*ngIf="
+  requestData?.documentRequest?.status !== 'PAYMENT_DUE' &&
+  requestData?.documentRequest?.status !== 'COMPLETED'
+"
         >
           <div class="payment-empty-icon">
             <i class="bi bi-lock"></i>
@@ -346,10 +355,11 @@
 
         <div
           class="payment-empty-state"
-          *ngIf="
-            requestData?.documentRequest?.status === 'COMPLETED' &&
-            !serviceRequestPayment
-          "
+         *ngIf="
+  (requestData?.documentRequest?.status === 'PAYMENT_DUE' ||
+   requestData?.documentRequest?.status === 'COMPLETED') &&
+  !serviceRequestPayment
+"
         >
           <div class="payment-empty-icon">
             <i class="bi bi-receipt"></i>
@@ -368,7 +378,11 @@
 
         <!-- ================= INVOICE ================= -->
 
-        <div class="invoice-wrapper">
+        <div class="invoice-wrapper"
+          *ngIf="
+    requestData?.documentRequest?.status === 'PAYMENT_DUE' ||
+    requestData?.documentRequest?.status === 'COMPLETED'
+  ">
           <div class="invoice-sheet" id="invoice-print-area">
             <!-- ================= COLOURED BAND ================= -->
 
@@ -797,7 +811,7 @@
           <label class="complete-label">
             Final Documents
 
-            <span class="required-star"> * </span>
+  <span class="optional-label">(Optional)</span>
           </label>
 
           <p class="complete-help-text">
@@ -886,7 +900,6 @@
           class="complete-submit-btn"
           [disabled]="
             finalUploading ||
-            finalDocuments.length === 0 ||
             !completionRemark.trim()
           "
           (click)="completeServiceRequest()"

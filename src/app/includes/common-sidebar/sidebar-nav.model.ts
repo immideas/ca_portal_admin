@@ -443,6 +443,28 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
     ],
   },
 
+// ================= PAYMENT HISTORY =================
+
+{
+  items: [
+    {
+      id: "payment-history",
+      label: "Payment History",
+      icon: "bi-credit-card",
+      children: [
+        {
+          label: "Payment History",
+          icon: "",
+          route: "/payments",
+          permission: "manage_payments",
+          activeRoutes: [
+            "/payments",
+          ],
+        },
+      ],
+    },
+  ],
+},
   {
     items: [
       {

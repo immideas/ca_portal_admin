@@ -1,0 +1,769 @@
+<main id="main" class="main">
+  <section class="section">
+    <div class="container-fluid py-4">
+      <!-- =====================================================
+           PAGE HEADER
+      ====================================================== -->
+
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1>Payments</h1>
+
+          <p>View all payments received from your clients</p>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           PAYMENT SUMMARY CARDS
+      ====================================================== -->
+
+      <div class="payment-summary-grid">
+        <!-- TOTAL RECEIVED -->
+
+        <div class="payment-summary-card">
+          <div class="summary-card-content">
+            <div class="summary-card-label">Total Received</div>
+
+            <div class="summary-card-value received">
+              {{ formatAmount(totalReceived) }}
+            </div>
+
+            <div class="summary-card-description">All successful payments</div>
+          </div>
+
+          <div class="summary-card-icon received-icon">
+            <i class="bi bi-wallet2"></i>
+          </div>
+        </div>
+
+        <!-- THIS MONTH -->
+
+        <div class="payment-summary-card">
+          <div class="summary-card-content">
+            <div class="summary-card-label">This Month</div>
+
+            <div class="summary-card-value month">
+              {{ formatAmount(thisMonthReceived) }}
+            </div>
+
+            <div class="summary-card-description">
+              Payments received this month
+            </div>
+          </div>
+
+          <div class="summary-card-icon month-icon">
+            <i class="bi bi-calendar3"></i>
+          </div>
+        </div>
+
+        <!-- TRANSACTIONS -->
+
+        <div class="payment-summary-card">
+          <div class="summary-card-content">
+            <div class="summary-card-label">Transactions</div>
+
+            <div class="summary-card-value transactions">
+              {{ transactionCount }}
+            </div>
+
+            <div class="summary-card-description">Successful payments</div>
+          </div>
+
+          <div class="summary-card-icon transaction-icon">
+            <i class="bi bi-receipt"></i>
+          </div>
+        </div>
+
+        <!-- PAYMENT DUE -->
+
+        <div class="payment-summary-card">
+          <div class="summary-card-content">
+            <div class="summary-card-label">Payment Due</div>
+
+            <div class="summary-card-value due">
+              {{ formatAmount(paymentDue) }}
+            </div>
+
+            <div class="summary-card-description">Pending payment amount</div>
+          </div>
+
+          <div class="summary-card-icon due-icon">
+            <i class="bi bi-clock-history"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================
+           PAYMENT TABLE
+      ====================================================== -->
+
+      <div class="data-table-wrapper">
+        <!-- TOOLBAR -->
+
+        <div class="page-top-toolbar">
+          <div class="toolbar-left">
+            <label class="entries-label">
+              Show
+
+              <span class="entries-select-wrap">
+                <div class="entries-select-box">
+                  <span class="entries-number">
+                    {{ pageSize }}
+                  </span>
+
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path
+                      d="M3 4.5L6 7.5L9 4.5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <select
+                  class="entries-select-native"
+                  [value]="pageSize"
+                  (change)="onPageSizeChange($event)"
+                >
+                  <option *ngFor="let size of [10, 25, 50, 100]" [value]="size">
+                    {{ size }}
+                  </option>
+                </select>
+              </span>
+
+              entries
+            </label>
+          </div>
+
+          <!-- SEARCH -->
+
+          <div class="toolbar-right">
+            <div class="search-input-wrap">
+              <span class="search-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="7"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+
+                  <path
+                    d="M16.5 16.5L21 21"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+
+              <input
+                class="search-input"
+                type="text"
+                placeholder="Search..."
+                [(ngModel)]="search"
+                (input)="onSearchChange()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+
+        <div class="data-table-scroll">
+          <table id="paymentsHistoryTable" class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+
+                <th>Client</th>
+
+                <th>Service</th>
+
+                <th>Amount</th>
+
+                <th>Payment Date</th>
+
+                <th>Payment Method</th>
+
+                <th>Status</th>
+
+                <!-- <th class="col-action">Action</th> -->
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- =================================================
+                   LOADING
+              ================================================== -->
+
+              <ng-container *ngIf="loading">
+                <tr *ngFor="let row of [1, 2, 3, 4, 5]" class="sk-list-row">
+                  <td>
+                    <div class="sk-line sk-line-sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk-client">
+                      <div class="sk-avatar"></div>
+
+                      <div class="sk-client-lines">
+                        <div class="sk-line sk-line-md"></div>
+
+                        <div class="sk-line sk-line-xs"></div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="sk-line sk-line-md"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk-line sk-line-sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk-line sk-line-sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk-line sk-line-sm"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk-status"></div>
+                  </td>
+
+                  <td>
+                    <div class="sk-action"></div>
+                  </td>
+                </tr>
+              </ng-container>
+
+              <!-- =================================================
+                   NO DATA
+              ================================================== -->
+
+              <tr *ngIf="!loading && filteredPayments.length === 0">
+                <td colspan="8" class="text-center py-5">
+                  <div class="empty-payment-state">
+                    <div class="empty-payment-icon">
+                      <i class="bi bi-wallet2"></i>
+                    </div>
+
+                    <div class="empty-payment-title">No payments found</div>
+
+                    <div class="empty-payment-text">
+                      No payment transactions match your search.
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- =================================================
+                   PAYMENT ROWS
+              ================================================== -->
+
+              <ng-container *ngIf="!loading">
+                <tr
+                  *ngFor="
+                    let payment of filteredPayments;
+                    trackBy: trackByPayment
+                  "
+                >
+                  <!-- INVOICE -->
+
+                  <td>
+                    <div class="invoice-cell">
+                      <span class="invoice-number">
+                        {{ payment.invoiceNumber || "—" }}
+                      </span>
+
+                      <span class="request-code">
+                        {{ payment.requestCode || "—" }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- CLIENT -->
+
+                  <td>
+                    <div class="client-cell">
+                      <span class="client-name">
+                        {{
+                          payment.client?.clientName ||
+                            payment.clientName ||
+                            "—"
+                        }}
+                      </span>
+
+                      <span class="client-file" *ngIf="payment.client?.fileNo">
+                        {{ payment.client.fileNo }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- SERVICE -->
+
+                  <td>
+                    <div class="service-cell">
+                      <span
+                        class="service-pill"
+                        *ngIf="getPrimaryService(payment)"
+                        [title]="getPrimaryService(payment)?.serviceName"
+                      >
+                        {{ getPrimaryService(payment)?.serviceName || "—" }}
+                      </span>
+
+                      <span
+                        class="more-services"
+                        *ngIf="getAdditionalServices(payment).length > 0"
+                      >
+                        +
+                        {{ getAdditionalServices(payment).length }}
+                        more
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- AMOUNT -->
+
+                  <td>
+                    <span class="payment-amount">
+                      {{ formatAmount(payment.amount) }}
+                    </span>
+                  </td>
+
+                  <!-- DATE -->
+
+                  <td>
+                    <span class="payment-date">
+                      {{ formatDate(payment.paidAt) }}
+                    </span>
+                  </td>
+
+                  <!-- METHOD -->
+
+                  <td>
+                    <span class="payment-method">
+                      {{ payment.paymentMethod || "—" }}
+                    </span>
+                  </td>
+
+                  <!-- STATUS -->
+
+                  <td>
+                    <span
+                      class="payment-status"
+                      [ngClass]="getStatusClass(payment.status)"
+                    >
+                      {{ payment.status || "—" }}
+                    </span>
+                  </td>
+
+                  <!-- ACTION -->
+<!-- 
+                  <td class="col-action">
+                    <button
+                      type="button"
+                      class="view-invoice-action"
+                      (click)="viewInvoice(payment)"
+                    >
+                      <i class="bi bi-eye"></i>
+
+                      View Invoice
+                    </button>
+                  </td> -->
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- =====================================================
+             PAGINATION
+        ====================================================== -->
+
+        <app-pagination-footer
+          *ngIf="totalItems > 0"
+          [totalItems]="totalItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          itemLabel="payments"
+          (pageChange)="onPageChange($event)"
+        >
+        </app-pagination-footer>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================================================
+     INVOICE MODAL
+============================================================= -->
+
+<div
+  class="invoice-modal-backdrop"
+  *ngIf="showInvoice && selectedPayment"
+  (click)="closeInvoice()"
+>
+  <div class="invoice-modal" (click)="$event.stopPropagation()">
+    <!-- ================= MODAL HEADER ================= -->
+
+    <div class="invoice-modal-header">
+      <div>
+        <h3>Invoice</h3>
+
+        <span>
+          {{ selectedPayment?.invoiceNumber || "—" }}
+        </span>
+      </div>
+
+      <button type="button" class="invoice-close-btn" (click)="closeInvoice()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- EXACT SERVICE REQUEST INVOICE -->
+    <!-- ================================================= -->
+
+    <div class="invoice-wrapper">
+      <div class="invoice-sheet" id="invoice-print-area">
+        <!-- ================= COLOURED BAND ================= -->
+
+        <div class="inv-band">
+          <div class="inv-band-brand">
+            <div class="inv-band-logo">
+              <i class="bi bi-receipt-cutoff"></i>
+            </div>
+
+            <div>
+              <div class="inv-brand">CA Desk</div>
+
+              <span class="inv-brand-sub"> Client Portal </span>
+            </div>
+          </div>
+
+          <div class="inv-band-title">
+            <span> TAX INVOICE </span>
+
+            <strong>
+              {{ selectedPayment?.invoiceNumber || "—" }}
+            </strong>
+          </div>
+        </div>
+
+        <!-- ================= BODY ================= -->
+
+        <div class="inv-body">
+          <!-- ================= BILLED TO + DETAILS ================= -->
+
+          <div class="inv-info-grid">
+            <!-- BILLED TO -->
+
+            <div class="inv-card">
+              <span class="inv-label"> BILLED TO </span>
+
+              <div class="inv-person">
+                {{
+                  selectedPayment?.client?.clientName ||
+                    selectedPayment?.clientName ||
+                    "Customer"
+                }}
+              </div>
+
+              <div class="inv-contact" *ngIf="selectedPayment?.client?.email">
+                <i class="bi bi-envelope"></i>
+
+                {{ selectedPayment.client.email }}
+              </div>
+
+              <div class="inv-contact" *ngIf="selectedPayment?.client?.phone">
+                <i class="bi bi-telephone"></i>
+
+                {{ selectedPayment.client.phone }}
+              </div>
+            </div>
+
+            <!-- INVOICE DETAILS -->
+
+            <div class="inv-card">
+              <div class="inv-details-grid">
+                <!-- INVOICE DATE -->
+
+                <div class="inv-detail">
+                  <span> Invoice date </span>
+
+                  <strong>
+                    {{
+                      selectedPayment?.paidAt
+                        ? (selectedPayment.paidAt | date: "dd MMM yyyy")
+                        : "—"
+                    }}
+                  </strong>
+                </div>
+
+                <!-- REQUEST NO -->
+
+                <div class="inv-detail">
+                  <span> Request no. </span>
+
+                  <strong>
+                    {{ selectedPayment?.requestCode || "—" }}
+                  </strong>
+                </div>
+
+                <!-- PERIOD -->
+
+                <div class="inv-detail">
+                  <span> Period </span>
+
+                  <strong>
+                    {{ selectedPayment?.period || "—" }}
+                  </strong>
+                </div>
+
+                <!-- STATUS -->
+
+                <div class="inv-detail">
+                  <span> Status </span>
+
+                  <strong
+                    class="inv-pill"
+                    [class.inv-pill--paid]="selectedPayment?.status === 'paid'"
+                  >
+                    <i
+                      class="bi"
+                      [class.bi-check-circle-fill]="
+                        selectedPayment?.status === 'paid'
+                      "
+                      [class.bi-clock-fill]="selectedPayment?.status !== 'paid'"
+                    ></i>
+
+                    {{
+                      selectedPayment?.status === "paid" ? "Paid" : "Pending"
+                    }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= ITEMS TABLE ================= -->
+
+          <div class="inv-table-wrap">
+            <table class="inv-table">
+              <thead>
+                <tr>
+                  <th class="col-no">#</th>
+
+                  <th>Description</th>
+
+                  <th class="col-num">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <!-- SERVICES -->
+
+                <tr
+                  *ngFor="
+                    let service of getServices(selectedPayment);
+                    let i = index
+                  "
+                >
+                  <td class="col-no">
+                    {{ i + 1 }}
+                  </td>
+
+                  <td>
+                    <div class="inv-item-name">
+                      {{ service?.serviceName || service?.name || "Service" }}
+                    </div>
+
+                    <div class="inv-item-code" *ngIf="service?.serviceCode">
+                      {{ service.serviceCode }}
+                    </div>
+                  </td>
+
+              <td class="col-num">
+  {{
+    service?.amount != null
+      ? (service.amount | currency: "INR" : "symbol" : "1.2-2")
+      : "—"
+  }}
+</td>
+                </tr>
+
+                <!-- FALLBACK WHEN SERVICE IS NOT AVAILABLE -->
+
+                <tr *ngIf="getServices(selectedPayment).length === 0">
+                  <td class="col-no">1</td>
+
+                  <td>
+                    <div class="inv-item-name">Service Request</div>
+
+                    <div
+                      class="inv-item-code"
+                      *ngIf="selectedPayment?.requestCode"
+                    >
+                      {{ selectedPayment.requestCode }}
+                    </div>
+                  </td>
+
+                  <td class="col-num">
+                    {{
+                      selectedPayment?.subtotal || selectedPayment?.amount || 0
+                        | currency: "INR" : "symbol" : "1.2-2"
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ================= PAYMENT + TOTALS ================= -->
+
+          <div class="inv-bottom">
+            <!-- PAYMENT INFORMATION -->
+
+            <div class="inv-payment-info">
+              <span class="inv-label"> PAYMENT </span>
+
+              <!-- STATUS -->
+
+              <div class="inv-meta-row">
+                <span> Status </span>
+
+                <strong [class.paid-text]="selectedPayment?.status === 'paid'">
+                  {{ selectedPayment?.status === "paid" ? "Paid" : "Pending" }}
+                </strong>
+              </div>
+
+              <!-- PAYMENT METHOD -->
+
+              <div class="inv-meta-row" *ngIf="selectedPayment?.paymentMethod">
+                <span> Payment Method </span>
+
+                <strong>
+                  {{ selectedPayment.paymentMethod }}
+                </strong>
+              </div>
+
+              <!-- TRANSACTION ID -->
+
+              <div class="inv-meta-row" *ngIf="selectedPayment?.transactionId">
+                <span> Transaction ID </span>
+
+                <strong class="transaction-id">
+                  {{ selectedPayment.transactionId }}
+                </strong>
+              </div>
+
+              <!-- PAID ON -->
+
+              <div class="inv-meta-row" *ngIf="selectedPayment?.paidAt">
+                <span> Paid on </span>
+
+                <strong>
+                  {{ selectedPayment.paidAt | date: "dd MMM yyyy, hh:mm a" }}
+                </strong>
+              </div>
+            </div>
+
+            <!-- TOTALS -->
+
+            <div class="inv-totals">
+              <!-- SUBTOTAL -->
+
+              <div class="inv-total-row">
+                <span> Subtotal </span>
+
+                <strong>
+                  {{
+                    selectedPayment?.subtotal || 0
+                      | currency: "INR" : "symbol" : "1.2-2"
+                  }}
+                </strong>
+              </div>
+
+              <!-- CGST -->
+
+              <div class="inv-total-row">
+                <span> CGST </span>
+
+                <strong>
+                  {{
+                    selectedPayment?.cgst || 0
+                      | currency: "INR" : "symbol" : "1.2-2"
+                  }}
+                </strong>
+              </div>
+
+              <!-- SGST -->
+
+              <div class="inv-total-row">
+                <span> SGST </span>
+
+                <strong>
+                  {{
+                    selectedPayment?.sgst || 0
+                      | currency: "INR" : "symbol" : "1.2-2"
+                  }}
+                </strong>
+              </div>
+
+              <!-- GRAND TOTAL -->
+
+              <div class="inv-grand-total">
+                <span>
+                  {{
+                    selectedPayment?.status === "paid"
+                      ? "Total paid"
+                      : "Total due"
+                  }}
+                </span>
+
+                <strong>
+                  {{
+                    selectedPayment?.amount || 0
+                      | currency: "INR" : "symbol" : "1.2-2"
+                  }}
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= FOOTER ================= -->
+
+        <div class="inv-footer">
+          <span> Thank you for choosing CA Desk. </span>
+
+          <span>
+            Invoice:
+            {{ selectedPayment?.invoiceNumber || "—" }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CLOSE BUTTON ================= -->
+
+    <div class="invoice-actions">
+      <button
+        type="button"
+        class="invoice-action-button invoice-download-button"
+        (click)="closeInvoice()"
+      >
+        <i class="bi bi-x-circle"></i>
+        Close
+      </button>
+    </div>
+  </div>
+</div>

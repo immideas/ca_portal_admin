@@ -544,7 +544,7 @@
           <!-- PERIOD -->
 
           <div class="col-md-4 form-group">
-            <label for="period"> Period </label>
+            <label for="period"> Period (FY) </label>
 
             <div
               class="field-wrap"
@@ -756,29 +756,30 @@
 
               <!-- Compact inline Required/Optional toggle -->
               <div
-                class="document-type-toggle"
-                *ngIf="isDocumentSelected(document.id)"
-              >
-                <button
-                  type="button"
-                  class="type-toggle-btn required"
-                  [class.active]="isRequiredDocument(document.id)"
-                  [disabled]="isViewMode"
-                  (click)="setDocumentRequired(document.id, true)"
-                >
-                  Required
-                </button>
+  class="document-requirement-toggle"
+  *ngIf="isDocumentSelected(document.id)"
+>
+  <label
+    class="requirement-switch"
+    title="Toggle Required / Optional"
+  >
+    <input
+      type="checkbox"
+      [checked]="isRequiredDocument(document.id)"
+      [disabled]="isViewMode"
+      (change)="
+        setDocumentRequired(
+          document.id,
+          !isRequiredDocument(document.id)
+        )
+      "
+    />
 
-                <button
-                  type="button"
-                  class="type-toggle-btn optional"
-                  [class.active]="!isRequiredDocument(document.id)"
-                  [disabled]="isViewMode"
-                  (click)="setDocumentRequired(document.id, false)"
-                >
-                  Optional
-                </button>
-              </div>
+    <span class="requirement-slider">
+      <span class="requirement-dot"></span>
+    </span>
+  </label>
+</div>
             </div>
           </div>
         </div>
@@ -994,29 +995,30 @@
 
                 <!-- Compact inline Required/Optional toggle -->
                 <div
-                  class="document-type-toggle"
-                  *ngIf="isDocumentSelected(document.id)"
-                >
-                  <button
-                    type="button"
-                    class="type-toggle-btn required"
-                    [class.active]="isRequiredDocument(document.id)"
-                    [disabled]="isViewMode"
-                    (click)="setDocumentRequired(document.id, true)"
-                  >
-                    Required
-                  </button>
+  class="document-requirement-toggle"
+  *ngIf="isDocumentSelected(document.id)"
+>
+  <label
+    class="requirement-switch"
+    title="Toggle Required / Optional"
+  >
+    <input
+      type="checkbox"
+      [checked]="isRequiredDocument(document.id)"
+      [disabled]="isViewMode"
+      (change)="
+        setDocumentRequired(
+          document.id,
+          !isRequiredDocument(document.id)
+        )
+      "
+    />
 
-                  <button
-                    type="button"
-                    class="type-toggle-btn optional"
-                    [class.active]="!isRequiredDocument(document.id)"
-                    [disabled]="isViewMode"
-                    (click)="setDocumentRequired(document.id, false)"
-                  >
-                    Optional
-                  </button>
-                </div>
+    <span class="requirement-slider">
+      <span class="requirement-dot"></span>
+    </span>
+  </label>
+</div>
               </div>
             </div>
           </div>

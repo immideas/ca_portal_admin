@@ -127,4 +127,13 @@ generateInvoice(
       }
     );
   }
+  getAllServiceRequestPayments(): Observable<any> {
+  return this.http.post(
+    `${this.base}/payments`,
+    {},
+    {
+      headers: this.getHeaders()
+    }
+  );
+}
 }

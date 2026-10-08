@@ -869,3 +869,113 @@
     margin-left: auto;
   }
 }
+
+/* =========================================================
+   LATEST REQUIRED / OPTIONAL TOGGLE
+   ON  = REQUIRED
+   OFF = OPTIONAL
+   ========================================================= */
+
+.document-requirement-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.requirement-switch {
+  position: relative;
+  display: block;
+  width: 38px;
+  height: 22px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.requirement-switch input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.requirement-slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #d9dee8;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.requirement-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+  transition: transform 0.2s ease;
+}
+
+/* Required = ON */
+
+.requirement-switch input:checked + .requirement-slider {
+  background: #5b52e8;
+  box-shadow: 0 2px 6px rgba(91, 82, 232, 0.22);
+}
+
+.requirement-switch
+input:checked
++ .requirement-slider
+.requirement-dot {
+  transform: translateX(16px);
+}
+
+/* Hover */
+
+.requirement-switch:hover .requirement-slider {
+  box-shadow: 0 0 0 3px rgba(91, 82, 232, 0.08);
+}
+
+/* Disabled */
+
+.requirement-switch
+input:disabled
++ .requirement-slider {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* Document cards spacing */
+.document-grid {
+  padding: 14px 18px 18px;
+  gap: 12px;
+}
+
+/* Selected / Required document */
+.document-request-item.required-selected {
+  border-color: #c9c6ff;
+  background: #faf9ff;
+  box-shadow: 0 3px 12px rgba(91, 82, 232, 0.08);
+}
+
+/* Left selected indicator */
+.document-request-item.required-selected::before {
+  background: #5b52e8;
+}
+
+/* Selected checkbox */
+.document-check-indicator.selected,
+.document-check-indicator.required {
+  border-color: #5b52e8;
+  background: #5b52e8;
+  color: #fff;
+}
+
+/* Slightly more space inside the card */
+.document-request-item {
+  padding-left: 18px;
+  padding-right: 14px;
+}

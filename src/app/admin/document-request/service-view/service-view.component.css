@@ -2652,7 +2652,7 @@
 
   padding: 26px 32px;
 
-  background: #2563eb !important;
+  background: var(--primary-color, #4f46e5) !important;
   color: #ffffff !important;
 
   min-height: 94px;
@@ -3052,7 +3052,7 @@
 
   letter-spacing: -0.02em;
 
-  color: var(--accent);
+color: var(--primary-color, #4f46e5);
 
   font-variant-numeric: tabular-nums;
 }

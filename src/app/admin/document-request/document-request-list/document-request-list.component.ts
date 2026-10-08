@@ -154,11 +154,15 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
     // EDIT
     // ---------------------------------------------------------
 
-    items.push({
-      id: "edit",
-
-      label: "Edit",
-    });
+  if (
+  this.selectedDocumentRequest.status !== "COMPLETED" &&
+  this.selectedDocumentRequest.status !== "PAYMENT_DUE"
+) {
+  items.push({
+    id: "edit",
+    label: "Edit",
+  });
+}
 
     // ---------------------------------------------------------
     // CANCEL REQUEST
@@ -445,9 +449,23 @@ export class DocumentRequestListComponent implements OnInit, OnDestroy {
   // EDIT DOCUMENT REQUEST
   // =========================================================
 
-  editDocumentRequest(id: string | number): void {
-    this.router.navigate(["/edit-service-request", id]);
+editDocumentRequest(id: string | number): void {
+  const request = this.documentRequests.find(
+    (item: any) => Number(item.id) === Number(id)
+  );
+
+  if (
+    request?.status === "COMPLETED" ||
+    request?.status === "PAYMENT_DUE"
+  ) {
+    this.toastr.info(
+      "This service request cannot be edited after completion."
+    );
+    return;
   }
+
+  this.router.navigate(["/edit-service-request", id]);
+}
 
   // =========================================================
   // VIEW DOCUMENT REQUEST

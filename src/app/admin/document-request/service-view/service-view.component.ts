@@ -822,11 +822,14 @@ export class ServiceViewComponent implements OnInit {
     // COMPLETED CHECK
     // =======================================================
 
-    if (this.requestData?.documentRequest?.status === "COMPLETED") {
-      this.toastr.info("This service request has already been completed.");
+  if (
+  this.requestData?.documentRequest?.status === "COMPLETED" ||
+  this.requestData?.documentRequest?.status === "PAYMENT_DUE"
+) {
+  this.toastr.info("This service request has already been completed.");
 
-      return;
-    }
+  return;
+}
 
     // =======================================================
     // UPLOAD CHECK
@@ -842,11 +845,11 @@ export class ServiceViewComponent implements OnInit {
     // DOCUMENT CHECK
     // =======================================================
 
-    if (!this.finalDocuments.length) {
-      this.toastr.error("Please upload at least one final document.");
+    // if (!this.finalDocuments.length) {
+    //   this.toastr.error("Please upload at least one final document.");
 
-      return;
-    }
+    //   return;
+    // }
 
     // =======================================================
     // REMARK CHECK

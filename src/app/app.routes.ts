@@ -43,7 +43,7 @@ import { AdminDashboardComponent } from "./admin/admin-dashboard/admin-dashboard
 
 import { AddSubAdminComponent } from "./admin/add-sub-admin/add-sub-admin.component";
 import { ManageAdminUsersComponent } from "./admin/manage-admin-users/manage-admin-users.component";
-
+import { PaymentsHistoryComponent } from "./admin/payments-history/payments-history.component";
 import { ManageSubadminPermissionsComponent } from "./admin/manage-subadmin-permissions/manage-subadmin-permissions.component";
 
 import { ForgotPasswordComponent } from "./admin/forgot-password/forgot-password.component";
@@ -634,6 +634,11 @@ export const routes: Routes = [
        component: ServiceViewComponent,
         canActivate: [AdminAuthGuard, paymentStatusGuard],
       },
+      {
+  path: "payments",
+  component: PaymentsHistoryComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
       
       {
         path: "submitted-documents/:id",
