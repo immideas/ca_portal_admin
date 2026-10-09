@@ -127,20 +127,35 @@ export class ServiceViewComponent implements OnInit {
   // INIT
   // =========================================================
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get("id");
 
-    if (!id) {
-      console.error("Document Request ID not found");
-      return;
-    }
+ngOnInit(): void {
+  const id = this.route.snapshot.paramMap.get("id");
 
-    this.documentRequestId = Number(id);
-
-    console.log("Document Request ID:", this.documentRequestId);
-
-    this.loadDocumentRequest();
+  if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+    console.error("Invalid Document Request ID:", id);
+    this.toastr.error("Invalid service request ID.");
+    return;
   }
+
+  this.documentRequestId = Number(id);
+
+  const tab = this.route.snapshot.queryParamMap.get("tab");
+
+  if (
+    tab === "request" ||
+    tab === "submitted" ||
+    tab === "final" ||
+    tab === "payment"
+  ) {
+    this.activeTab = tab;
+  }
+
+  console.log("Document Request ID:", this.documentRequestId);
+  console.log("Active Tab:", this.activeTab);
+
+  this.loadDocumentRequest();
+}
+
 
   // =========================================================
   // LOAD DOCUMENT REQUEST

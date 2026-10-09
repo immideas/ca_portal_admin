@@ -1,0 +1,275 @@
+<main id="main" class="main">
+  <section class="section">
+    <div class="container-fluid py-4">
+      <!-- ================= PAGE HEADER ================= -->
+
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1>Payout Settings</h1>
+
+          <p>View and manage your payout account</p>
+        </div>
+
+        <div class="page-header-actions" *ngIf="!loading && !setting">
+          <button class="btn-primary" (click)="addSetting()">
+            <i class="bi bi-plus-lg"></i>
+
+            Add Payout Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= DATA TABLE ================= -->
+
+      <div class="data-table-wrapper">
+        <!-- ================= TOP TOOLBAR ================= -->
+
+        <div class="page-top-toolbar">
+          <div class="toolbar-left">
+            <label class="entries-label">
+              Show
+
+              <span class="entries-select-wrap">
+                <div class="entries-select-box">
+                  <span class="entries-number">
+                    {{ pageSize }}
+                  </span>
+
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path
+                      d="M3 4.5L6 7.5L9 4.5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <select
+                  class="entries-select-native"
+                  [value]="pageSize"
+                  (change)="onPageSizeChange($event)"
+                >
+                  <option *ngFor="let s of [10, 25, 50, 100]" [value]="s">
+                    {{ s }}
+                  </option>
+                </select>
+              </span>
+
+              entries
+            </label>
+          </div>
+
+          <!-- ================= SEARCH ================= -->
+
+          <div class="toolbar-right">
+            <div class="search-input-wrap">
+              <span class="search-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle
+                    cx="6"
+                    cy="6"
+                    r="4.5"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+
+                  <path
+                    d="M9.5 9.5L12 12"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+
+              <input
+                class="search-input"
+                type="text"
+                placeholder="Search..."
+                [(ngModel)]="search"
+                (input)="onSearchChange()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TABLE ================= -->
+
+        <div class="data-table-scroll">
+          <table id="payoutSettingTable" class="data-table">
+            <thead>
+              <tr>
+                <th>Account Holder</th>
+
+                <th>Type</th>
+
+                <th>Account / UPI</th>
+
+                <th>IFSC</th>
+
+                <th>Frequency</th>
+
+                <th>Min. Payout</th>
+
+                <th>Mode</th>
+
+                <th>Status</th>
+
+                <th class="col-action">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- ================= LOADING SKELETON ================= -->
+
+              <ng-container *ngIf="loading">
+                <tr *ngFor="let r of [1, 2, 3, 4, 5]" class="sk-list-row">
+                  <td><div class="sk sk-cell sk-cell--lg"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td><div class="sk sk-cell sk-cell--lg"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+                  <td><div class="sk sk-cell sk-cell--sm"></div></td>
+
+                  <td class="col-action">
+                    <div
+                      class="sk sk-cell sk-cell--xs"
+                      style="margin: 0 auto"
+                    ></div>
+                  </td>
+                </tr>
+              </ng-container>
+
+              <!-- ================= NO DATA ================= -->
+
+              <tr *ngIf="!loading && pagedSettings.length === 0">
+                <td colspan="9" class="text-center py-5">
+                  <div class="text-muted">
+                    {{
+                      errorMessage ||
+                        "No payout settings found."
+                    }}
+                  </div>
+                </td>
+              </tr>
+
+              <!-- ================= PAYOUT SETTINGS ================= -->
+
+              <ng-container *ngIf="!loading">
+                <tr
+                  *ngFor="let item of pagedSettings"
+                  (click)="editSetting()"
+                  style="cursor: pointer"
+                >
+                  <!-- ================= ACCOUNT HOLDER ================= -->
+
+                  <td>
+                    {{ item.account_holder_name || "—" }}
+                  </td>
+
+                  <!-- ================= TYPE ================= -->
+
+                  <td>
+                    {{ isUpiRow(item) ? "UPI" : "Bank" }}
+                  </td>
+
+                  <!-- ================= ACCOUNT / UPI ================= -->
+
+                  <td>
+                    {{
+                      isUpiRow(item)
+                        ? item.upi_vpa || "—"
+                        : getMaskedAccount(item)
+                    }}
+                  </td>
+
+                  <!-- ================= IFSC ================= -->
+
+                  <td>
+                    {{ isUpiRow(item) ? "—" : item.bank_ifsc || "—" }}
+                  </td>
+
+                  <!-- ================= FREQUENCY ================= -->
+
+                  <td>
+                    {{ item.frequency | titlecase }}
+                    <span *ngIf="item.payout_day">
+                      ({{ item.payout_day | titlecase }})
+                    </span>
+                  </td>
+
+                  <!-- ================= MIN PAYOUT ================= -->
+
+                  <td>
+                    {{
+                      item.min_payout_threshold || 0
+                        | currency: "INR" : "symbol" : "1.2-2" : "en-IN"
+                    }}
+                  </td>
+
+                  <!-- ================= MODE ================= -->
+
+                  <td>
+                    {{ item.mode | titlecase }}
+                  </td>
+
+                  <!-- ================= STATUS ================= -->
+
+                  <td>
+                    <span
+                      class="request-status"
+                      [ngClass]="{
+                        'status-completed': isRegistered(item),
+                        'status-under-verification': !isRegistered(item)
+                      }"
+                    >
+                      {{ isRegistered(item) ? "REGISTERED" : "NOT REGISTERED" }}
+                    </span>
+                  </td>
+
+                  <!-- ================= ACTIONS ================= -->
+
+                  <td class="col-action" (click)="$event.stopPropagation()">
+                    <app-three-dots-button
+                      [active]="activeMenuId === item.id"
+                      (menuClick)="openMenu(item, $event)"
+                    >
+                    </app-three-dots-button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ================= PAGINATION ================= -->
+
+        <app-pagination-footer
+          *ngIf="totalItems > 0"
+          [totalItems]="totalItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          itemLabel="payout settings"
+          (pageChange)="onPageChange($event)"
+        >
+        </app-pagination-footer>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= POPUP MENU ================= -->
+
+<app-popup-menu
+  *ngIf="menuPopupPosition"
+  title="Actions"
+  [items]="actionItems"
+  [position]="menuPopupPosition"
+  (itemClick)="onMenuItemClick($event)"
+  (closeClick)="closeMenu()"
+>
+</app-popup-menu>

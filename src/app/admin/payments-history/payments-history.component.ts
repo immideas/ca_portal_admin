@@ -210,27 +210,26 @@ constructor(
         },
       });
   }
+
 openInvoicePayment(payment: any): void {
-  console.log("Clicked Payment Object:", payment);
+  const requestId = Number(payment?.requestId);
 
-  const documentRequestId =
-    payment?.documentRequestId ??
-    payment?.document_request_id;
-
-  if (!documentRequestId) {
-    console.error("Document Request ID missing:", payment);
+  if (!Number.isInteger(requestId) || requestId <= 0) {
+    console.error("Invalid payment/request data:", payment);
     return;
   }
 
   this.router.navigate(
-    ["/service-view", documentRequestId],
+    ["/view-service-request", requestId],
     {
-      queryParams: {
-        tab: "payment"
-      }
+      queryParams: { tab: "payment" }
     }
-  );
+  ).then((success) => {
+    console.log("Navigation successful:", success);
+    console.log("Current URL:", this.router.url);
+  });
 }
+
   // ============================================================
   // RESET
   // ============================================================

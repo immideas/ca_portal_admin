@@ -1168,3 +1168,89 @@ input:disabled
   font-size: 20px;
   font-weight: 800;
 }
+
+/* Keep required service documents inside a fixed-height scroll area */
+.required-document-card .document-grid {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-content: start;
+  grid-auto-rows: max-content;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+/* Keep each document card at its natural height */
+.required-document-card .document-grid .document-request-item {
+  height: auto;
+  min-height: 88px;
+}
+
+/* Chrome, Edge and Safari scrollbar */
+.required-document-card .document-grid::-webkit-scrollbar {
+  width: 7px;
+}
+
+.required-document-card .document-grid::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.required-document-card .document-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+.required-document-card .document-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  .required-document-card .document-grid {
+    max-height: 360px;
+  }
+}
+
+/* Additional Documents: fixed-height scrollable list */
+.additional-document-card .document-grid {
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-content: start;
+  grid-auto-rows: max-content;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+/* Prevent document cards from being compressed */
+.additional-document-card .document-grid .document-request-item {
+  height: auto;
+  min-height: 88px;
+}
+
+/* Chrome, Edge and Safari scrollbar */
+.additional-document-card .document-grid::-webkit-scrollbar {
+  width: 7px;
+}
+
+.additional-document-card .document-grid::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.additional-document-card .document-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+.additional-document-card .document-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .additional-document-card .document-grid {
+    max-height: 360px;
+  }
+}

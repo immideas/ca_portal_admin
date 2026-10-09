@@ -465,6 +465,28 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
     },
   ],
 },
+// ================= PAYMENTS & PAYOUTS =================
+{
+  items: [
+    {
+      id: "payments-payouts",
+      label: "Payments & Payouts",
+      icon: "bi-wallet2",
+      children: [
+        {
+          label: "Payout Settings",
+          icon: "",
+          route: "/payout-setting-summary",
+          permission: "manage_payout_settings",
+          activeRoutes: [
+            "/payout-setting-summary",
+            "/payout-setting"
+          ]
+        }
+      ]
+    }
+  ]
+},
   {
     items: [
       {

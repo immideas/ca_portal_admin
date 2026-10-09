@@ -592,98 +592,95 @@
 
                 <!-- TOTALS -->
 
-               <div class="inv-totals">
+                <div class="inv-totals">
+                  <!-- SERVICE COST -->
+                  <div class="inv-total-row">
+                    <span>Service Cost</span>
 
-  <!-- SERVICE COST -->
-  <div class="inv-total-row">
-    <span>Service Cost</span>
+                    <strong>
+                      {{
+                        serviceRequestPayment.serviceCost
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
 
-    <strong>
-      {{
-        serviceRequestPayment.serviceCost
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
+                  <!-- PLATFORM FEE -->
+                  <div class="inv-total-row">
+                    <span>Platform Fee</span>
 
+                    <strong>
+                      {{
+                        serviceRequestPayment.platformFeeAmount
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+                  <!-- DISCOUNT -->
+                  <div class="inv-total-row">
+                    <span>Discount</span>
 
+                    <strong class="discount-amount">
+                      -
+                      {{
+                        serviceRequestPayment.discountAmount
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
 
-  <!-- PLATFORM FEE -->
-  <div class="inv-total-row">
-    <span>Platform Fee</span>
+                  <!-- SUBTOTAL -->
+                  <div class="inv-total-row">
+                    <span>Subtotal</span>
 
-    <strong>
-      {{
-        serviceRequestPayment.platformFeeAmount
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
-    <!-- DISCOUNT -->
-  <div class="inv-total-row">
-    <span>Discount</span>
+                    <strong>
+                      {{
+                        serviceRequestPayment.subtotal
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
 
-    <strong class="discount-amount">
-      - {{
-        serviceRequestPayment.discountAmount
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
+                  <!-- CGST -->
+                  <div class="inv-total-row">
+                    <span>
+                      CGST ({{ getTaxPercent(serviceRequestPayment, "cgst") }}%)
+                    </span>
 
-  <!-- SUBTOTAL -->
-  <div class="inv-total-row">
-    <span>Subtotal</span>
+                    <strong>
+                      {{
+                        serviceRequestPayment.cgst
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
 
-    <strong>
-      {{
-        serviceRequestPayment.subtotal
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
+                  <!-- SGST -->
+                  <div class="inv-total-row">
+                    <span>
+                      SGST ({{ getTaxPercent(serviceRequestPayment, "sgst") }}%)
+                    </span>
 
-  <!-- CGST -->
-  <div class="inv-total-row">
-    <span>
-      CGST ({{ getTaxPercent(serviceRequestPayment, "cgst") }}%)
-    </span>
+                    <strong>
+                      {{
+                        serviceRequestPayment.sgst
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
 
-    <strong>
-      {{
-        serviceRequestPayment.cgst
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
+                  <!-- TOTAL -->
+                  <div class="inv-grand-total">
+                    <span>Total Amount</span>
 
-  <!-- SGST -->
-  <div class="inv-total-row">
-    <span>
-      SGST ({{ getTaxPercent(serviceRequestPayment, "sgst") }}%)
-    </span>
-
-    <strong>
-      {{
-        serviceRequestPayment.sgst
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
-
-  <!-- TOTAL -->
-  <div class="inv-grand-total">
-    <span>Total Amount</span>
-
-    <strong>
-      {{
-        serviceRequestPayment.amount
-          | currency: "INR" : "symbol" : "1.2-2"
-      }}
-    </strong>
-  </div>
-
-</div>
+                    <strong>
+                      {{
+                        serviceRequestPayment.amount
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+                </div>
               </div>
 
               <!-- ================= FOOTER ================= -->

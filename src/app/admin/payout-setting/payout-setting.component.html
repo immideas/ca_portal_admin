@@ -1,0 +1,728 @@
+<main id="main" class="complaint-wrapper payout-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="payout settings" />
+        </div>
+
+        <div class="title-text">
+          <h4>Payout Settings</h4>
+          <p>Manage your beneficiary details and payout preferences</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HEADER ACTIONS ================= -->
+
+    <div class="header-actions">
+      <span class="saved-status" *ngIf="isEditMode">
+        <i class="bi bi-check-circle-fill"></i> Saved Settings
+      </span>
+
+      <button
+        type="button"
+        class="btn-cancel btn-register"
+        [ngClass]="{ 'is-registered': registrationComplete }"
+        [disabled]="!isEditMode || isRegistering || registrationComplete"
+        [title]="
+          isEditMode
+            ? 'Register beneficiary with RazorpayX'
+            : 'Save settings to enable registration'
+        "
+        (click)="registerWithRazorpayX()"
+      >
+        <i
+          class="bi"
+          [ngClass]="registrationComplete ? 'bi-check-circle-fill' : 'bi-shield-lock'"
+        ></i>
+        <span>
+          {{
+            isRegistering
+              ? "Registering..."
+              : registrationComplete
+                ? "Registered with RazorpayX"
+                : "Register with RazorpayX"
+          }}
+        </span>
+      </button>
+
+      <button
+        type="submit"
+        form="payoutForm"
+        class="btn-save"
+        [ngClass]="{ 'btn-active': payoutForm.valid && !isSaving && !isLoading }"
+        [disabled]="payoutForm.invalid || isSaving || isLoading"
+      >
+        <img class="save-icon" src="assets/img/Group-Save.svg" alt="save" />
+
+        <span>
+          {{
+            isSaving
+              ? "Saving..."
+              : isEditMode
+                ? "Update Settings"
+                : "Save Settings"
+          }}
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================================================== -->
+  <!-- FORM -->
+  <!-- ===================================================== -->
+
+  <form
+    [formGroup]="payoutForm"
+    id="payoutForm"
+    (ngSubmit)="savePayoutSetting()"
+    class="form-padding-wrap"
+  >
+    <!-- ===================================================== -->
+    <!-- BENEFICIARY INFORMATION -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Beneficiary Information </span>
+          <span class="header-subtext">
+            Enter the details associated with your payout account.
+          </span>
+        </div>
+
+        <div class="required-group">
+          <span class="badge-required">
+            Required
+
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- ACCOUNT HOLDER NAME -->
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="account_holder_name">
+              Account Holder Name
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="account_holder_name"
+                type="text"
+                class="form-controler"
+                formControlName="account_holder_name"
+                placeholder="Enter account holder name"
+                maxlength="150"
+                autocomplete="off"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                f['account_holder_name'].touched &&
+                f['account_holder_name'].invalid
+              "
+            >
+              Please enter a valid account holder name.
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCOUNT TYPE -->
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label>
+              Payout Account Type
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div class="document-grid account-type-grid">
+              <div
+                class="document-request-item option-card"
+                [class.selected]="isBankAccount"
+                [class.required-selected]="isBankAccount"
+                role="button"
+                tabindex="0"
+                (click)="
+                  payoutForm.patchValue({ payout_account_type: 'bank' });
+                  onAccountTypeChange()
+                "
+                (keyup.enter)="
+                  payoutForm.patchValue({ payout_account_type: 'bank' });
+                  onAccountTypeChange()
+                "
+              >
+                <div class="document-main-row option-row">
+                  <span
+                    class="document-check-indicator"
+                    [class.selected]="isBankAccount"
+                    [class.required]="isBankAccount"
+                  >
+                    <i class="bi bi-check-lg" *ngIf="isBankAccount"></i>
+                  </span>
+
+                  <span class="document-checkbox-label">
+                    <span class="document-name">
+                      <i class="bi bi-bank option-inline-icon"></i>
+                      Bank Account
+                    </span>
+                    <span class="document-description">
+                      Account number and IFSC
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div
+                class="document-request-item option-card"
+                [class.selected]="!isBankAccount"
+                [class.required-selected]="!isBankAccount"
+                role="button"
+                tabindex="0"
+                (click)="
+                  payoutForm.patchValue({ payout_account_type: 'upi' });
+                  onAccountTypeChange()
+                "
+                (keyup.enter)="
+                  payoutForm.patchValue({ payout_account_type: 'upi' });
+                  onAccountTypeChange()
+                "
+              >
+                <div class="document-main-row option-row">
+                  <span
+                    class="document-check-indicator"
+                    [class.selected]="!isBankAccount"
+                    [class.required]="!isBankAccount"
+                  >
+                    <i class="bi bi-check-lg" *ngIf="!isBankAccount"></i>
+                  </span>
+
+                  <span class="document-checkbox-label">
+                    <span class="document-name">
+                      <i class="bi bi-phone option-inline-icon"></i>
+                      UPI
+                    </span>
+                    <span class="document-description">
+                      Receive payouts through UPI
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BANK FIELDS -->
+
+        <div class="row mb-3" *ngIf="isBankAccount">
+          <div class="col-md-6 form-group">
+            <label for="bank_account_number">
+              Bank Account Number
+
+              <img
+                *ngIf="!isEditMode"
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="bank_account_number"
+                type="password"
+                inputmode="numeric"
+                autocomplete="new-password"
+                class="form-controler"
+                formControlName="bank_account_number"
+                placeholder="Enter bank account number"
+                maxlength="30"
+              />
+            </div>
+
+            <div
+              class="text-muted mt-1"
+              style="font-size: 11px"
+              *ngIf="isEditMode"
+            >
+              Leave blank to keep the saved account number
+              <ng-container *ngIf="existingAccountNumber">
+                ({{ maskedAccountNumber }}).
+              </ng-container>
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                f['bank_account_number'].touched &&
+                f['bank_account_number'].invalid
+              "
+            >
+              Enter a valid account number containing 6–30 digits.
+            </div>
+          </div>
+
+          <div class="col-md-6 form-group">
+            <label for="bank_ifsc">
+              IFSC Code
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="bank_ifsc"
+                type="text"
+                class="form-controler text-uppercase"
+                formControlName="bank_ifsc"
+                placeholder="e.g. HDFC0001234"
+                maxlength="11"
+                autocomplete="off"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="f['bank_ifsc'].touched && f['bank_ifsc'].invalid"
+            >
+              Enter a valid IFSC code.
+            </div>
+          </div>
+        </div>
+
+        <!-- UPI FIELD -->
+
+        <div class="row mb-3" *ngIf="!isBankAccount">
+          <div class="col-md-12 form-group">
+            <label for="upi_vpa">
+              UPI ID
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="upi_vpa"
+                type="text"
+                class="form-controler"
+                formControlName="upi_vpa"
+                placeholder="e.g. name@bank"
+                autocomplete="off"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="f['upi_vpa'].touched && f['upi_vpa'].invalid"
+            >
+              Enter a valid UPI ID.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- PAYOUT SCHEDULE -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Payout Schedule </span>
+          <span class="header-subtext">
+            Configure your preferred payout frequency and threshold.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="payout-field-grid">
+          <!-- FREQUENCY -->
+
+          <div class="form-group">
+            <label for="frequency">
+              Payout Frequency
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="frequency"
+                class="form-controler"
+                formControlName="frequency"
+              >
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- WEEKLY DAY -->
+
+          <div class="form-group" *ngIf="isWeekly">
+            <label for="weekly_day"> Payout Day </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="weekly_day"
+                class="form-controler"
+                formControlName="payout_day"
+              >
+                <option *ngFor="let day of weekdays" [value]="day.value">
+                  {{ day.label }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- MONTHLY DAY -->
+
+          <div class="form-group" *ngIf="isMonthly">
+            <label for="monthly_day"> Day of Month </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="monthly_day"
+                class="form-controler"
+                formControlName="payout_day"
+              >
+                <option *ngFor="let day of monthDays" [value]="day">
+                  {{ day }}
+                </option>
+              </select>
+            </div>
+
+            <div class="text-muted mt-1" style="font-size: 11px">
+              The actual processing date depends on the payout system and bank
+              holidays.
+            </div>
+          </div>
+
+          <!-- MIN THRESHOLD -->
+
+          <div class="form-group">
+            <label for="min_payout_threshold">
+              Minimum Payout Amount (₹)
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                id="min_payout_threshold"
+                type="number"
+                class="form-controler"
+                formControlName="min_payout_threshold"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                autocomplete="off"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                f['min_payout_threshold'].touched &&
+                f['min_payout_threshold'].invalid
+              "
+            >
+              Minimum payout must be zero or greater.
+            </div>
+          </div>
+
+          <!-- TRANSFER MODE -->
+
+          <div class="form-group" *ngIf="isBankAccount">
+            <label for="payout_mode">
+              Bank Transfer Mode
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="payout_mode"
+                class="form-controler"
+                formControlName="payout_mode"
+              >
+                <option value="IMPS">IMPS</option>
+                <option value="NEFT">NEFT</option>
+                <option value="RTGS">RTGS</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================================================== -->
+    <!-- PAYOUT PREFERENCES -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Payout Preferences </span>
+          <span class="header-subtext">
+            Choose the preferred payout management method.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label>
+              Payout Management Mode
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div class="document-grid account-type-grid">
+              <label
+                class="document-request-item option-card"
+                [class.selected]="f['mode'].value === 'manual'"
+                [class.required-selected]="f['mode'].value === 'manual'"
+              >
+                <div class="document-main-row option-row">
+                  <input type="radio" formControlName="mode" value="manual" />
+
+                  <span
+                    class="document-check-indicator"
+                    [class.selected]="f['mode'].value === 'manual'"
+                    [class.required]="f['mode'].value === 'manual'"
+                  >
+                    <i
+                      class="bi bi-check-lg"
+                      *ngIf="f['mode'].value === 'manual'"
+                    ></i>
+                  </span>
+
+                  <span class="document-checkbox-label">
+                    <span class="document-name">
+                      <i class="bi bi-hand-index-thumb option-inline-icon"></i>
+                      Manual
+                    </span>
+                    <span class="document-description">
+                      Payouts are initiated manually.
+                    </span>
+                  </span>
+                </div>
+              </label>
+
+              <label
+                class="document-request-item option-card"
+                [class.selected]="f['mode'].value === 'automatic'"
+                [class.required-selected]="f['mode'].value === 'automatic'"
+              >
+                <div class="document-main-row option-row">
+                  <input type="radio" formControlName="mode" value="automatic" />
+
+                  <span
+                    class="document-check-indicator"
+                    [class.selected]="f['mode'].value === 'automatic'"
+                    [class.required]="f['mode'].value === 'automatic'"
+                  >
+                    <i
+                      class="bi bi-check-lg"
+                      *ngIf="f['mode'].value === 'automatic'"
+                    ></i>
+                  </span>
+
+                  <span class="document-checkbox-label">
+                    <span class="document-name">
+                      <i class="bi bi-arrow-repeat option-inline-icon"></i>
+                      Automatic
+                    </span>
+                    <span class="document-description">
+                      Use an automated payout workflow.
+                    </span>
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- AUTO PAYOUT TOGGLE -->
+
+        <div class="row mb-3" *ngIf="f['mode'].value === 'automatic'">
+          <div class="col-md-12 form-group">
+            <div class="document-request-item selected required-selected">
+              <div class="document-main-row">
+                <div class="document-checkbox static-row">
+                  <span class="document-checkbox-label">
+                    <span class="document-name">Enable Automatic Payouts</span>
+                    <span class="document-description">
+                      This preference does not itself initiate transfers.
+                      Backend payout processing must be configured separately.
+                    </span>
+                  </span>
+                </div>
+
+                <div class="document-requirement-toggle">
+                  <label class="requirement-switch" title="Toggle automatic payouts">
+                    <input type="checkbox" formControlName="auto_payout_enabled" />
+
+                    <span class="requirement-slider">
+                      <span class="requirement-dot"></span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="notes"> Notes (Optional) </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <textarea
+                id="notes"
+                class="form-controler"
+                formControlName="notes"
+                rows="4"
+                maxlength="1000"
+                placeholder="Add any payout-related notes"
+              ></textarea>
+            </div>
+
+            <div class="text-muted mt-1" style="font-size: 11px">
+              Maximum 1000 characters.
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </form>
+</main>
+
+<!-- ===================================================== -->
+<!-- BACK TO TOP -->
+<!-- ===================================================== -->
+
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

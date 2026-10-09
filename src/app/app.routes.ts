@@ -73,6 +73,9 @@ import { AddDocumentGroupComponent } from "./super-admin/document-group/add-docu
 // ================= SERVICE CATEGORY =================
 import { ManageServiceCategoryComponent } from "./super-admin/services/manage-service-category/manage-service-category.component";
 import { AddServiceCategoryComponent } from "./super-admin/services/add-service-category/add-service-category.component";
+// ================= PAYOUT SETTINGS =================
+import { PayoutSettingComponent } from "./admin/payout-setting/payout-setting.component";
+import { PayoutSettingSummaryComponent } from "./admin/payout-setting-summary/payout-setting-summary.component";
 // ================= SERVICE =================
 import { ManageServiceComponent } from "./super-admin/services/manage-service/manage-service.component";
 import { AddServiceComponent } from "./super-admin/services/add-service/add-service.component";
@@ -288,6 +291,19 @@ export const routes: Routes = [
         component: ChangeUserThemeComponent,
         canActivate: [SuperAdminAuthGuard],
       },
+      // ================= PAYOUT SETTINGS =================
+
+{
+  path: "payout-setting-summary",
+  component: PayoutSettingSummaryComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
+
+{
+  path: "payout-setting",
+  component: PayoutSettingComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
 
       // =====================================================================
       // SECTION 2 — ADMIN GENERAL (logged-in admin/sub-admin entry points,
