@@ -145,27 +145,35 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
       },
     ],
   },
-  {
-    items: [
-      {
-        id: "Configurations",
-        label: "Configurations",
-        icon: "bi-diagram-3",
-        children: [
-          {
-            label: "Manage SMTP Config",
-            icon: "",
-            route: "/manage-smtp-config",
-          },
-          {
-            label: "Manage Themes",
-            icon: "",
-            route: "/manage-themes",
-          },
-        ],
-      },
-    ],
-  },
+ 
+{
+  items: [
+    {
+      id: "Configurations",
+      label: "Configurations",
+      icon: "bi-diagram-3",
+      children: [
+        {
+          label: "Manage SMTP Config",
+          icon: "",
+          route: "/manage-smtp-config",
+        },
+        {
+          label: "Manage Themes",
+          icon: "",
+          route: "/manage-themes",
+        },
+        {
+          label: "Payout Configuration",
+          icon: "",
+          route: "/payout-config",
+          activeRoutes: ["/superadmin-payout-config"],
+        },
+      ],
+    },
+  ],
+},
+
 
   {
     items: [
@@ -466,6 +474,7 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
   ],
 },
 // ================= PAYMENTS & PAYOUTS =================
+
 {
   items: [
     {
@@ -473,6 +482,15 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
       label: "Payments & Payouts",
       icon: "bi-wallet2",
       children: [
+        {
+          label: "Payout",
+          icon: "",
+          route: "/payout",
+          permission: "payout",
+          activeRoutes: [
+            "/payout"
+          ]
+        },
         {
           label: "Payout Settings",
           icon: "",
@@ -487,6 +505,7 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
     }
   ]
 },
+
   {
     items: [
       {

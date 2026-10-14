@@ -1,0 +1,318 @@
+<main id="main" class="complaint-wrapper payout-wrapper">
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <div class="payout-container">
+    <!-- HEADER -->
+    <header class="payout-header">
+      <h1>Payouts</h1>
+      <p>Your cash-out history, and a way to withdraw your pending balance.</p>
+    </header>
+
+    <!-- MESSAGES -->
+    <div class="alert alert-danger" role="alert" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="alert alert-success" role="status" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <!-- PENDING BALANCE -->
+    <section class="pending-balance-card" aria-labelledby="balance-label">
+      <div class="pending-balance-content">
+        <span class="pending-balance-label" id="balance-label">
+          Pending balance
+        </span>
+
+        <h2 class="pending-balance-amount">
+          <ng-container *ngIf="!isLoading; else loadingBalance">
+            {{ formatAmount(payoutSummary?.availableAmount || 0) }}
+          </ng-container>
+
+          <ng-template #loadingBalance>
+            <span class="balance-skeleton" aria-label="Loading balance"></span>
+          </ng-template>
+        </h2>
+
+        <!-- GLOBAL MINIMUM PAYOUT INFORMATION -->
+        <div class="payout-minimum-info" *ngIf="payoutSummary && !isLoading">
+          <div class="minimum-info-item">
+            <span class="minimum-info-label">Minimum Payout Amount</span>
+            <strong class="minimum-info-value">
+              {{ formatAmount(payoutSummary.minimumAmount) }}
+            </strong>
+          </div>
+
+          <div
+            class="minimum-info-item"
+            *ngIf="
+              payoutSummary.availableAmount > 0 &&
+              payoutSummary.availableAmount < payoutSummary.minimumAmount
+            "
+          >
+            <span class="minimum-info-label">Amount Needed</span>
+            <strong class="minimum-info-value amount-needed">
+              {{
+                formatAmount(
+                  payoutSummary.minimumAmount - payoutSummary.availableAmount
+                )
+              }}
+            </strong>
+          </div>
+
+          <div
+            class="minimum-info-item"
+            *ngIf="
+              payoutSummary.bankAccountConfigured &&
+              payoutSummary.availableAmount >= payoutSummary.minimumAmount &&
+              payoutSummary.availableAmount > 0
+            "
+          >
+            <span class="minimum-info-label">Payout Eligibility</span>
+            <strong class="minimum-info-value amount-eligible">
+              Minimum Reached
+            </strong>
+          </div>
+        </div>
+
+        <!-- READY TO WITHDRAW -->
+        <p
+          class="balance-hint"
+          *ngIf="payoutSummary && payoutSummary.canCashOut"
+        >
+          Ready to withdraw. Platform fees are deducted from each payout.
+        </p>
+
+        <!-- THRESHOLD MESSAGE -->
+        <p
+          class="threshold-message"
+          *ngIf="payoutSummary && !payoutSummary.canCashOut"
+        >
+          <ng-container *ngIf="!payoutSummary.bankAccountConfigured">
+            Add your payout account to start cashing out.
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              payoutSummary.bankAccountConfigured &&
+              payoutSummary.availableAmount <= 0
+            "
+          >
+            There are no earnings available for payout right now.
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              payoutSummary.bankAccountConfigured &&
+              payoutSummary.availableAmount > 0 &&
+              payoutSummary.availableAmount < payoutSummary.minimumAmount
+            "
+          >
+            You can cash out once your balance reaches
+            {{ formatAmount(payoutSummary.minimumAmount) }}.
+          </ng-container>
+        </p>
+      </div>
+
+      <!-- CASH OUT BUTTON -->
+      <button
+        type="button"
+        class="cash-out-btn"
+        [disabled]="isLoading || isCashOutLoading || !payoutSummary?.canCashOut"
+        (click)="cashOutNow()"
+      >
+        <ng-container *ngIf="!isCashOutLoading">
+          <svg
+            class="btn-icon"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M10 3v10m0 0l-4-4m4 4l4-4M4 16h12"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Cash out now
+        </ng-container>
+
+        <ng-container *ngIf="isCashOutLoading">
+          <span class="btn-spinner" aria-hidden="true"></span>
+          Processing…
+        </ng-container>
+      </button>
+    </section>
+
+    <!-- PAYOUT HISTORY -->
+    <section class="payout-table-card" aria-labelledby="history-title">
+      <div class="payout-table-toolbar">
+        <h3 class="table-title" id="history-title">Payout history</h3>
+
+        <div class="toolbar-actions">
+          <div class="entries-control">
+            <label for="pageSize">Rows</label>
+
+            <select
+              id="pageSize"
+              class="entries-select"
+              [value]="pageSize"
+              (change)="changePageSize($any($event.target).value)"
+            >
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+              <option [value]="100">100</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            class="refresh-btn"
+            (click)="loadPayoutData()"
+            [disabled]="isLoading || isCashOutLoading"
+          >
+            <svg
+              class="btn-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+              [class.spin]="isLoading"
+            >
+              <path
+                d="M16 10a6 6 0 11-1.76-4.24M16 4v3.5h-3.5"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <table class="table payout-table mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th class="num">Amount</th>
+              <th class="num">Platform fee</th>
+              <th class="num">Net amount</th>
+              <th>Mode</th>
+              <th>Triggered by</th>
+              <th>Status</th>
+              <th>UTR</th>
+              <th class="action-col">
+                <span class="visually-hidden">Actions</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let payout of paginatedPayouts">
+              <td class="payout-id">#{{ payout.id }}</td>
+              <td class="num">{{ formatAmount(payout.amount) }}</td>
+              <td class="num muted">
+                {{ formatAmount(payout.platformFeeAmount) }}
+              </td>
+              <td class="num strong">
+                {{ formatAmount(payout.netAmount) }}
+              </td>
+              <td>{{ payout.mode || "-" }}</td>
+              <td>{{ formatTriggeredBy(payout.triggeredBy) }}</td>
+
+              <td>
+                <span
+                  class="payout-status-badge"
+                  [ngClass]="getStatusClass(payout.status)"
+                >
+                  <span class="badge-text">
+                    {{ payout.status || "Pending" }}
+                  </span>
+                </span>
+              </td>
+
+              <td class="utr">{{ payout.utr || "-" }}</td>
+              <td class="action-col"></td>
+            </tr>
+
+            <!-- EMPTY STATE -->
+            <tr *ngIf="!isLoading && payouts.length === 0">
+              <td colspan="9" class="empty-table-message">
+                <svg
+                  class="empty-icon"
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <rect
+                    x="8"
+                    y="12"
+                    width="32"
+                    height="24"
+                    rx="4"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M8 20h32M16 29h8"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+
+                <strong>No payouts yet</strong>
+                <span>Once you cash out, each payout will show up here.</span>
+              </td>
+            </tr>
+
+            <!-- LOADING STATE -->
+            <tr *ngIf="isLoading && payouts.length === 0">
+              <td colspan="9" class="empty-table-message">
+                <span class="btn-spinner dark" aria-hidden="true"></span>
+                <span>Loading payouts…</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="payout-table-footer">
+        <span class="entries-info">
+          Showing {{ startEntry }}–{{ endEntry }} of {{ payouts.length }}
+        </span>
+
+        <div class="pagination-controls">
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="currentPage <= 1"
+            (click)="previousPage()"
+          >
+            Previous
+          </button>
+
+          <span class="current-page">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
+
+          <button
+            type="button"
+            class="pagination-btn"
+            [disabled]="currentPage >= totalPages"
+            (click)="nextPage()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

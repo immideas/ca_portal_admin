@@ -76,6 +76,8 @@ import { AddServiceCategoryComponent } from "./super-admin/services/add-service-
 // ================= PAYOUT SETTINGS =================
 import { PayoutSettingComponent } from "./admin/payout-setting/payout-setting.component";
 import { PayoutSettingSummaryComponent } from "./admin/payout-setting-summary/payout-setting-summary.component";
+import { PayoutComponent } from "./admin/payout/payout.component";
+import { SuperadminPayoutConfigComponent } from "./superadmin/superadmin-payout-config/superadmin-payout-config.component";
 // ================= SERVICE =================
 import { ManageServiceComponent } from "./super-admin/services/manage-service/manage-service.component";
 import { AddServiceComponent } from "./super-admin/services/add-service/add-service.component";
@@ -303,6 +305,17 @@ export const routes: Routes = [
   path: "payout-setting",
   component: PayoutSettingComponent,
   canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
+
+{
+  path: "payout",
+  component: PayoutComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
+{
+  path: "payout-config",
+  component: SuperadminPayoutConfigComponent,
+  canActivate: [SuperAdminAuthGuard],
 },
 
       // =====================================================================

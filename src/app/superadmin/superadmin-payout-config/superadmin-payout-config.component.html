@@ -1,0 +1,233 @@
+
+<main id="main" class="complaint-wrapper">
+
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- ================= HEADER ================= -->
+  <header class="top-header">
+    <div class="header-left">
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="settings" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{ isEditMode
+              ? 'Edit  Configuration'
+              : 'Add  Configuration' }}
+          </h4>
+          <p>payout configuration details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HEADER ACTIONS ================= -->
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="cancel()"
+        [disabled]="isSaving"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        form="superadminConfigForm"
+        class="btn-save"
+        [ngClass]="{
+          'btn-active': superadminConfigForm.valid && !isSaving
+        }"
+        [disabled]="superadminConfigForm.invalid || isSaving"
+      >
+        <img
+          class="save-icon"
+          src="assets/img/Group-Save.svg"
+          alt="save"
+        />
+
+        <span>
+          {{ isEditMode ? 'Update' : 'Save Configuration' }}
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= FORM ================= -->
+  <form
+    [formGroup]="superadminConfigForm"
+    id="superadminConfigForm"
+    (ngSubmit)="saveSuperadminConfig()"
+    class="form-padding-wrap"
+  >
+
+    <!-- ================= PAYOUT CONFIGURATION ================= -->
+    <article class="card complaint-card mb-4">
+
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
+
+        <div class="header-content">
+          <span class="header-text">
+            Payout Configuration
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+
+        <div class="row mb-3">
+
+          <!-- Minimum Payout Amount -->
+          <div class="col-md-6 form-group">
+
+            <label for="minPayoutAmount">
+              Minimum Payout Amount (₹)
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url('assets/img/category-sub.svg')"
+            >
+              <input
+                type="number"
+                id="minPayoutAmount"
+                formControlName="minPayoutAmount"
+                class="form-controler"
+                placeholder="Enter minimum payout amount"
+                min="0"
+                max="9999999999.99"
+                step="0.01"
+              />
+            </div>
+
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                superadminConfigForm.get('minPayoutAmount')?.invalid &&
+                superadminConfigForm.get('minPayoutAmount')?.touched
+              "
+            >
+              <div
+                *ngIf="
+                  superadminConfigForm.get('minPayoutAmount')
+                    ?.errors?.['required']
+                "
+              >
+                Minimum payout amount is required.
+              </div>
+
+              <div
+                *ngIf="
+                  superadminConfigForm.get('minPayoutAmount')
+                    ?.errors?.['min']
+                "
+              >
+                Minimum payout amount cannot be negative.
+              </div>
+
+              <div
+                *ngIf="
+                  superadminConfigForm.get('minPayoutAmount')
+                    ?.errors?.['max']
+                "
+              >
+                Amount exceeds the maximum allowed value.
+              </div>
+
+              <div
+                *ngIf="
+                  superadminConfigForm.get('minPayoutAmount')
+                    ?.errors?.['pattern']
+                "
+              >
+                Enter a valid amount with up to two decimal places.
+              </div>
+            </div>
+
+            <small class="text-muted d-block mt-2">
+              This amount applies globally to CA payouts.
+            </small>
+          </div>
+
+          <!-- Status -->
+          <div class="col-md-6 form-group">
+
+            <label for="status">
+              Status
+
+              <img
+                src="assets/img/star.svg"
+                class="required-icon"
+                alt="required"
+              />
+            </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url('assets/img/category-sub.svg')"
+            >
+              <select
+                id="status"
+                formControlName="status"
+                class="form-controler"
+              >
+                <option [ngValue]="null" disabled>
+                  Select status
+                </option>
+
+                <option [ngValue]="1">Active</option>
+                <option [ngValue]="0">Inactive</option>
+              </select>
+            </div>
+
+            <div
+              class="text-danger small mt-1"
+              *ngIf="
+                superadminConfigForm.get('status')?.invalid &&
+                superadminConfigForm.get('status')?.touched
+              "
+            >
+              Status is required.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </article>
+
+  
+
+  </form>
+</main>
+
+<!-- Back to top -->
+<a
+  href="#"
+  class="back-to-top d-flex align-items-center justify-content-center"
+  aria-label="Scroll to top"
+>
+  <i class="bi bi-arrow-up-short"></i>
+</a>

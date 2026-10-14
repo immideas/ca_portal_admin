@@ -79,10 +79,10 @@ export class PayoutSettingComponent implements OnInit, OnDestroy {
       frequency: ['weekly', Validators.required],
       mode: ['manual', Validators.required],
       payout_day: ['monday'],
-      min_payout_threshold: [
-        0,
-        [Validators.required, Validators.min(0)]
-      ],
+      // min_payout_threshold: [
+      //   0,
+      //   [Validators.required, Validators.min(0)]
+      // ],
       auto_payout_enabled: [false],
       notes: ['', Validators.maxLength(1000)]
     });
@@ -254,7 +254,7 @@ export class PayoutSettingComponent implements OnInit, OnDestroy {
           frequency: data.frequency || 'weekly',
           mode: data.mode || 'manual',
           payout_day: data.payout_day || 'monday',
-          min_payout_threshold: Number(data.min_payout_threshold || 0),
+          // min_payout_threshold: Number(data.min_payout_threshold || 0),
           auto_payout_enabled: Boolean(data.auto_payout_enabled),
           notes: data.notes || ''
         });
@@ -322,7 +322,7 @@ export class PayoutSettingComponent implements OnInit, OnDestroy {
       frequency: value.frequency,
       mode: value.mode,
       payout_day: value.frequency === 'daily' ? null : String(value.payout_day),
-      min_payout_threshold: Number(value.min_payout_threshold),
+      // min_payout_threshold: Number(value.min_payout_threshold),
       auto_payout_enabled:
         value.mode === 'automatic' && Boolean(value.auto_payout_enabled),
       notes: String(value.notes || '').trim() || null
