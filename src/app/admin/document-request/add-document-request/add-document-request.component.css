@@ -1254,3 +1254,159 @@ input:disabled
     max-height: 360px;
   }
 }
+/* =========================================
+   RECURRING SERVICE CARD
+========================================= */
+
+.recurring-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* Recurring toggle row */
+.recurring-card .recurring-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+/* Toggle heading */
+.recurring-card .recurring-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Helper text */
+.recurring-card .recurring-help {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Toggle switch container */
+.recurring-card .recurring-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+/* Hide default checkbox */
+.recurring-card .recurring-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Switch background */
+.recurring-card .recurring-slider {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+/* Switch circle */
+.recurring-card .recurring-slider::before {
+  position: absolute;
+  content: "";
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease;
+}
+
+/* Enabled state */
+.recurring-card
+  .recurring-switch
+  input:checked
+  + .recurring-slider {
+  background: #2563eb;
+}
+
+.recurring-card
+  .recurring-switch
+  input:checked
+  + .recurring-slider::before {
+  transform: translateX(20px);
+}
+
+/* Keyboard focus */
+.recurring-card
+  .recurring-switch
+  input:focus-visible
+  + .recurring-slider {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* Disabled state */
+.recurring-card
+  .recurring-switch
+  input:disabled
+  + .recurring-slider {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Frequency information shown when enabled */
+.recurring-card .recurring-frequency-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.recurring-card .recurring-frequency-info i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 15px;
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+  .recurring-card .recurring-toggle-row {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .recurring-card .recurring-label {
+    font-size: 13px;
+  }
+
+  .recurring-card .recurring-help {
+    font-size: 11px;
+  }
+
+  .recurring-card .recurring-frequency-info {
+    padding: 10px 12px;
+  }
+}

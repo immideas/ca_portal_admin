@@ -511,30 +511,75 @@
         <div class="row mb-3">
           <!-- Client Group -->
 
-          <div class="col-md-12 form-group">
-            <label for="clientGroupId"> Client Group </label>
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <select
-                id="clientGroupId"
-                formControlName="clientGroupId"
-                class="form-controler"
-              >
-                <option [ngValue]="null">Select client group</option>
+<!-- Client Group -->
+<div class="col-md-12 form-group">
+  <label for="clientGroupSearch">Client Group</label>
 
-                <option *ngFor="let group of clientGroups" [ngValue]="group.id">
-                  {{ group.name }} ({{ group.code }})
-                </option>
-              </select>
-            </div>
+  <div class="client-group-select">
+    <div class="client-group-input">
+      <div class="field-wrap flex-grow-1">
+        <input
+          id="clientGroupSearch"
+          type="text"
+          class="form-controler"
+          [value]="getSelectedGroupName()"
+          placeholder="Select client group"
+          readonly
+          (click)="toggleClientGroupDropdown()"
+          [disabled]="isViewMode"
+          autocomplete="off"
+        />
 
-            <div class="text-muted mt-1" style="font-size: 11px">
-              Client group is optional.
-            </div>
-          </div>
+        <i class="bi bi-chevron-down group-chevron"></i>
+      </div>
+    </div>
+
+    <div
+      class="client-group-dropdown"
+      *ngIf="showClientGroupDropdown && !isViewMode"
+    >
+      <div
+        class="client-group-option"
+        (click)="selectClientGroup(null)"
+      >
+        Select client group
+      </div>
+
+      <div
+        class="client-group-option"
+        *ngFor="let group of clientGroups"
+        (click)="selectClientGroup(group)"
+      >
+        {{ group.name }}<span *ngIf="group.code"> ({{ group.code }})</span>
+      </div>
+
+      <div
+        class="no-groups"
+        *ngIf="clientGroups.length === 0"
+      >
+        No client groups found.
+      </div>
+
+      <div class="client-group-dropdown-footer">
+        <button
+          type="button"
+          class="add-new-group-btn"
+          (click)="openAddClientGroupDialog()"
+        >
+          <i class="bi bi-plus-lg"></i>
+          Add new group
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-muted mt-1" style="font-size: 11px">
+    Client group is optional. You can create a new group here.
+  </div>
+</div>
+
+
 
           <!-- Phone -->
 

@@ -1,0 +1,59 @@
+
+.group-popup {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.group-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9edf3;
+}
+
+.group-popup-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.popup-close {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.group-popup-body {
+  padding: 24px;
+}
+
+.group-popup-body label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.group-popup-body input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.group-popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 24px;
+  border-top: 1px solid #e9edf3;
+}
+
+.group-popup .required {
+  color: #e5484d;
+}

@@ -369,32 +369,40 @@ ngOnInit(): void {
   // GROUP SERVICES BY CATEGORY
   // =====================================================
 
-  buildServiceGroups(): void {
-    const groups = new Map<number, any>();
 
-    this.services.forEach((service: any) => {
-      const category = service?.category || service?.ServiceCategory || {};
+buildServiceGroups(): void {
+  const groups = new Map<number, any>();
 
-      const categoryId = Number(service.categoryId ?? category.id);
+  // In view mode, display only assigned services.
+  // In add/edit mode, display all active services.
+  const visibleServices = this.isViewMode
+    ? this.services.filter((service: any) =>
+        this.selectedServiceIds.has(Number(service.id))
+      )
+    : this.services;
 
-      const categoryName =
-        category.name || service.categoryName || "Other Services";
+  visibleServices.forEach((service: any) => {
+    const category = service?.category || service?.ServiceCategory || {};
+    const categoryId = Number(service.categoryId ?? category.id);
+    const categoryName =
+      category.name || service.categoryName || "Other Services";
 
-      if (!groups.has(categoryId)) {
-        groups.set(categoryId, {
-          id: categoryId,
-          name: categoryName,
-          services: [],
-        });
-      }
+    if (!groups.has(categoryId)) {
+      groups.set(categoryId, {
+        id: categoryId,
+        name: categoryName,
+        services: [],
+      });
+    }
 
-      groups.get(categoryId).services.push(service);
-    });
+    groups.get(categoryId).services.push(service);
+  });
 
-    this.serviceGroups = Array.from(groups.values()).sort((a: any, b: any) =>
-      a.name.localeCompare(b.name),
-    );
-  }
+  this.serviceGroups = Array.from(groups.values()).sort(
+    (a: any, b: any) => a.name.localeCompare(b.name)
+  );
+}
+
 
   // =====================================================
   // CHECK SERVICE
@@ -541,9 +549,14 @@ ngOnInit(): void {
         const assignments = response.data || [];
 
         // Select all services assigned to this client
-        this.selectedServiceIds = new Set(
-          assignments.map((item: any) => Number(item.serviceId)),
-        );
+    this.selectedServiceIds = new Set(
+  assignments
+    .map((item: any) => Number(item.serviceId ?? item.service?.id ?? item.Service?.id))
+    .filter((id: number) => Number.isFinite(id) && id > 0)
+);
+
+// Rebuild the groups after assigned service IDs have loaded.
+this.buildServiceGroups();
 
         console.log("Assigned services:", assignments);
         console.log(

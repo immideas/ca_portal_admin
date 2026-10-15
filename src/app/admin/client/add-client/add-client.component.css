@@ -7,3 +7,210 @@
   padding-top: 0 !important;
   min-height: auto !important;
 }
+
+.client-group-select {
+  position: relative;
+  width: 100%;
+}
+
+.client-group-input .field-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.client-group-input input {
+  width: 100%;
+  padding-right: 40px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.group-chevron {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #344054;
+  pointer-events: none;
+}
+
+.client-group-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.client-group-option {
+  padding: 11px 16px;
+  cursor: pointer;
+  color: #344054;
+  font-size: 14px;
+}
+
+.client-group-option:hover {
+  background: #f0f4fa;
+}
+
+.client-group-dropdown-footer {
+  position: sticky;
+  bottom: 0;
+  padding: 8px;
+  border-top: 1px solid #eaecf0;
+  background: #fff;
+}
+
+.add-new-group-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-new-group-btn:hover {
+  background: #f0f4fa;
+}
+
+.no-groups {
+  padding: 12px 16px;
+  color: #667085;
+}
+/* Client Group dropdown */
+.client-group-select {
+  position: relative;
+  width: 100%;
+}
+
+.client-group-input .field-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.client-group-input input {
+  width: 100%;
+  padding-right: 40px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.group-chevron {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #344054;
+  pointer-events: none;
+}
+
+/* Dropdown list */
+.client-group-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.client-group-option {
+  display: flex;
+  align-items: center;
+  padding: 11px 16px;
+  cursor: pointer;
+  color: #344054;
+  font-size: 14px;
+}
+
+.client-group-option:hover {
+  background: #f0f4fa;
+}
+
+/* Add new group footer */
+.client-group-dropdown-footer {
+  position: sticky;
+  bottom: 0;
+  padding: 8px;
+  border-top: 1px solid #eaecf0;
+  background: #fff;
+}
+
+.add-new-group-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-new-group-btn:hover {
+  background: #f0f4fa;
+}
+
+.no-groups {
+  padding: 12px 16px;
+  color: #667085;
+}
+
+/* Keep the Material dialog above the dropdown */
+:host ::ng-deep .cdk-overlay-container {
+  z-index: 2000 !important;
+}
+
+:host ::ng-deep .client-group-dialog {
+  z-index: 2001 !important;
+}
+/* Allow dropdown to extend beyond the card */
+.client-group-select {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+
+.client-group-input,
+.client-group-input .field-wrap {
+  overflow: visible;
+}
+
+/* Dropdown list */
+.client-group-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* Ensure the card does not clip the list */
+.complaint-card,
+.card {
+  overflow: visible;
+}

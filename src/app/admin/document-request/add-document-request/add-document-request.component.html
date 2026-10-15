@@ -583,6 +583,74 @@
       </div>
     </article>
     
+
+
+<!-- RECURRING SERVICE -->
+<article class="card complaint-card mb-4 recurring-card">
+  <div class="section-title">
+    <div class="item-icon">
+      <i class="bi bi-arrow-repeat"></i>
+    </div>
+
+    <div class="header-content">
+      <span class="header-text">Recurring Service</span>
+      <span class="header-subtext">
+        Automatically generate future document requests
+        according to the selected service frequency.
+      </span>
+    </div>
+  </div>
+
+  <div class="form-padding-wrap">
+    <div class="recurring-toggle-row">
+      <div>
+        <label for="isRecurring" class="recurring-label">
+          Enable recurring requests
+        </label>
+
+        <p class="text-muted mb-0 recurring-help">
+          Future requests will be generated automatically
+          using the frequency configured for the selected service.
+        </p>
+      </div>
+
+      <label class="recurring-switch">
+        <input
+          id="isRecurring"
+          type="checkbox"
+          formControlName="isRecurring"
+          [disabled]="isViewMode"
+        />
+        <span class="recurring-slider"></span>
+      </label>
+    </div>
+
+  
+<div
+  class="recurring-frequency-info"
+  *ngIf="documentRequestForm.get('isRecurring')?.value"
+>
+  <i class="bi bi-info-circle"></i>
+
+  <div class="recurring-frequency-content">
+    <div class="recurring-frequency-title">
+      Service frequency:
+      <strong>
+        {{ getRecurringFrequency() || 'Not configured' }}
+      </strong>
+    </div>
+
+    <small>
+      Future document requests will be generated automatically
+      according to this service frequency.
+    </small>
+  </div>
+</div>
+
+  </div>
+</article>
+
+
 <!-- ===================================================== -->
 <!-- PRICING & DISCOUNT -->
 <!-- ===================================================== -->

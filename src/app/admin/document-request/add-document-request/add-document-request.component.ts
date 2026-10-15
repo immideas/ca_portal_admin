@@ -221,6 +221,7 @@ export class AddDocumentRequestComponent implements OnInit {
       period: ["", [Validators.maxLength(100)]],
 
       dueDate: [null],
+      isRecurring: [false],
       discountType: ["FIXED"],
 
 discountValue: [
@@ -374,6 +375,9 @@ discountValue: [
           period: request.period ?? "",
 
           dueDate: request.dueDate ?? null,
+            isRecurring: Boolean(
+    request.isRecurring ?? request.recurringScheduleId
+  ),
             discountType: request.discountType ?? "FIXED",
   discountValue: request.discountValue ?? 0,
         });
@@ -831,11 +835,20 @@ discountValue: [
     else {
       this.selectedServiceIds.push(serviceId);
 
-      this.selectedServices.push({
-        ...assignment,
-        serviceId,
-        id: clientServiceId,
-      });
+   const serviceDetails =
+  assignment.service ??
+  assignment.Service ??
+  {};
+
+this.selectedServices.push({
+  ...assignment,
+  serviceId,
+  id: clientServiceId,
+  frequency:
+    assignment.frequency ??
+    serviceDetails.frequency ??
+    null,
+});
     }
 
     // =================================================
@@ -1555,6 +1568,7 @@ discountValue: [
       return;
     }
 
+
     // =================================================
     // SERVICE VALIDATION
     // =================================================
@@ -1613,6 +1627,10 @@ discountValue: [
 
     const payload: any = {
       taskName: formValue.taskName?.trim(),
+      
+isRecurring: formValue.isRecurring === true,
+
+
 
       clientId: Number(formValue.clientId),
 
@@ -1862,6 +1880,82 @@ getTotalAfterDiscount(): number {
   cancel(): void {
     this.router.navigate(["/service-requests"]);
   }
+
+onRecurringToggle(): void {
+  const isRecurring =
+    this.documentRequestForm.get("isRecurring")?.value === true;
+
+  const startControl =
+    this.documentRequestForm.get("recurringStartDate");
+
+  const endControl =
+    this.documentRequestForm.get("recurringEndDate");
+
+  if (!isRecurring) {
+    startControl?.setValue(null);
+    endControl?.setValue(null);
+  }
+
+  startControl?.updateValueAndValidity();
+  endControl?.updateValueAndValidity();
+}
+
+private validateRecurringDates(): boolean {
+  const formValue = this.documentRequestForm.getRawValue();
+
+  if (!formValue.isRecurring) {
+    return true;
+  }
+
+  if (!formValue.recurringStartDate) {
+    this.toastr.error(
+      "Please select a recurring start date.",
+      "Validation Error"
+    );
+    return false;
+  }
+
+  if (
+    formValue.recurringEndDate &&
+    formValue.recurringEndDate < formValue.recurringStartDate
+  ) {
+    this.toastr.error(
+      "Recurring end date cannot be before the start date.",
+      "Validation Error"
+    );
+    return false;
+  }
+
+  return true;
+}
+getRecurringFrequency(): string {
+  const primaryService = this.selectedServices?.[0];
+
+  const frequency =
+    primaryService?.frequency ??
+    primaryService?.service?.frequency ??
+    primaryService?.Service?.frequency;
+
+  if (!frequency) {
+    return '';
+  }
+
+  const frequencyLabels: Record<string, string> = {
+    MONTHLY: 'Monthly',
+    QUARTERLY: 'Quarterly',
+    'HALF-YEARLY': 'Half-Yearly',
+    HALFYEARLY: 'Half-Yearly',
+    YEARLY: 'Yearly',
+    ANNUALLY: 'Yearly',
+  };
+
+  const normalizedFrequency = String(frequency).trim().toUpperCase();
+
+  return (
+    frequencyLabels[normalizedFrequency] ??
+    String(frequency).trim()
+  );
+}
 
   // =====================================================
   // CAN DEACTIVATE

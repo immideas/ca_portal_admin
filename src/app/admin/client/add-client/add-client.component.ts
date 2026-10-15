@@ -7,6 +7,7 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormsModule
 } from "@angular/forms";
 
 import { CommonModule } from "@angular/common";
@@ -27,7 +28,7 @@ import { ClientService } from "../../../services/client.service";
 
 import { ClientGroupService } from "../../../services/client-group.service";
 import { getLocationDetails, getAllCountries } from "@swiftlyme/locationbycsc";
-
+import { AddClientGroupComponent } from "../../client-group/add-client-group/add-client-group.component";
 @Component({
   selector: "app-add-client",
 
@@ -36,16 +37,16 @@ import { getLocationDetails, getAllCountries } from "@swiftlyme/locationbycsc";
   styleUrls: ["./add-client.component.css"],
 
   standalone: true,
-
-  imports: [
-    CommonModule,
-    HttpClientModule,
-    RouterModule,
-    ReactiveFormsModule,
-    NgxUiLoaderModule,
-    ToastrModule,
-    MatDialogModule,
-  ],
+imports: [
+  CommonModule,
+  HttpClientModule,
+  RouterModule,
+  ReactiveFormsModule,
+  FormsModule,
+  NgxUiLoaderModule,
+  ToastrModule,
+  MatDialogModule,
+],
 })
 export class AddClientComponent implements OnInit, OnDestroy {
   clientForm: FormGroup;
@@ -70,7 +71,9 @@ export class AddClientComponent implements OnInit, OnDestroy {
   countries: any[] = [];
   states: any[] = [];
   cities: any[] = [];
-
+  
+clientGroupSearch = "";
+showClientGroupDropdown = false;
   selectedCountry: any = null;
   selectedState: any = null;
 
@@ -202,6 +205,43 @@ export class AddClientComponent implements OnInit, OnDestroy {
     }
   });
 }
+
+toggleClientGroupDropdown(): void {
+  if (this.isViewMode) {
+    return;
+  }
+
+  this.showClientGroupDropdown = !this.showClientGroupDropdown;
+}
+
+getSelectedGroupName(): string {
+  const selectedId = this.clientForm.get('clientGroupId')?.value;
+
+  if (selectedId == null || selectedId === '') {
+    return '';
+  }
+
+  const selectedGroup = this.clientGroups.find(
+    (group: any) =>
+      String(group.id ?? group.clientGroupId) === String(selectedId)
+  );
+
+  return selectedGroup
+    ? `${selectedGroup.name}${selectedGroup.code ? ' (' + selectedGroup.code + ')' : ''}`
+    : '';
+}
+
+selectClientGroup(group: any): void {
+  this.clientForm.patchValue({
+    clientGroupId: group
+      ? (group.id ?? group.clientGroupId)
+      : null
+  });
+
+  this.showClientGroupDropdown = false;
+}
+
+
   // =====================================================
   // BUSINESS VALIDATION
   // =====================================================
@@ -373,29 +413,59 @@ export class AddClientComponent implements OnInit, OnDestroy {
   // LOAD CLIENT GROUPS
   // =====================================================
 
-  loadClientGroups(): void {
-    this.clientGroupService.listAllClientGroups({}).subscribe({
-      next: (response: any) => {
-        /*
-         * Depending on your API response,
-         * support both:
-         *
-         * response.data
-         * response
-         */
-        this.clientGroups = response?.data || response || [];
-      },
+  
+loadClientGroups(createdGroup?: any): void {
+  this.clientGroupService.listAllClientGroups({}).subscribe({
+    next: (response: any) => {
+      const groups = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response?.data?.data)
+          ? response.data.data
+          : Array.isArray(response)
+            ? response
+            : [];
 
-      error: (err: any) => {
-        console.error("Failed to fetch client groups:", err);
+      this.clientGroups = groups;
 
-        this.toastr.error(
-          err?.error?.message || "Failed to fetch client groups",
-          "Error",
-        );
-      },
-    });
-  }
+      // Automatically select the group just created in the popup.
+      if (createdGroup) {
+        const createdData =
+          createdGroup?.data ||
+          createdGroup?.clientGroup ||
+          createdGroup;
+
+        const createdId = createdData?.id;
+
+        const matchingGroup = this.clientGroups.find((group: any) => {
+          if (createdId != null && String(group.id) === String(createdId)) {
+            return true;
+          }
+
+          return (
+            group.name?.trim()?.toLowerCase() ===
+              createdData?.name?.trim()?.toLowerCase() &&
+            group.code === createdData?.code
+          );
+        });
+
+        if (matchingGroup) {
+          this.clientForm.patchValue({
+            clientGroupId: matchingGroup.id,
+          });
+        }
+      }
+    },
+    error: (err: any) => {
+      console.error("Failed to fetch client groups:", err);
+
+      this.toastr.error(
+        err?.error?.message || "Failed to fetch client groups",
+        "Error"
+      );
+    },
+  });
+}
+
 
   // =====================================================
   // FETCH CLIENT
@@ -469,6 +539,33 @@ export class AddClientComponent implements OnInit, OnDestroy {
       },
     });
   }
+  
+openAddClientGroupDialog(): void {
+  if (this.isViewMode) {
+    return;
+  }
+
+  const dialogRef = this.dialog.open(AddClientGroupComponent, {
+    width: "550px",
+    maxWidth: "95vw",
+    maxHeight: "90vh",
+    disableClose: true,
+    panelClass: "client-group-dialog",
+  });
+
+  // Open the component in popup mode instead of full-page mode.
+  dialogRef.componentInstance.popupMode = true;
+
+  dialogRef.afterClosed().subscribe((createdGroup: any) => {
+    if (!createdGroup) {
+      return;
+    }
+
+    // Refresh the dropdown and select the newly created group.
+    this.loadClientGroups(createdGroup);
+  });
+}
+
 
   // =====================================================
   // SAVE CLIENT

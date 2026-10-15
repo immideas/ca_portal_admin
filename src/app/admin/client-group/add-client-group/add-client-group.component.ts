@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  Optional,
+} from "@angular/core";
 
 import { Router, ActivatedRoute, RouterModule } from "@angular/router";
 
@@ -19,7 +25,11 @@ import { ToastrService, ToastrModule } from "ngx-toastr";
 
 import { Observable } from "rxjs";
 
-import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import {
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from "@angular/material/dialog";
 
 import { ConfirmDialogComponent } from "../../../confirm-dialog/confirm-dialog.component";
 
@@ -43,6 +53,7 @@ import { ClientGroupService } from "../../../services/client-group.service";
   ],
 })
 export class AddClientGroupComponent implements OnInit, OnDestroy {
+    @Input() popupMode = false;
   clientGroupForm: FormGroup;
 
   token: string | null = localStorage.getItem("token");
@@ -73,6 +84,8 @@ export class AddClientGroupComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
 
     private clientGroupService: ClientGroupService,
+      @Optional()
+  private dialogRef: MatDialogRef<AddClientGroupComponent> | null
   ) {
     this.clientGroupForm = this.fb.group({
       name: [
@@ -187,91 +200,113 @@ generateGroupCode(): void {
     .get("code")
     ?.setValue(`${prefix}-001`);
 }
-  saveClientGroup(): void {
-    this.submitted = true;
+  
+saveClientGroup(): void {
+  this.submitted = true;
 
-    if (this.clientGroupForm.invalid) {
-      this.clientGroupForm.markAllAsTouched();
-
-      this.toastr.error("Please fill in all required fields correctly.");
-
-      return;
-    }
-
-    this.isSaving = true;
-
-    this.ngxLoader.start();
-
-    const formValue = this.clientGroupForm.getRawValue();
-
-    const payload: any = {
-      name: formValue.name?.trim(),
-
-  code: formValue.code?.trim(),
-
-      description: formValue.description?.trim() || null,
-
-      status: formValue.status,
-    };
-
-    if (this.isEditMode && this.clientGroupId) {
-      payload.id = this.clientGroupId;
-
-      this.clientGroupService.updateClientGroup(payload).subscribe({
-        next: () => {
-          this.ngxLoader.stop();
-
-          this.isSaving = false;
-
-          this.toastr.success("Client group updated successfully", "Success");
-
-          this.router.navigate(["/client-groups"]);
-        },
-
-        error: (err: any) => {
-          this.ngxLoader.stop();
-
-          this.isSaving = false;
-
-          console.error("Update client group failed:", err);
-
-          this.toastr.error(
-            err?.error?.message || "Failed to update client group",
-            "Error",
-          );
-        },
-      });
-    } else {
-      this.clientGroupService.createClientGroup(payload).subscribe({
-        next: () => {
-          this.ngxLoader.stop();
-
-          this.isSaving = false;
-
-          this.toastr.success("Client group added successfully", "Success");
-
-          this.router.navigate(["/client-groups"]);
-        },
-
-        error: (err: any) => {
-          this.ngxLoader.stop();
-
-          this.isSaving = false;
-
-          console.error("Create client group failed:", err);
-
-          this.toastr.error(
-            err?.error?.message || "Failed to add client group",
-            "Error",
-          );
-        },
-      });
-    }
+  if (this.clientGroupForm.invalid) {
+    this.clientGroupForm.markAllAsTouched();
+    this.toastr.error(
+      "Please enter a valid group name (at least 3 characters)."
+    );
+    return;
   }
 
-  cancel(): void {
-    this.router.navigate(["/client-groups"]);
+  this.isSaving = true;
+  this.ngxLoader.start();
+
+  const formValue = this.clientGroupForm.getRawValue();
+
+  const payload: any = {
+    name: formValue.name?.trim(),
+    code: formValue.code?.trim(),
+    description: this.popupMode
+      ? null
+      : formValue.description?.trim() || null,
+    status: this.popupMode ? 1 : formValue.status,
+  };
+
+  const stopSaving = (): void => {
+    this.ngxLoader.stop();
+    this.isSaving = false;
+  };
+
+  if (this.isEditMode && this.clientGroupId) {
+    payload.id = this.clientGroupId;
+
+    this.clientGroupService.updateClientGroup(payload).subscribe({
+      next: () => {
+        stopSaving();
+        this.toastr.success(
+          "Client group updated successfully",
+          "Success"
+        );
+        this.router.navigate(["/client-groups"]);
+      },
+      error: (err: any) => {
+        stopSaving();
+        console.error("Update client group failed:", err);
+        this.toastr.error(
+          err?.error?.message || "Failed to update client group",
+          "Error"
+        );
+      },
+    });
+
+    return;
   }
+
+  this.clientGroupService.createClientGroup(payload).subscribe({
+    next: (response: any) => {
+      stopSaving();
+
+      const responseData =
+        response?.data?.clientGroup ||
+        response?.data ||
+        response?.clientGroup ||
+        response;
+
+      const createdGroup = {
+        ...responseData,
+        id: responseData?.id ?? responseData?.clientGroupId,
+        name: responseData?.name || payload.name,
+        code: responseData?.code || payload.code,
+      };
+
+      this.toastr.success(
+        "Client group added successfully",
+        "Success"
+      );
+
+      if (this.popupMode && this.dialogRef) {
+        this.dialogRef.close(createdGroup);
+        return;
+      }
+
+      this.router.navigate(["/client-groups"]);
+    },
+    error: (err: any) => {
+      stopSaving();
+      console.error("Create client group failed:", err);
+      this.toastr.error(
+        err?.error?.message || "Failed to add client group",
+        "Error"
+      );
+    },
+  });
+}
+
+
+
+cancel(): void {
+  if (this.popupMode && this.dialogRef) {
+    this.dialogRef.close(null);
+    return;
+  }
+
+  this.router.navigate(['/client-groups']);
+}
+
 
   enableEditMode(): void {
     this.isViewMode = false;
@@ -283,7 +318,11 @@ generateGroupCode(): void {
      */
     this.clientGroupForm.get("code")?.disable();
   }
-
+closePopup(): void {
+  if (this.dialogRef) {
+    this.dialogRef.close(null);
+  }
+}
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
     if (this.clientGroupForm.dirty && !this.submitted && !this.isViewMode) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {

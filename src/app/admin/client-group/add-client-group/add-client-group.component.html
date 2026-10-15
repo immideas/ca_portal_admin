@@ -1,4 +1,83 @@
-<main id="main" class="complaint-wrapper">
+
+<!-- Popup mode: only Group Name -->
+<div *ngIf="popupMode" class="group-popup">
+
+  <div class="group-popup-header">
+    <h2>Add Client Group</h2>
+
+   
+<button
+  type="button"
+  class="popup-close"
+  aria-label="Close"
+  (click)="closePopup()"
+  [disabled]="isSaving">
+  &times;
+</button>
+
+  </div>
+
+  <form
+    [formGroup]="clientGroupForm"
+    (ngSubmit)="saveClientGroup()">
+
+    <div class="group-popup-body">
+      <label for="popupGroupName">
+        Group Name <span class="required">*</span>
+      </label>
+
+      <input
+        id="popupGroupName"
+        type="text"
+        class="form-control"
+        formControlName="name"
+        placeholder="Enter group name"
+        maxlength="150" />
+
+      <div
+        class="text-danger mt-1"
+        *ngIf="
+          clientGroupForm.get('name')?.touched &&
+          clientGroupForm.get('name')?.invalid">
+
+        <small *ngIf="clientGroupForm.get('name')?.errors?.['required']">
+          Group name is required.
+        </small>
+
+        <small *ngIf="clientGroupForm.get('name')?.errors?.['minlength']">
+          Group name must be at least 3 characters.
+        </small>
+
+        <small *ngIf="clientGroupForm.get('name')?.errors?.['maxlength']">
+          Group name cannot exceed 150 characters.
+        </small>
+      </div>
+    </div>
+
+    <div class="group-popup-footer">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="cancel()"
+        [disabled]="isSaving">
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        class="btn-save btn-active"
+        [disabled]="clientGroupForm.get('name')?.invalid || isSaving">
+        {{ isSaving ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<main
+  *ngIf="!popupMode"
+  id="main"
+  class="complaint-wrapper">
   <ngx-ui-loader></ngx-ui-loader>
 
   <header class="top-header">
