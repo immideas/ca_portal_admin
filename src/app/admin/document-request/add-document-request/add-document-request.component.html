@@ -504,88 +504,119 @@
     <!-- ===================================================== -->
     <!-- REQUEST DETAILS -->
     <!-- ===================================================== -->
+<article class="card complaint-card mb-4">
+  <div class="section-title">
+    <div class="item-icon">
+      <img src="assets/img/Information.svg" alt="info" />
+    </div>
 
-    <article class="card complaint-card mb-4">
-      <div class="section-title">
-        <div class="item-icon">
-          <img src="assets/img/Information.svg" alt="info" />
-        </div>
+    <div class="header-content">
+      <span class="header-text">Request Details</span>
+    </div>
+  </div>
 
-        <div class="header-content">
-          <span class="header-text"> Request Details </span>
-        </div>
-      </div>
+  <div class="form-padding-wrap">
 
-      <div class="form-padding-wrap">
-        <div class="row mb-3">
-          <!-- PRIORITY -->
+    <!-- FIRST ROW: PRIORITY + PERIOD -->
+    <!-- FIRST ROW: PRIORITY + PERIOD -->
+<div class="row mb-3">
 
-          <div class="col-md-4 form-group">
-            <label for="priority"> Priority </label>
+  <!-- PRIORITY -->
+  <div class="col-md-6 form-group">
+    <label for="priority">Priority</label>
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <select
-                id="priority"
-                formControlName="priority"
-                class="form-controler"
-              >
-                <option [ngValue]="'LOW'">Low</option>
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <select
+        id="priority"
+        formControlName="priority"
+        class="form-controler"
+        [disabled]="isViewMode"
+      >
+        <option [ngValue]="'LOW'">Low</option>
+        <option [ngValue]="'MEDIUM'">Medium</option>
+        <option [ngValue]="'HIGH'">High</option>
+      </select>
+    </div>
+  </div>
 
-                <option [ngValue]="'MEDIUM'">Medium</option>
+  <!-- PERIOD / FINANCIAL YEAR -->
+  <div class="col-md-6 form-group">
+    <label for="period">Period (FY)</label>
 
-                <option [ngValue]="'HIGH'">High</option>
-              </select>
-            </div>
-          </div>
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <select
+        id="period"
+        formControlName="period"
+        class="form-controler"
+        [disabled]="isViewMode"
+      >
+        <option value="">Select financial year</option>
 
-          <!-- PERIOD -->
+        <option
+          *ngFor="let year of financialYears"
+          [value]="year"
+        >
+          {{ year }}
+        </option>
+      </select>
+    </div>
+  </div>
 
-          <div class="col-md-4 form-group">
-            <label for="period"> Period (FY) </label>
+</div>
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="text"
-                id="period"
-                formControlName="period"
-                class="form-controler"
-                placeholder="e.g. May 2026"
-                autocomplete="off"
-              />
-            </div>
-          </div>
+<!-- SECOND ROW: DUE DATE -->
+<div class="row mb-3">
+  <div class="col-md-12 form-group">
+    <label for="dueDate">Due Date</label>
 
-          <!-- DUE DATE -->
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <input
+        type="date"
+        id="dueDate"
+        formControlName="dueDate"
+        class="form-controler"
+        [disabled]="isViewMode"
+      />
+    </div>
+  </div>
+</div>
+<!-- SECOND ROW: FULL-WIDTH DUE DATE -->
+<!-- <div class="row mb-3">
+  <div class="col-md-12 form-group">
+    <label for="dueDate">Due Date</label>
 
-          <div class="col-md-4 form-group">
-            <label for="dueDate"> Due Date </label>
+    <div
+      class="field-wrap"
+      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+    >
+      <input
+        type="date"
+        id="dueDate"
+        formControlName="dueDate"
+        class="form-controler"
+      />
+    </div>
+  </div>
+</div> -->
 
-            <div
-              class="field-wrap"
-              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-            >
-              <input
-                type="date"
-                id="dueDate"
-                formControlName="dueDate"
-                class="form-controler"
-              />
-            </div>
-          </div>
-          
-        </div>
-      </div>
-    </article>
+  </div>
+</article>
     
 
 
+<!-- ===================================================== -->
 <!-- RECURRING SERVICE -->
+<!-- ===================================================== -->
+
 <article class="card complaint-card mb-4 recurring-card">
   <div class="section-title">
     <div class="item-icon">
@@ -594,14 +625,17 @@
 
     <div class="header-content">
       <span class="header-text">Recurring Service</span>
+
       <span class="header-subtext">
         Automatically generate future document requests
-        according to the selected service frequency.
+        according to the selected frequency.
       </span>
     </div>
   </div>
 
   <div class="form-padding-wrap">
+
+    <!-- RECURRING TOGGLE -->
     <div class="recurring-toggle-row">
       <div>
         <label for="isRecurring" class="recurring-label">
@@ -610,7 +644,7 @@
 
         <p class="text-muted mb-0 recurring-help">
           Future requests will be generated automatically
-          using the frequency configured for the selected service.
+          using the frequency selected below.
         </p>
       </div>
 
@@ -621,31 +655,55 @@
           formControlName="isRecurring"
           [disabled]="isViewMode"
         />
+
         <span class="recurring-slider"></span>
       </label>
     </div>
 
-  
-<div
-  class="recurring-frequency-info"
-  *ngIf="documentRequestForm.get('isRecurring')?.value"
->
-  <i class="bi bi-info-circle"></i>
+    <!-- FREQUENCY DROPDOWN -->
+    <div
+      class="recurring-frequency-info mt-3"
+      *ngIf="documentRequestForm.get('isRecurring')?.value"
+    >
+      <div class="form-group">
 
-  <div class="recurring-frequency-content">
-    <div class="recurring-frequency-title">
-      Service frequency:
-      <strong>
-        {{ getRecurringFrequency() || 'Not configured' }}
-      </strong>
+        <label for="frequency" class="recurring-frequency-title">
+          Recurrence Frequency
+          <span class="text-danger">*</span>
+        </label>
+
+        <select
+          id="frequency"
+          formControlName="frequency"
+          class="form-controler"
+          [disabled]="isViewMode"
+        >
+          <option value="">Select frequency</option>
+          <option value="Monthly">Monthly</option>
+          <option value="Quarterly">Quarterly</option>
+          <option value="Half-Yearly">Half-Yearly</option>
+          <option value="Yearly">Yearly</option>
+        </select>
+
+        <!-- VALIDATION MESSAGE -->
+        <div
+          class="text-danger mt-1"
+          style="font-size: 11px"
+          *ngIf="
+            documentRequestForm.get('frequency')?.invalid &&
+            documentRequestForm.get('frequency')?.touched
+          "
+        >
+          Please select a recurring frequency.
+        </div>
+
+        <small class="text-muted d-block mt-2">
+          The next request will be generated automatically
+          according to this frequency.
+        </small>
+
+      </div>
     </div>
-
-    <small>
-      Future document requests will be generated automatically
-      according to this service frequency.
-    </small>
-  </div>
-</div>
 
   </div>
 </article>

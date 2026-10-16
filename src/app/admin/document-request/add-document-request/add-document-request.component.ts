@@ -66,10 +66,10 @@ export class AddDocumentRequestComponent implements OnInit {
   isViewMode = false;
   isEditMode = false;
 
-@Input() documentRequestId: number | null = null;
+  @Input() documentRequestId: number | null = null;
 
-@Input() forceViewMode = false;
-@Input() embedded = false;
+  @Input() forceViewMode = false;
+  @Input() embedded = false;
   // =====================================================
   // CLIENTS
   // =====================================================
@@ -159,7 +159,7 @@ export class AddDocumentRequestComponent implements OnInit {
    * requestServices contains all selected services.
    */
   selectedClientServiceId: number | null = null;
-
+financialYears: string[] = [];
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -222,35 +222,31 @@ export class AddDocumentRequestComponent implements OnInit {
 
       dueDate: [null],
       isRecurring: [false],
+      frequency: [""],
       discountType: ["FIXED"],
 
-discountValue: [
-  0,
-  [
-    Validators.min(0),
-  ],
-],
+      discountValue: [0, [Validators.min(0)]],
     });
-    
   }
-
 
   // =====================================================
   // INIT
   // =====================================================
 
   ngOnInit(): void {
+      this.loadFinancialYears();
+
     this.loadClients();
 
     this.loadUsers();
-  if (this.forceViewMode && this.documentRequestId) {
-    this.isViewMode = true;
-    this.isEditMode = false;
+    if (this.forceViewMode && this.documentRequestId) {
+      this.isViewMode = true;
+      this.isEditMode = false;
 
-    this.loadDocumentRequest(this.documentRequestId);
+      this.loadDocumentRequest(this.documentRequestId);
 
-    return;
-  }
+      return;
+    }
     // =================================================
     // ROUTE ID -> EDIT MODE
     // =================================================
@@ -375,11 +371,12 @@ discountValue: [
           period: request.period ?? "",
 
           dueDate: request.dueDate ?? null,
-            isRecurring: Boolean(
-    request.isRecurring ?? request.recurringScheduleId
-  ),
-            discountType: request.discountType ?? "FIXED",
-  discountValue: request.discountValue ?? 0,
+          isRecurring: Boolean(
+            request.isRecurring ?? request.recurringScheduleId,
+          ),
+          frequency: request.frequency ?? "",
+          discountType: request.discountType ?? "FIXED",
+          discountValue: request.discountValue ?? 0,
         });
 
         // =================================================
@@ -454,7 +451,9 @@ discountValue: [
               Number.isInteger(documentId) && documentId > 0,
           );
 
-        this.selectedDocumentIds = Array.from(new Set(this.selectedDocumentIds));
+        this.selectedDocumentIds = Array.from(
+          new Set(this.selectedDocumentIds),
+        );
 
         this.requiredDocumentIds = Array.from(
           new Set(this.requiredDocumentIds),
@@ -640,9 +639,7 @@ discountValue: [
           return;
         }
 
-        const assignments = Array.isArray(response.data)
-          ? response.data
-          : [];
+        const assignments = Array.isArray(response.data) ? response.data : [];
 
         this.services = assignments;
 
@@ -651,9 +648,9 @@ discountValue: [
         // =================================================
 
         if (
-  (this.isEditMode || this.forceViewMode) &&
-  this.selectedServiceIds.length > 0
-) {
+          (this.isEditMode || this.forceViewMode) &&
+          this.selectedServiceIds.length > 0
+        ) {
           this.selectedServices = this.selectedServiceIds
             .map((serviceId: number) =>
               this.services.find(
@@ -694,7 +691,10 @@ discountValue: [
 
     return this.services.filter((service: any) => {
       const name = String(
-        service.serviceName || service.service?.serviceName || service.name || "",
+        service.serviceName ||
+          service.service?.serviceName ||
+          service.name ||
+          "",
       ).toLowerCase();
 
       return name.includes(query);
@@ -736,7 +736,8 @@ discountValue: [
 
     const spaceBelow = window.innerHeight - rect.bottom;
 
-    const openUpwards = spaceBelow < estimatedPanelHeight && rect.top > spaceBelow;
+    const openUpwards =
+      spaceBelow < estimatedPanelHeight && rect.top > spaceBelow;
 
     this.servicePanelStyle = openUpwards
       ? {
@@ -835,20 +836,14 @@ discountValue: [
     else {
       this.selectedServiceIds.push(serviceId);
 
-   const serviceDetails =
-  assignment.service ??
-  assignment.Service ??
-  {};
+      const serviceDetails = assignment.service ?? assignment.Service ?? {};
 
-this.selectedServices.push({
-  ...assignment,
-  serviceId,
-  id: clientServiceId,
-  frequency:
-    assignment.frequency ??
-    serviceDetails.frequency ??
-    null,
-});
+      this.selectedServices.push({
+        ...assignment,
+        serviceId,
+        id: clientServiceId,
+        frequency: assignment.frequency ?? serviceDetails.frequency ?? null,
+      });
     }
 
     // =================================================
@@ -1025,7 +1020,9 @@ this.selectedServices.push({
         //
 
         uniqueRequiredDocuments.sort((a: any, b: any) =>
-          String(a.documentName || "").localeCompare(String(b.documentName || "")),
+          String(a.documentName || "").localeCompare(
+            String(b.documentName || ""),
+          ),
         );
 
         // =================================================
@@ -1262,9 +1259,7 @@ this.selectedServices.push({
         //
 
         const allAvailableDocumentIds = new Set([
-          ...this.requiredDocuments.map((document: any) =>
-            Number(document.id),
-          ),
+          ...this.requiredDocuments.map((document: any) => Number(document.id)),
           ...this.additionalDocuments.map((document: any) =>
             Number(document.id),
           ),
@@ -1400,7 +1395,9 @@ this.selectedServices.push({
     }
 
     return this.additionalDocuments.filter((document: any) => {
-      const name = String(document.documentName || document.name || "").toLowerCase();
+      const name = String(
+        document.documentName || document.name || "",
+      ).toLowerCase();
 
       const description = String(
         document.documentDescription || document.description || "",
@@ -1568,7 +1565,6 @@ this.selectedServices.push({
       return;
     }
 
-
     // =================================================
     // SERVICE VALIDATION
     // =================================================
@@ -1593,6 +1589,20 @@ this.selectedServices.push({
     }
 
     const formValue = this.documentRequestForm.getRawValue();
+    // =====================================================
+    // RECURRING FREQUENCY VALIDATION
+    // =====================================================
+
+    if (formValue.isRecurring && !formValue.frequency) {
+      this.documentRequestForm.get("frequency")?.markAsTouched();
+
+      this.toastr.error(
+        "Please select a recurring frequency.",
+        "Validation Error",
+      );
+
+      return;
+    }
 
     // =================================================
     // NORMALIZE SERVICES
@@ -1627,10 +1637,10 @@ this.selectedServices.push({
 
     const payload: any = {
       taskName: formValue.taskName?.trim(),
-      
-isRecurring: formValue.isRecurring === true,
 
+      isRecurring: formValue.isRecurring === true,
 
+      frequency: formValue.isRecurring ? formValue.frequency : null,
 
       clientId: Number(formValue.clientId),
 
@@ -1658,17 +1668,17 @@ isRecurring: formValue.isRecurring === true,
 
       dueDate: formValue.dueDate || null,
       discountType:
-  formValue.discountType === "FIXED" ||
-  formValue.discountType === "PERCENTAGE"
-    ? formValue.discountType
-    : null,
+        formValue.discountType === "FIXED" ||
+        formValue.discountType === "PERCENTAGE"
+          ? formValue.discountType
+          : null,
 
-discountValue:
-  formValue.discountValue !== null &&
-  formValue.discountValue !== undefined &&
-  formValue.discountValue !== ""
-    ? Number(formValue.discountValue)
-    : 0,
+      discountValue:
+        formValue.discountValue !== null &&
+        formValue.discountValue !== undefined &&
+        formValue.discountValue !== ""
+          ? Number(formValue.discountValue)
+          : 0,
 
       /*
        * All selected documents.
@@ -1797,81 +1807,78 @@ discountValue:
     });
   }
   // =====================================================
-// REQUEST PRICING
-// =====================================================
+  // REQUEST PRICING
+  // =====================================================
 
-// =====================================================
-// REQUEST PRICING
-// =====================================================
+  // =====================================================
+  // REQUEST PRICING
+  // =====================================================
 
-getServiceCost(): number {
-  if (!Array.isArray(this.selectedServices)) {
-    return 0;
+  getServiceCost(): number {
+    if (!Array.isArray(this.selectedServices)) {
+      return 0;
+    }
+
+    return this.selectedServices.reduce((total: number, service: any) => {
+      const price = Number(
+        service.billingAmount ??
+          service.billing_amount ??
+          service.service?.billingAmount ??
+          service.service?.billing_amount ??
+          service.servicePrice ??
+          service.service_price ??
+          service.service?.servicePrice ??
+          service.service?.service_price ??
+          service.price ??
+          service.amount ??
+          0,
+      );
+
+      return total + (Number.isFinite(price) ? price : 0);
+    }, 0);
   }
 
-  return this.selectedServices.reduce((total: number, service: any) => {
-    const price = Number(
-      service.billingAmount ??
-      service.billing_amount ??
-      service.service?.billingAmount ??
-      service.service?.billing_amount ??
-      service.servicePrice ??
-      service.service_price ??
-      service.service?.servicePrice ??
-      service.service?.service_price ??
-      service.price ??
-      service.amount ??
-      0
+  // =====================================================
+  // DISCOUNT AMOUNT
+  // =====================================================
+
+  getDiscountAmount(): number {
+    const serviceCost = this.getServiceCost();
+
+    const discountType = this.documentRequestForm.get("discountType")?.value;
+
+    const discountValue = Number(
+      this.documentRequestForm.get("discountValue")?.value || 0,
     );
 
-    return total + (Number.isFinite(price) ? price : 0);
-  }, 0);
-}
+    if (serviceCost <= 0 || discountValue <= 0) {
+      return 0;
+    }
 
+    let discountAmount = 0;
 
-// =====================================================
-// DISCOUNT AMOUNT
-// =====================================================
+    if (discountType === "FIXED") {
+      discountAmount = discountValue;
+    }
 
-getDiscountAmount(): number {
-  const serviceCost = this.getServiceCost();
+    if (discountType === "PERCENTAGE") {
+      discountAmount = (serviceCost * discountValue) / 100;
+    }
 
-  const discountType =
-    this.documentRequestForm.get("discountType")?.value;
-
-  const discountValue = Number(
-    this.documentRequestForm.get("discountValue")?.value || 0
-  );
-
-  if (serviceCost <= 0 || discountValue <= 0) {
-    return 0;
+    // Discount cannot be greater than service cost
+    return Math.min(discountAmount, serviceCost);
   }
 
-  let discountAmount = 0;
+  // =====================================================
+  // TOTAL AFTER DISCOUNT
+  // =====================================================
 
-  if (discountType === "FIXED") {
-    discountAmount = discountValue;
+  getTotalAfterDiscount(): number {
+    const serviceCost = this.getServiceCost();
+    const discountAmount = this.getDiscountAmount();
+
+    return Math.max(serviceCost - discountAmount, 0);
   }
-
-  if (discountType === "PERCENTAGE") {
-    discountAmount = (serviceCost * discountValue) / 100;
-  }
-
-  // Discount cannot be greater than service cost
-  return Math.min(discountAmount, serviceCost);
-}
-
-
-// =====================================================
-// TOTAL AFTER DISCOUNT
-// =====================================================
-
-getTotalAfterDiscount(): number {
-  const serviceCost = this.getServiceCost();
-  const discountAmount = this.getDiscountAmount();
-
-  return Math.max(serviceCost - discountAmount, 0);
-}
 
   // =====================================================
   // CANCEL
@@ -1881,80 +1888,67 @@ getTotalAfterDiscount(): number {
     this.router.navigate(["/service-requests"]);
   }
 
-onRecurringToggle(): void {
-  const isRecurring =
-    this.documentRequestForm.get("isRecurring")?.value === true;
+  onRecurringToggle(): void {
+    const isRecurring =
+      this.documentRequestForm.get("isRecurring")?.value === true;
 
-  const startControl =
-    this.documentRequestForm.get("recurringStartDate");
+    const startControl = this.documentRequestForm.get("recurringStartDate");
 
-  const endControl =
-    this.documentRequestForm.get("recurringEndDate");
+    const endControl = this.documentRequestForm.get("recurringEndDate");
 
-  if (!isRecurring) {
-    startControl?.setValue(null);
-    endControl?.setValue(null);
+    if (!isRecurring) {
+      startControl?.setValue(null);
+      endControl?.setValue(null);
+    }
+
+    startControl?.updateValueAndValidity();
+    endControl?.updateValueAndValidity();
   }
 
-  startControl?.updateValueAndValidity();
-  endControl?.updateValueAndValidity();
-}
+  private validateRecurringDates(): boolean {
+    const formValue = this.documentRequestForm.getRawValue();
 
-private validateRecurringDates(): boolean {
-  const formValue = this.documentRequestForm.getRawValue();
+    if (!formValue.isRecurring) {
+      return true;
+    }
 
-  if (!formValue.isRecurring) {
+    if (!formValue.recurringStartDate) {
+      this.toastr.error(
+        "Please select a recurring start date.",
+        "Validation Error",
+      );
+      return false;
+    }
+
+    if (
+      formValue.recurringEndDate &&
+      formValue.recurringEndDate < formValue.recurringStartDate
+    ) {
+      this.toastr.error(
+        "Recurring end date cannot be before the start date.",
+        "Validation Error",
+      );
+      return false;
+    }
+
     return true;
   }
-
-  if (!formValue.recurringStartDate) {
-    this.toastr.error(
-      "Please select a recurring start date.",
-      "Validation Error"
-    );
-    return false;
+  getRecurringFrequency(): string {
+    return this.documentRequestForm.get("frequency")?.value || "";
   }
+  private loadFinancialYears(): void {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
 
-  if (
-    formValue.recurringEndDate &&
-    formValue.recurringEndDate < formValue.recurringStartDate
-  ) {
-    this.toastr.error(
-      "Recurring end date cannot be before the start date.",
-      "Validation Error"
-    );
-    return false;
-  }
+  // Financial year starts in April.
+  const startYear =
+    currentMonth >= 3 ? currentYear : currentYear - 1;
 
-  return true;
-}
-getRecurringFrequency(): string {
-  const primaryService = this.selectedServices?.[0];
-
-  const frequency =
-    primaryService?.frequency ??
-    primaryService?.service?.frequency ??
-    primaryService?.Service?.frequency;
-
-  if (!frequency) {
-    return '';
-  }
-
-  const frequencyLabels: Record<string, string> = {
-    MONTHLY: 'Monthly',
-    QUARTERLY: 'Quarterly',
-    'HALF-YEARLY': 'Half-Yearly',
-    HALFYEARLY: 'Half-Yearly',
-    YEARLY: 'Yearly',
-    ANNUALLY: 'Yearly',
-  };
-
-  const normalizedFrequency = String(frequency).trim().toUpperCase();
-
-  return (
-    frequencyLabels[normalizedFrequency] ??
-    String(frequency).trim()
-  );
+  this.financialYears = Array.from({ length: 6 }, (_, index) => {
+    const year = startYear + index;
+    return `${year}-${String(year + 1).slice(-2)}`;
+  });
 }
 
   // =====================================================
@@ -1962,11 +1956,7 @@ getRecurringFrequency(): string {
   // =====================================================
 
   canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
-    if (
-      this.documentRequestForm.dirty &&
-      !this.submitted &&
-      !this.isViewMode
-    ) {
+    if (this.documentRequestForm.dirty && !this.submitted && !this.isViewMode) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: "550px",
         disableClose: true,
