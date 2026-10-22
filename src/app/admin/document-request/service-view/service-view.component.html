@@ -669,6 +669,42 @@
                     </strong>
                   </div>
 
+                  
+<!-- LATE FEE -->
+<div
+  class="inv-total-row"
+  *ngIf="serviceRequestPayment.lateFeeAmount > 0"
+>
+  <span>
+    Late Fee
+    <small *ngIf="serviceRequestPayment.lateFeeDescription">
+      ({{ serviceRequestPayment.lateFeeDescription }})
+    </small>
+  </span>
+
+  <strong>
+    {{
+      serviceRequestPayment.lateFeeAmount
+        | currency: "INR" : "symbol" : "1.2-2"
+    }}
+  </strong>
+</div>
+
+<!-- ADDITIONAL CHARGES -->
+<div
+  class="inv-total-row"
+  *ngIf="serviceRequestPayment.otherAmountPaid > 0"
+>
+  <span>Additional Charges</span>
+
+  <strong>
+    {{
+      serviceRequestPayment.otherAmountPaid
+        | currency: "INR" : "symbol" : "1.2-2"
+    }}
+  </strong>
+</div>
+
                   <!-- TOTAL -->
                   <div class="inv-grand-total">
                     <span>Total Amount</span>

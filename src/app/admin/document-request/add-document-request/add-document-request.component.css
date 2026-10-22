@@ -1604,3 +1604,198 @@ input:disabled
     padding: 12px;
   }
 }
+
+/* =====================================================
+   LAST FILING DATE & ADDITIONAL FEE FIELDS
+   Preserve existing fonts and typography
+===================================================== */
+
+/* Input and textarea appearance */
+.form-padding-wrap .form-controler {
+  border: 1px solid #e4eaf2;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus state */
+.form-padding-wrap .form-controler:focus {
+  outline: none;
+  border-color: #6585ff;
+  box-shadow: 0 0 0 3px rgba(72, 103, 255, 0.10);
+  background-color: #ffffff;
+}
+
+/* Description textarea */
+.form-padding-wrap textarea.form-controler {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+/* View mode */
+.form-padding-wrap .form-controler:disabled,
+.form-padding-wrap textarea.form-controler:read-only {
+  background-color: #f1f4f9;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Consistent spacing between rows */
+.form-padding-wrap .row.mb-3 {
+  row-gap: 0;
+}
+
+/* Fix Late Fee Description textarea spacing */
+.form-padding-wrap textarea.form-controler {
+  padding: 12px 14px;
+  box-sizing: border-box;
+  line-height: normal;
+  vertical-align: top;
+}
+
+/* Keep placeholder away from the edges */
+.form-padding-wrap textarea.form-controler::placeholder {
+  opacity: 1;
+}
+
+/* Consistent field appearance */
+.form-padding-wrap textarea.form-controler:focus {
+  outline: none;
+}
+
+/* DOCUMENT REMINDERS */
+.reminder-card {
+  overflow: hidden;
+}
+
+.reminder-card .section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reminder-card .reminder-icon {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.reminder-body {
+  padding: 18px 22px;
+}
+
+.reminder-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.reminder-setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reminder-setting-title {
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reminder-setting-description {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.reminder-options {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0f5;
+}
+
+.reminder-options-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reminder-options-hint {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.reminder-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.reminder-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  background: #fff;
+  color: #4b5563;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reminder-chip input {
+  display: none;
+}
+
+.reminder-chip i {
+  color: #9ca3af;
+  font-size: 15px;
+}
+
+.reminder-chip.selected {
+  border-color: #c7d2fe;
+  background: #f5f7ff;
+  color: #3730a3;
+}
+
+.reminder-chip.selected i {
+  color: #4f46e5;
+}
+
+.reminder-chip:not(.disabled):hover {
+  border-color: #818cf8;
+}
+
+.reminder-chip.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (max-width: 576px) {
+  .reminder-body {
+    padding: 15px;
+  }
+
+  .reminder-options-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .reminder-chips {
+    gap: 8px;
+  }
+
+  .reminder-chip {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}

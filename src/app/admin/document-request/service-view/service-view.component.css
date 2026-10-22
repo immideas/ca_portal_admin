@@ -3320,3 +3320,44 @@ color: var(--primary-color, #4f46e5);
 .inv-totals .discount-amount {
   color: #dc3545 !important;
 }
+/* Late Fee & Additional Charges */
+.inv-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.inv-total-row span {
+  flex: 1;
+}
+
+.inv-total-row strong {
+  font-weight: 600;
+  color: #1f2937;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.inv-total-row small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Keep invoice amounts aligned on smaller screens */
+@media (max-width: 576px) {
+  .inv-total-row {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .inv-total-row strong {
+    font-size: 13px;
+  }
+}

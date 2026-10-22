@@ -504,93 +504,171 @@
     <!-- ===================================================== -->
     <!-- REQUEST DETAILS -->
     <!-- ===================================================== -->
-<article class="card complaint-card mb-4">
-  <div class="section-title">
-    <div class="item-icon">
-      <img src="assets/img/Information.svg" alt="info" />
-    </div>
+    <article class="card complaint-card mb-4">
+      <div class="section-title">
+        <div class="item-icon">
+          <img src="assets/img/Information.svg" alt="info" />
+        </div>
 
-    <div class="header-content">
-      <span class="header-text">Request Details</span>
-    </div>
-  </div>
+        <div class="header-content">
+          <span class="header-text">Request Details</span>
+        </div>
+      </div>
 
-  <div class="form-padding-wrap">
+      <div class="form-padding-wrap">
+        <!-- FIRST ROW: PRIORITY + PERIOD -->
+        <!-- FIRST ROW: PRIORITY + PERIOD -->
+        <div class="row mb-3">
+          <!-- PRIORITY -->
+          <div class="col-md-6 form-group">
+            <label for="priority">Priority</label>
 
-    <!-- FIRST ROW: PRIORITY + PERIOD -->
-    <!-- FIRST ROW: PRIORITY + PERIOD -->
-<div class="row mb-3">
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="priority"
+                formControlName="priority"
+                class="form-controler"
+                [disabled]="isViewMode"
+              >
+                <option [ngValue]="'LOW'">Low</option>
+                <option [ngValue]="'MEDIUM'">Medium</option>
+                <option [ngValue]="'HIGH'">High</option>
+              </select>
+            </div>
+          </div>
 
-  <!-- PRIORITY -->
-  <div class="col-md-6 form-group">
-    <label for="priority">Priority</label>
+          <!-- PERIOD / FINANCIAL YEAR -->
+          <div class="col-md-6 form-group">
+            <label for="period">Period (FY)</label>
 
-    <div
-      class="field-wrap"
-      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-    >
-      <select
-        id="priority"
-        formControlName="priority"
-        class="form-controler"
-        [disabled]="isViewMode"
-      >
-        <option [ngValue]="'LOW'">Low</option>
-        <option [ngValue]="'MEDIUM'">Medium</option>
-        <option [ngValue]="'HIGH'">High</option>
-      </select>
-    </div>
-  </div>
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="period"
+                formControlName="period"
+                class="form-controler"
+                [disabled]="isViewMode"
+              >
+                <option value="">Select financial year</option>
 
-  <!-- PERIOD / FINANCIAL YEAR -->
-  <div class="col-md-6 form-group">
-    <label for="period">Period (FY)</label>
+                <option *ngFor="let year of financialYears" [value]="year">
+                  {{ year }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-    <div
-      class="field-wrap"
-      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-    >
-      <select
-        id="period"
-        formControlName="period"
-        class="form-controler"
-        [disabled]="isViewMode"
-      >
-        <option value="">Select financial year</option>
+        <!-- SECOND ROW: DUE DATE -->
 
-        <option
-          *ngFor="let year of financialYears"
-          [value]="year"
-        >
-          {{ year }}
-        </option>
-      </select>
-    </div>
-  </div>
+        <!-- SECOND ROW: DUE DATE -->
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="dueDate">Due Date</label>
 
-</div>
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="date"
+                id="dueDate"
+                formControlName="dueDate"
+                class="form-controler"
+                [disabled]="isViewMode"
+              />
+            </div>
+          </div>
+        </div>
 
-<!-- SECOND ROW: DUE DATE -->
+        <!-- LAST FILING DATE + LATE FEE AMOUNT -->
+        <div class="row mb-3">
+          <div class="col-md-6 form-group">
+            <label for="lastFilingDate">Last Filing Date</label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="date"
+                id="lastFilingDate"
+                formControlName="lastFilingDate"
+                class="form-controler"
+                [disabled]="isViewMode"
+              />
+            </div>
+          </div>
+
+          <div class="col-md-6 form-group">
+            <label for="lateFeeAmount">Late Fee Amount (₹)</label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="number"
+                id="lateFeeAmount"
+                formControlName="lateFeeAmount"
+                class="form-controler"
+                placeholder="Enter late fee amount"
+                min="0"
+                step="0.01"
+                [disabled]="isViewMode"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- LATE FEE DESCRIPTION -->
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="lateFeeDescription">Late Fee Description</label>
+
+            <textarea
+              id="lateFeeDescription"
+              formControlName="lateFeeDescription"
+              class="form-controler"
+              rows="3"
+              placeholder="Enter late fee description"
+              [readonly]="isViewMode"
+            ></textarea>
+          </div>
+        </div>
+
+        
+<!-- OTHER AMOUNT PAID -->
 <div class="row mb-3">
   <div class="col-md-12 form-group">
-    <label for="dueDate">Due Date</label>
+    <label for="otherAmountPaid">Other Amount Paid (₹)</label>
 
     <div
       class="field-wrap"
       style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
     >
       <input
-        type="date"
-        id="dueDate"
-        formControlName="dueDate"
+        type="number"
+        id="otherAmountPaid"
+        formControlName="otherAmountPaid"
         class="form-controler"
+        placeholder="Enter other amount paid"
+        min="0"
+        step="0.01"
         [disabled]="isViewMode"
       />
     </div>
   </div>
 </div>
-<!-- SECOND ROW: FULL-WIDTH DUE DATE -->
-<!-- <div class="row mb-3">
+
+
+        <!-- SECOND ROW: FULL-WIDTH DUE DATE -->
+        <!-- <div class="row mb-3">
   <div class="col-md-12 form-group">
     <label for="dueDate">Due Date</label>
 
@@ -607,308 +685,319 @@
     </div>
   </div>
 </div> -->
+      </div>
+    </article>
 
-  </div>
-</article>
-    
+    <!-- ===================================================== -->
+    <!-- RECURRING SERVICE -->
+    <!-- ===================================================== -->
 
+    <article class="card complaint-card mb-4 recurring-card">
+      <div class="section-title">
+        <div class="item-icon">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+
+        <div class="header-content">
+          <span class="header-text">Recurring Service</span>
+
+          <span class="header-subtext">
+            Automatically generate future document requests according to the
+            selected frequency.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- RECURRING TOGGLE -->
+        <div class="recurring-toggle-row">
+          <div>
+            <label for="isRecurring" class="recurring-label">
+              Enable recurring requests
+            </label>
+
+            <p class="text-muted mb-0 recurring-help">
+              Future requests will be generated automatically using the
+              frequency selected below.
+            </p>
+          </div>
+
+          <label class="recurring-switch">
+            <input
+              id="isRecurring"
+              type="checkbox"
+              formControlName="isRecurring"
+              [disabled]="isViewMode"
+            />
+
+            <span class="recurring-slider"></span>
+          </label>
+        </div>
+
+        <!-- FREQUENCY DROPDOWN -->
+        <div
+          class="recurring-frequency-info mt-3"
+          *ngIf="documentRequestForm.get('isRecurring')?.value"
+        >
+          <div class="form-group">
+            <label for="frequency" class="recurring-frequency-title">
+              Recurrence Frequency
+              <span class="text-danger">*</span>
+            </label>
+
+            <select
+              id="frequency"
+              formControlName="frequency"
+              class="form-controler"
+              [disabled]="isViewMode"
+            >
+              <option value="">Select frequency</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Quarterly">Quarterly</option>
+              <option value="Half-Yearly">Half-Yearly</option>
+              <option value="Yearly">Yearly</option>
+            </select>
+
+            <!-- VALIDATION MESSAGE -->
+            <div
+              class="text-danger mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentRequestForm.get('frequency')?.invalid &&
+                documentRequestForm.get('frequency')?.touched
+              "
+            >
+              Please select a recurring frequency.
+            </div>
+
+            <small class="text-muted d-block mt-2">
+              The next request will be generated automatically according to this
+              frequency.
+            </small>
+          </div>
+        </div>
+      </div>
+    </article>
 
 <!-- ===================================================== -->
-<!-- RECURRING SERVICE -->
+<!-- DOCUMENT REMINDERS -->
 <!-- ===================================================== -->
 
-<article class="card complaint-card mb-4 recurring-card">
+
+<!-- DOCUMENT REMINDERS -->
+<article class="card complaint-card mb-4 reminder-card">
   <div class="section-title">
-    <div class="item-icon">
-      <i class="bi bi-arrow-repeat"></i>
+    <div class="item-icon reminder-icon">
+      <i class="bi bi-bell"></i>
     </div>
 
     <div class="header-content">
-      <span class="header-text">Recurring Service</span>
-
+      <span class="header-text">Document Reminders</span>
       <span class="header-subtext">
-        Automatically generate future document requests
-        according to the selected frequency.
+        Configure automatic reminders for pending documents.
       </span>
     </div>
   </div>
 
-  <div class="form-padding-wrap">
-
-    <!-- RECURRING TOGGLE -->
-    <div class="recurring-toggle-row">
-      <div>
-        <label for="isRecurring" class="recurring-label">
-          Enable recurring requests
-        </label>
-
-        <p class="text-muted mb-0 recurring-help">
-          Future requests will be generated automatically
-          using the frequency selected below.
-        </p>
+  <div class="reminder-body">
+    <!-- Enable reminders -->
+    <div class="reminder-setting">
+      <div class="reminder-setting-info">
+        <span class="reminder-setting-title">Automatic reminders</span>
+        <span class="reminder-setting-description">
+          Notify clients before or after the due date.
+        </span>
       </div>
 
       <label class="recurring-switch">
         <input
-          id="isRecurring"
           type="checkbox"
-          formControlName="isRecurring"
+          formControlName="reminderEnabled"
           [disabled]="isViewMode"
         />
-
         <span class="recurring-slider"></span>
       </label>
     </div>
 
-    <!-- FREQUENCY DROPDOWN -->
+    <!-- Reminder options -->
     <div
-      class="recurring-frequency-info mt-3"
-      *ngIf="documentRequestForm.get('isRecurring')?.value"
+      class="reminder-options"
+      *ngIf="documentRequestForm.get('reminderEnabled')?.value"
     >
-      <div class="form-group">
-
-        <label for="frequency" class="recurring-frequency-title">
-          Recurrence Frequency
-          <span class="text-danger">*</span>
-        </label>
-
-        <select
-          id="frequency"
-          formControlName="frequency"
-          class="form-controler"
-          [disabled]="isViewMode"
-        >
-          <option value="">Select frequency</option>
-          <option value="Monthly">Monthly</option>
-          <option value="Quarterly">Quarterly</option>
-          <option value="Half-Yearly">Half-Yearly</option>
-          <option value="Yearly">Yearly</option>
-        </select>
-
-        <!-- VALIDATION MESSAGE -->
-        <div
-          class="text-danger mt-1"
-          style="font-size: 11px"
-          *ngIf="
-            documentRequestForm.get('frequency')?.invalid &&
-            documentRequestForm.get('frequency')?.touched
-          "
-        >
-          Please select a recurring frequency.
-        </div>
-
-        <small class="text-muted d-block mt-2">
-          The next request will be generated automatically
-          according to this frequency.
-        </small>
-
-      </div>
-    </div>
-
-  </div>
-</article>
-
-
-<!-- ===================================================== -->
-<!-- PRICING & DISCOUNT -->
-<!-- ===================================================== -->
-
-<article class="card complaint-card mb-4 pricing-card">
-
-  <!-- HEADER -->
-  <div class="section-title">
-    <div class="item-icon">
-      <i class="bi bi-percent"></i>
-    </div>
-
-    <div class="header-content">
-      <span class="header-text">
-        Pricing & Discount
-      </span>
-
-      <span class="header-subtext">
-        Review service cost and apply a discount to this request.
-      </span>
-    </div>
-  </div>
-
-  <div class="form-padding-wrap">
-
-    <!-- SERVICE COST -->
-    <div class="pricing-summary-row service-cost-row">
-
-      <div class="pricing-label">
-        <span>Service Cost</span>
-
-        <small>
-          Total cost of selected services
-        </small>
+      <div class="reminder-options-heading">
+        <span>Reminder schedule</span>
+        <!-- <span class="reminder-options-hint">Select one or more</span> -->
       </div>
 
-      <strong class="pricing-value">
-        {{
-          getServiceCost()
-            | currency: "INR" : "symbol" : "1.2-2"
-        }}
-      </strong>
-
-    </div>
-
-
-    <!-- DISCOUNT INPUT -->
-    <div class="row mt-3">
-
-      <!-- DISCOUNT TYPE -->
-      <div class="col-md-6 form-group">
-
-        <label for="discountType">
-          Discount Type
-        </label>
-
-        <div
-          class="field-wrap"
-          style="--field-icon: url('assets/img/category-sub.svg')"
+      <div class="reminder-chips">
+        <label
+          *ngFor="let day of reminderDayOptions"
+          class="reminder-chip"
+          [class.selected]="isReminderDaySelected(day.value)"
+          [class.disabled]="isViewMode"
         >
-
-          <select
-            id="discountType"
-            formControlName="discountType"
-            class="form-controler"
-            [disabled]="isViewMode"
-          >
-
-            <option [ngValue]="'FIXED'">
-              Fixed Amount
-            </option>
-
-            <option [ngValue]="'PERCENTAGE'">
-              Percentage
-            </option>
-
-          </select>
-
-        </div>
-
-      </div>
-
-
-      <!-- DISCOUNT VALUE -->
-      <div class="col-md-6 form-group">
-
-        <label for="discountValue">
-          Discount
-        </label>
-
-        <div
-          class="field-wrap"
-          style="--field-icon: url('assets/img/category-sub.svg')"
-        >
-
           <input
-            type="number"
-            id="discountValue"
-            formControlName="discountValue"
-            class="form-controler"
-            min="0"
-
-            [max]="
-              documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
-                ? 100
-                : getServiceCost()
-            "
-
-            [placeholder]="
-              documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
-                ? 'Enter percentage'
-                : 'Enter discount amount'
-            "
-
-            autocomplete="off"
+            type="checkbox"
+            [checked]="isReminderDaySelected(day.value)"
             [disabled]="isViewMode"
+            (change)="toggleReminderDay(day.value, $event)"
           />
 
-        </div>
+          <i
+            class="bi"
+            [ngClass]="isReminderDaySelected(day.value)
+              ? 'bi-check-circle-fill'
+              : 'bi-circle'"
+          ></i>
 
-        <!-- PERCENTAGE HELP -->
-        <div
-          class="text-muted mt-1"
-          style="font-size: 11px"
-          *ngIf="
-            documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
-          "
-        >
-          Enter percentage between 0% and 100%.
-        </div>
-
+          <span>{{ day.label }}</span>
+        </label>
       </div>
-
     </div>
-
-
-    <!-- CALCULATED DISCOUNT -->
-    <div class="pricing-summary-row discount-row">
-
-      <div class="pricing-label">
-
-        <span>
-          Discount
-
-          <ng-container
-            *ngIf="
-              documentRequestForm.get('discountType')?.value ===
-              'PERCENTAGE'
-            "
-          >
-            ({{ documentRequestForm.get('discountValue')?.value || 0 }}%)
-          </ng-container>
-        </span>
-
-        <small>
-          Discount applied to service cost
-        </small>
-
-      </div>
-
-      <strong class="pricing-value discount-value">
-
-        -
-        {{
-          getDiscountAmount()
-            | currency: "INR" : "symbol" : "1.2-2"
-        }}
-
-      </strong>
-
-    </div>
-
-
-    <!-- AMOUNT AFTER DISCOUNT -->
-    <div class="pricing-total-row">
-
-      <div>
-
-        <span>
-          Amount After Discount
-        </span>
-
-        <small>
-          Before platform fee and taxes
-        </small>
-
-      </div>
-
-      <strong>
-        {{
-          getTotalAfterDiscount()
-            | currency: "INR" : "symbol" : "1.2-2"
-        }}
-      </strong>
-
-    </div>
-
   </div>
-
 </article>
+
+
+    <!-- ===================================================== -->
+    <!-- PRICING & DISCOUNT -->
+    <!-- ===================================================== -->
+
+    <article class="card complaint-card mb-4 pricing-card">
+      <!-- HEADER -->
+      <div class="section-title">
+        <div class="item-icon">
+          <i class="bi bi-percent"></i>
+        </div>
+
+        <div class="header-content">
+          <span class="header-text"> Pricing & Discount </span>
+
+          <span class="header-subtext">
+            Review service cost and apply a discount to this request.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-padding-wrap">
+        <!-- SERVICE COST -->
+        <div class="pricing-summary-row service-cost-row">
+          <div class="pricing-label">
+            <span>Service Cost</span>
+
+            <small> Total cost of selected services </small>
+          </div>
+
+          <strong class="pricing-value">
+            {{ getServiceCost() | currency: "INR" : "symbol" : "1.2-2" }}
+          </strong>
+        </div>
+
+        <!-- DISCOUNT INPUT -->
+        <div class="row mt-3">
+          <!-- DISCOUNT TYPE -->
+          <div class="col-md-6 form-group">
+            <label for="discountType"> Discount Type </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <select
+                id="discountType"
+                formControlName="discountType"
+                class="form-controler"
+                [disabled]="isViewMode"
+              >
+                <option [ngValue]="'FIXED'">Fixed Amount</option>
+
+                <option [ngValue]="'PERCENTAGE'">Percentage</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- DISCOUNT VALUE -->
+          <div class="col-md-6 form-group">
+            <label for="discountValue"> Discount </label>
+
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="number"
+                id="discountValue"
+                formControlName="discountValue"
+                class="form-controler"
+                min="0"
+                [max]="
+                  documentRequestForm.get('discountType')?.value ===
+                  'PERCENTAGE'
+                    ? 100
+                    : getServiceCost()
+                "
+                [placeholder]="
+                  documentRequestForm.get('discountType')?.value ===
+                  'PERCENTAGE'
+                    ? 'Enter percentage'
+                    : 'Enter discount amount'
+                "
+                autocomplete="off"
+                [disabled]="isViewMode"
+              />
+            </div>
+
+            <!-- PERCENTAGE HELP -->
+            <div
+              class="text-muted mt-1"
+              style="font-size: 11px"
+              *ngIf="
+                documentRequestForm.get('discountType')?.value === 'PERCENTAGE'
+              "
+            >
+              Enter percentage between 0% and 100%.
+            </div>
+          </div>
+        </div>
+
+        <!-- CALCULATED DISCOUNT -->
+        <div class="pricing-summary-row discount-row">
+          <div class="pricing-label">
+            <span>
+              Discount
+
+              <ng-container
+                *ngIf="
+                  documentRequestForm.get('discountType')?.value ===
+                  'PERCENTAGE'
+                "
+              >
+                ({{ documentRequestForm.get("discountValue")?.value || 0 }}%)
+              </ng-container>
+            </span>
+
+            <small> Discount applied to service cost </small>
+          </div>
+
+          <strong class="pricing-value discount-value">
+            -
+            {{ getDiscountAmount() | currency: "INR" : "symbol" : "1.2-2" }}
+          </strong>
+        </div>
+
+        <!-- AMOUNT AFTER DISCOUNT -->
+        <div class="pricing-total-row">
+          <div>
+            <span> Amount After Discount </span>
+
+            <small> Before platform fee and taxes </small>
+          </div>
+
+          <strong>
+            {{ getTotalAfterDiscount() | currency: "INR" : "symbol" : "1.2-2" }}
+          </strong>
+        </div>
+      </div>
+    </article>
     <!-- ===================================================== -->
     <!-- SELECTED SERVICES SUMMARY -->
     <!-- ===================================================== -->
@@ -965,9 +1054,8 @@
           <span class="header-text"> Service Documents </span>
 
           <span class="header-subtext">
-            Documents related to the selected service(s). Select the
-            documents you want to request and mark each as Required or
-            Optional.
+            Documents related to the selected service(s). Select the documents
+            you want to request and mark each as Required or Optional.
           </span>
         </div>
 
@@ -988,7 +1076,9 @@
 
         <div
           class="document-toolbar"
-          *ngIf="!loadingDocuments && requiredDocuments.length > 0 && !isViewMode"
+          *ngIf="
+            !loadingDocuments && requiredDocuments.length > 0 && !isViewMode
+          "
         >
           <span class="document-toolbar-hint">
             {{ selectedDocumentIds.length }} of
@@ -1031,8 +1121,7 @@
             class="document-request-item"
             [class.selected]="isDocumentSelected(document.id)"
             [class.required-selected]="
-              isDocumentSelected(document.id) &&
-              isRequiredDocument(document.id)
+              isDocumentSelected(document.id) && isRequiredDocument(document.id)
             "
             [class.optional-selected]="
               isDocumentSelected(document.id) &&
@@ -1072,9 +1161,7 @@
 
                   <span
                     class="document-description"
-                    *ngIf="
-                      document.documentDescription || document.description
-                    "
+                    *ngIf="document.documentDescription || document.description"
                   >
                     {{ document.documentDescription || document.description }}
                   </span>
@@ -1083,30 +1170,30 @@
 
               <!-- Compact inline Required/Optional toggle -->
               <div
-  class="document-requirement-toggle"
-  *ngIf="isDocumentSelected(document.id)"
->
-  <label
-    class="requirement-switch"
-    title="Toggle Required / Optional"
-  >
-    <input
-      type="checkbox"
-      [checked]="isRequiredDocument(document.id)"
-      [disabled]="isViewMode"
-      (change)="
-        setDocumentRequired(
-          document.id,
-          !isRequiredDocument(document.id)
-        )
-      "
-    />
+                class="document-requirement-toggle"
+                *ngIf="isDocumentSelected(document.id)"
+              >
+                <label
+                  class="requirement-switch"
+                  title="Toggle Required / Optional"
+                >
+                  <input
+                    type="checkbox"
+                    [checked]="isRequiredDocument(document.id)"
+                    [disabled]="isViewMode"
+                    (change)="
+                      setDocumentRequired(
+                        document.id,
+                        !isRequiredDocument(document.id)
+                      )
+                    "
+                  />
 
-    <span class="requirement-slider">
-      <span class="requirement-dot"></span>
-    </span>
-  </label>
-</div>
+                  <span class="requirement-slider">
+                    <span class="requirement-dot"></span>
+                  </span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -1123,7 +1210,9 @@
         >
           <i class="bi bi-file-earmark-text"></i>
 
-          <span> No documents are configured for the selected service(s). </span>
+          <span>
+            No documents are configured for the selected service(s).
+          </span>
         </div>
 
         <!-- ================= NO SERVICE ================= -->
@@ -1164,8 +1253,8 @@
           <span class="header-text"> Additional Documents </span>
 
           <span class="header-subtext">
-            Select any other document from the document master that you want
-            to request from the client.
+            Select any other document from the document master that you want to
+            request from the client.
           </span>
         </div>
 
@@ -1247,10 +1336,7 @@
 
           <!-- ================= LOADING ================= -->
 
-          <div
-            class="document-list-loading"
-            *ngIf="loadingAdditionalDocuments"
-          >
+          <div class="document-list-loading" *ngIf="loadingAdditionalDocuments">
             <i class="bi bi-arrow-repeat spin"></i>
             Loading available documents...
           </div>
@@ -1313,39 +1399,37 @@
                         document.documentDescription || document.description
                       "
                     >
-                      {{
-                        document.documentDescription || document.description
-                      }}
+                      {{ document.documentDescription || document.description }}
                     </span>
                   </span>
                 </label>
 
                 <!-- Compact inline Required/Optional toggle -->
                 <div
-  class="document-requirement-toggle"
-  *ngIf="isDocumentSelected(document.id)"
->
-  <label
-    class="requirement-switch"
-    title="Toggle Required / Optional"
-  >
-    <input
-      type="checkbox"
-      [checked]="isRequiredDocument(document.id)"
-      [disabled]="isViewMode"
-      (change)="
-        setDocumentRequired(
-          document.id,
-          !isRequiredDocument(document.id)
-        )
-      "
-    />
+                  class="document-requirement-toggle"
+                  *ngIf="isDocumentSelected(document.id)"
+                >
+                  <label
+                    class="requirement-switch"
+                    title="Toggle Required / Optional"
+                  >
+                    <input
+                      type="checkbox"
+                      [checked]="isRequiredDocument(document.id)"
+                      [disabled]="isViewMode"
+                      (change)="
+                        setDocumentRequired(
+                          document.id,
+                          !isRequiredDocument(document.id)
+                        )
+                      "
+                    />
 
-    <span class="requirement-slider">
-      <span class="requirement-dot"></span>
-    </span>
-  </label>
-</div>
+                    <span class="requirement-slider">
+                      <span class="requirement-dot"></span>
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

@@ -184,11 +184,23 @@ ngOnInit(): void {
         // LOAD PAYMENT
         // =====================================================
 
-        this.serviceRequestPayment = this.requestData?.payment || null;
-        this.invoiceItems = this.buildInvoiceItems(
-          this.serviceRequestPayment,
-          this.requestData?.services || [],
-        );
+const documentRequest = this.requestData?.documentRequest || {};
+const payment = this.requestData?.payment;
+
+this.serviceRequestPayment = payment
+  ? {
+      ...payment,
+      lateFeeAmount: Number(documentRequest.lateFeeAmount || 0),
+      lateFeeDescription: documentRequest.lateFeeDescription || null,
+      otherAmountPaid: Number(documentRequest.otherAmountPaid || 0),
+    }
+  : null;
+
+this.invoiceItems = this.buildInvoiceItems(
+  this.serviceRequestPayment,
+  this.requestData?.services || [],
+);
+
 
         if (this.requestData?.documentRequest?.serviceId) {
           this.serviceId = Number(this.requestData.documentRequest.serviceId);

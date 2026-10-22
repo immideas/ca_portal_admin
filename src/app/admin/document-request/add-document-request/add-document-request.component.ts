@@ -159,7 +159,7 @@ export class AddDocumentRequestComponent implements OnInit {
    * requestServices contains all selected services.
    */
   selectedClientServiceId: number | null = null;
-financialYears: string[] = [];
+  financialYears: string[] = [];
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -221,6 +221,14 @@ financialYears: string[] = [];
       period: ["", [Validators.maxLength(100)]],
 
       dueDate: [null],
+      reminderEnabled: [false],
+reminderDays: [[15, 7, 3, 1, 0, -1]],
+
+      lastFilingDate: [null],
+      lateFeeDescription: [""],
+      lateFeeAmount: [0, [Validators.min(0)]],
+      otherAmountPaid: [0, [Validators.min(0)]],
+
       isRecurring: [false],
       frequency: [""],
       discountType: ["FIXED"],
@@ -234,7 +242,7 @@ financialYears: string[] = [];
   // =====================================================
 
   ngOnInit(): void {
-      this.loadFinancialYears();
+    this.loadFinancialYears();
 
     this.loadClients();
 
@@ -350,10 +358,26 @@ financialYears: string[] = [];
               : Array.isArray(response?.data)
                 ? response.data[0]?.items || []
                 : [];
-
+                
         // =================================================
         // PATCH FORM
         // =================================================
+
+           let savedReminderDays: number[] = [15, 7, 3, 1, 0, -1];
+
+        if (Array.isArray(request.reminderDays)) {
+          savedReminderDays = request.reminderDays.map(Number);
+        } else if (typeof request.reminderDays === "string") {
+          try {
+            const parsedDays = JSON.parse(request.reminderDays);
+
+            savedReminderDays = Array.isArray(parsedDays)
+              ? parsedDays.map(Number)
+              : [];
+          } catch {
+            savedReminderDays = [];
+          }
+        }
 
         this.documentRequestForm.patchValue({
           taskName: request.taskName ?? "",
@@ -371,6 +395,18 @@ financialYears: string[] = [];
           period: request.period ?? "",
 
           dueDate: request.dueDate ?? null,
+          reminderEnabled:
+  request.reminderEnabled === true ||
+  Number(request.reminderEnabled) === 1,
+
+reminderDays: savedReminderDays,
+          lastFilingDate: request.lastFilingDate
+            ? String(request.lastFilingDate).slice(0, 10)
+            : null,
+
+          lateFeeDescription: request.lateFeeDescription ?? "",
+          lateFeeAmount: Number(request.lateFeeAmount ?? 0),
+          otherAmountPaid: Number(request.otherAmountPaid ?? 0),
           isRecurring: Boolean(
             request.isRecurring ?? request.recurringScheduleId,
           ),
@@ -1644,18 +1680,10 @@ financialYears: string[] = [];
 
       clientId: Number(formValue.clientId),
 
-      /*
-       * Primary service.
-       *
-       * Kept for old backend compatibility.
-       */
       clientServiceId: Number(this.selectedClientServiceId),
 
       serviceId: Number(formValue.serviceId),
 
-      /*
-       * ALL selected services.
-       */
       requestServices: normalizedRequestServices,
 
       assignedTo: Number(formValue.assignedTo),
@@ -1667,6 +1695,15 @@ financialYears: string[] = [];
       period: formValue.period?.trim() || null,
 
       dueDate: formValue.dueDate || null,
+      reminderEnabled: formValue.reminderEnabled === true,
+
+reminderDays: Array.isArray(formValue.reminderDays)
+  ? formValue.reminderDays.map(Number)
+  : [],
+      lastFilingDate: formValue.lastFilingDate || null,
+      lateFeeDescription: formValue.lateFeeDescription?.trim() || null,
+      lateFeeAmount: Number(formValue.lateFeeAmount || 0),
+      otherAmountPaid: Number(formValue.otherAmountPaid || 0),
       discountType:
         formValue.discountType === "FIXED" ||
         formValue.discountType === "PERCENTAGE"
@@ -1937,19 +1974,60 @@ financialYears: string[] = [];
     return this.documentRequestForm.get("frequency")?.value || "";
   }
   private loadFinancialYears(): void {
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
 
-  // Financial year starts in April.
-  const startYear =
-    currentMonth >= 3 ? currentYear : currentYear - 1;
+    // Financial year starts in April.
+    const startYear = currentMonth >= 3 ? currentYear : currentYear - 1;
 
-  this.financialYears = Array.from({ length: 6 }, (_, index) => {
-    const year = startYear + index;
-    return `${year}-${String(year + 1).slice(-2)}`;
-  });
-}
+    this.financialYears = Array.from({ length: 6 }, (_, index) => {
+      const year = startYear + index;
+      return `${year}-${String(year + 1).slice(-2)}`;
+    });
+  }
+
+  // =====================================================
+  // DOCUMENT REMINDER SETTINGS
+  // =====================================================
+
+  reminderDayOptions = [
+    { value: 15, label: "15 days before" },
+    { value: 7, label: "7 days before" },
+    { value: 3, label: "3 days before" },
+    { value: 1, label: "1 day before" },
+    { value: 0, label: "On due date" },
+    { value: -1, label: "1 day after due date" },
+  ];
+
+  isReminderDaySelected(day: number): boolean {
+    const selectedDays =
+      this.documentRequestForm.get("reminderDays")?.value || [];
+
+    return selectedDays.map(Number).includes(day);
+  }
+
+  toggleReminderDay(day: number, event: Event): void {
+    if (this.isViewMode) {
+      return;
+    }
+
+    const checked = (event.target as HTMLInputElement).checked;
+
+    const selectedDays: number[] = [
+      ...(this.documentRequestForm.get("reminderDays")?.value || []),
+    ].map(Number);
+
+    const updatedDays = checked
+      ? Array.from(new Set([...selectedDays, day]))
+      : selectedDays.filter((value) => value !== day);
+
+    this.documentRequestForm
+      .get("reminderDays")
+      ?.setValue(updatedDays);
+
+    this.documentRequestForm.get("reminderDays")?.markAsDirty();
+  }
 
   // =====================================================
   // CAN DEACTIVATE
