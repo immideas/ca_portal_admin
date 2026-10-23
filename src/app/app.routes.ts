@@ -138,6 +138,7 @@ import { ManageThemesComponent } from "./super-admin/ThemeConfiguration/manage-t
 import { AddThemeComponent } from "./super-admin/ThemeConfiguration/add-theme/add-theme.component";
 // ================= CHANGE USER THEME =================
 import { ChangeUserThemeComponent } from "./super-admin/ThemeConfiguration/change-user-theme/change-user-theme.component";
+import { ServiceCalendarComponent } from "./admin/service-calendar/service-calendar.component";
 export const routes: Routes = [
   { path: "login", component: LoginComponent, canActivate: [LoginAuthGuard] },
   { path: "password-reset", component: RequestPasswordResetComponent }, // public — no guard
@@ -295,28 +296,28 @@ export const routes: Routes = [
       },
       // ================= PAYOUT SETTINGS =================
 
-{
-  path: "payout-setting-summary",
-  component: PayoutSettingSummaryComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+      {
+        path: "payout-setting-summary",
+        component: PayoutSettingSummaryComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "payout-setting",
-  component: PayoutSettingComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+      {
+        path: "payout-setting",
+        component: PayoutSettingComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
 
-{
-  path: "payout",
-  component: PayoutComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
-{
-  path: "payout-config",
-  component: SuperadminPayoutConfigComponent,
-  canActivate: [SuperAdminAuthGuard],
-},
+      {
+        path: "payout",
+        component: PayoutComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+      {
+        path: "payout-config",
+        component: SuperadminPayoutConfigComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
 
       // =====================================================================
       // SECTION 2 — ADMIN GENERAL (logged-in admin/sub-admin entry points,
@@ -329,13 +330,10 @@ export const routes: Routes = [
         canActivate: [AdminAuthGuard, paymentStatusGuard],
       },
       {
-  path: "admin-config",
-  component: AdminConfigComponent,
-  canActivate: [
-    AdminAuthGuard,
-    paymentStatusGuard,
-  ],
-},
+        path: "admin-config",
+        component: AdminConfigComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
       {
         path: "forgot-password",
         component: ForgotPasswordComponent,
@@ -637,6 +635,12 @@ export const routes: Routes = [
         component: AddDocumentComponent,
         canActivate: [SuperAdminAuthGuard],
       },
+      // ---- My Calendar ----
+{
+  path: "my-calendar",
+  component: ServiceCalendarComponent,
+  canActivate: [AdminAuthGuard, paymentStatusGuard],
+},
       // ---- Document Request Management ----
 
       {
@@ -660,15 +664,15 @@ export const routes: Routes = [
 
       {
         path: "view-service-request/:id",
-       component: ServiceViewComponent,
+        component: ServiceViewComponent,
         canActivate: [AdminAuthGuard, paymentStatusGuard],
       },
       {
-  path: "payments",
-  component: PaymentsHistoryComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
-      
+        path: "payments",
+        component: PaymentsHistoryComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
+
       {
         path: "submitted-documents/:id",
         component: SubmittedDocumentsComponent,

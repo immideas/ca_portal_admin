@@ -451,6 +451,25 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
     ],
   },
 
+{
+  items: [
+    {
+      id: "due-date-calendar",
+      label: "Due Date Calendar",
+      icon: "bi-calendar3",
+      children: [
+        {
+          label: "My Calendar",
+          icon: "",
+          route: "/my-calendar",
+          permission: "my_calendar",
+          activeRoutes: ["/my-calendar"],
+        },
+      ],
+    },
+  ],
+},
+
 // ================= PAYMENT HISTORY =================
 
 {

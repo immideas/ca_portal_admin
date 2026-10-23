@@ -1,0 +1,211 @@
+<main id="main" class="main service-calendar-page">
+  <section class="section">
+    <div class="container-fluid py-4">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header-row">
+        <div class="page-header">
+          <h1>My Calendar</h1>
+          <p>Track service due dates, upcoming tasks and completed requests</p>
+        </div>
+      </div>
+
+      <div class="calendar-layout">
+
+        <!-- LEFT: MONTHLY CALENDAR -->
+        <div class="calendar-card">
+
+          <div class="calendar-toolbar">
+            <div class="calendar-month-title">
+              <h2>{{ monthTitle }}</h2>
+              <span>
+                {{ monthRequests.length }}
+                {{ monthRequests.length === 1 ? 'service request' : 'service requests' }}
+                this month
+              </span>
+            </div>
+
+            <div class="calendar-navigation">
+              <button type="button" class="calendar-nav-btn"
+                (click)="previousMonth()" aria-label="Previous month">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+
+              <button type="button" class="calendar-today-btn" (click)="goToToday()">
+                Today
+              </button>
+
+              <button type="button" class="calendar-nav-btn"
+                (click)="nextMonth()" aria-label="Next month">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- CALENDAR GRID -->
+          <div class="calendar-grid">
+
+            <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+
+            <button
+              type="button"
+              *ngFor="let day of calendarDays"
+              class="calendar-day"
+              [class.other-month]="!day.isCurrentMonth"
+              [class.selected-day]="isSelectedDate(day.date)"
+              [class.today]="day.isToday"
+              [class.has-events]="getRequestsForDate(day.date).length > 0"
+              [attr.aria-label]="day.dayNumber + ': ' + getRequestsForDate(day.date).length + ' services'"
+              (click)="selectDate(day.date)">
+
+              <div class="day-top">
+                <span class="day-number">{{ day.dayNumber }}</span>
+              </div>
+
+              <!-- Only colored dots, no names -->
+              <div class="day-dots" *ngIf="getRequestsForDate(day.date).length">
+                <span
+                  class="event-dot"
+                  *ngFor="let request of getRequestsForDate(day.date).slice(0, 4)"
+                  [ngClass]="getStatusClass(request)">
+                </span>
+
+                <span
+                  class="more-events"
+                  *ngIf="getRequestsForDate(day.date).length > 4">
+                  +{{ getRequestsForDate(day.date).length - 4 }}
+                </span>
+              </div>
+            </button>
+
+          </div>
+
+          <!-- STATUS LEGEND (bottom of calendar) -->
+          <div class="calendar-footer">
+            <span><i class="legend-dot completed"></i> Completed</span>
+            <span><i class="legend-dot payment-due"></i> Payment due</span>
+            <span><i class="legend-dot pending"></i> Pending</span>
+            <span><i class="legend-dot upcoming"></i> Upcoming</span>
+            <span><i class="legend-dot overdue"></i> Overdue</span>
+          </div>
+
+          <div class="calendar-loading" *ngIf="loading">
+            <i class="bi bi-arrow-repeat"></i>
+            Loading service requests...
+          </div>
+
+          <div class="calendar-error" *ngIf="!loading && loadError">
+            <span>{{ loadError }}</span>
+            <button type="button" (click)="loadAllRequests()">Retry</button>
+          </div>
+
+          <div class="calendar-no-data"
+            *ngIf="!loading && !loadError && allRequests.length === 0">
+            No service requests found.
+          </div>
+
+        </div>
+
+        <!-- RIGHT: SELECTED DATE -->
+        <aside class="date-details-card">
+
+          <div class="details-header">
+            <div>
+              <span class="details-eyebrow">SELECTED DATE</span>
+              <h2>{{ selectedDate | date:'EEE, dd MMM yyyy' }}</h2>
+            </div>
+
+            <span class="request-count">{{ selectedRequests.length }}</span>
+          </div>
+
+          <div class="details-summary">
+            <div class="summary-icon">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+
+            <div>
+              <strong>
+                {{ selectedRequests.length }}
+                {{ selectedRequests.length === 1 ? 'service' : 'services' }}
+              </strong>
+              <p>Scheduled for this date</p>
+            </div>
+          </div>
+
+          <div class="empty-date" *ngIf="selectedRequests.length === 0">
+            <i class="bi bi-calendar2-x"></i>
+            <h3>No services scheduled</h3>
+            <p>There are no service requests with a due date on this day.</p>
+          </div>
+
+          <div class="selected-request-list" *ngIf="selectedRequests.length > 0">
+
+            <button
+              type="button"
+              class="service-request-item"
+              *ngFor="let request of selectedRequests"
+              [ngClass]="getStatusClass(request)"
+              (click)="viewServiceRequest(request.id)">
+
+              <div class="request-item-top">
+                <span class="request-code">
+                  {{ request.requestCode || ('Request #' + request.id) }}
+                </span>
+
+                <span class="status-badge" [ngClass]="getStatusClass(request)">
+                  {{ request.status || 'REQUESTED' }}
+                </span>
+              </div>
+
+              <h3>
+                {{
+                  request.taskName ||
+                  request.service?.serviceName ||
+                  request.serviceName ||
+                  'Service Request'
+                }}
+              </h3>
+
+              <div class="request-meta">
+                <i class="bi bi-person"></i>
+                <span>
+                  {{
+                    request.client?.clientName ||
+                    request.clientName ||
+                    request.client?.name ||
+                    'Client not available'
+                  }}
+                </span>
+              </div>
+
+              <div class="request-meta">
+                <i class="bi bi-briefcase"></i>
+                <span>
+                  {{
+                    request.service?.serviceName ||
+                    request.serviceName ||
+                    request.service?.name ||
+                    'Service not available'
+                  }}
+                </span>
+              </div>
+
+              <div class="request-meta">
+                <i class="bi bi-calendar-event"></i>
+                <span>Due: {{ request.dueDate | date:'dd MMM yyyy' }}</span>
+              </div>
+
+              <div class="request-item-footer">
+                <span>View service details</span>
+                <i class="bi bi-arrow-up-right"></i>
+              </div>
+
+            </button>
+          </div>
+
+        </aside>
+      </div>
+
+    </div>
+  </section>
+</main>
