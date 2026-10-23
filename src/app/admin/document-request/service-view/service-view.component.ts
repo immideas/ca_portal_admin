@@ -12,7 +12,7 @@ import { UploadType } from "../../../shared/enums/uploadTypeEnums";
 import { AddDocumentRequestComponent } from "../add-document-request/add-document-request.component";
 import { SubmittedDocumentsComponent } from "../submitted-documents/submitted-documents.component";
 import { ImageUploaderLibComponent } from "@swiftlyme/image-uploader";
-
+import html2pdf from "html2pdf.js";
 @Component({
   selector: "app-service-view",
   standalone: true,
@@ -42,7 +42,8 @@ export class ServiceViewComponent implements OnInit {
   loading = false;
 
   // UPDATED: added payment tab
-  activeTab: "request" | "submitted" | "final" | "payment" = "request";
+activeTab: "request" | "submitted" | "final" | "payment" | "receipt" =
+  "request";
 
   // =========================================================
   // PAYMENT
@@ -56,6 +57,7 @@ export class ServiceViewComponent implements OnInit {
   // =========================================================
 
   showCompleteModal = false;
+  isDownloadingInvoice = false;
 
   completionRemark = "";
 
@@ -127,35 +129,34 @@ export class ServiceViewComponent implements OnInit {
   // INIT
   // =========================================================
 
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get("id");
 
-ngOnInit(): void {
-  const id = this.route.snapshot.paramMap.get("id");
+    if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+      console.error("Invalid Document Request ID:", id);
+      this.toastr.error("Invalid service request ID.");
+      return;
+    }
 
-  if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
-    console.error("Invalid Document Request ID:", id);
-    this.toastr.error("Invalid service request ID.");
-    return;
-  }
+    this.documentRequestId = Number(id);
 
-  this.documentRequestId = Number(id);
+    const tab = this.route.snapshot.queryParamMap.get("tab");
 
-  const tab = this.route.snapshot.queryParamMap.get("tab");
-
-  if (
-    tab === "request" ||
-    tab === "submitted" ||
-    tab === "final" ||
-    tab === "payment"
-  ) {
-    this.activeTab = tab;
-  }
-
-  console.log("Document Request ID:", this.documentRequestId);
-  console.log("Active Tab:", this.activeTab);
-
-  this.loadDocumentRequest();
+   if (
+  tab === "request" ||
+  tab === "submitted" ||
+  tab === "final" ||
+  tab === "payment" ||
+  tab === "receipt"
+) {
+  this.activeTab = tab;
 }
 
+    console.log("Document Request ID:", this.documentRequestId);
+    console.log("Active Tab:", this.activeTab);
+
+    this.loadDocumentRequest();
+  }
 
   // =========================================================
   // LOAD DOCUMENT REQUEST
@@ -184,23 +185,22 @@ ngOnInit(): void {
         // LOAD PAYMENT
         // =====================================================
 
-const documentRequest = this.requestData?.documentRequest || {};
-const payment = this.requestData?.payment;
+        const documentRequest = this.requestData?.documentRequest || {};
+        const payment = this.requestData?.payment;
 
-this.serviceRequestPayment = payment
-  ? {
-      ...payment,
-      lateFeeAmount: Number(documentRequest.lateFeeAmount || 0),
-      lateFeeDescription: documentRequest.lateFeeDescription || null,
-      otherAmountPaid: Number(documentRequest.otherAmountPaid || 0),
-    }
-  : null;
+        this.serviceRequestPayment = payment
+          ? {
+              ...payment,
+              lateFeeAmount: Number(documentRequest.lateFeeAmount || 0),
+              lateFeeDescription: documentRequest.lateFeeDescription || null,
+              otherAmountPaid: Number(documentRequest.otherAmountPaid || 0),
+            }
+          : null;
 
-this.invoiceItems = this.buildInvoiceItems(
-  this.serviceRequestPayment,
-  this.requestData?.services || [],
-);
-
+        this.invoiceItems = this.buildInvoiceItems(
+          this.serviceRequestPayment,
+          this.requestData?.services || [],
+        );
 
         if (this.requestData?.documentRequest?.serviceId) {
           this.serviceId = Number(this.requestData.documentRequest.serviceId);
@@ -229,9 +229,11 @@ this.invoiceItems = this.buildInvoiceItems(
   // TAB
   // =========================================================
 
-  setTab(tab: "request" | "submitted" | "final" | "payment"): void {
-    this.activeTab = tab;
-  }
+setTab(
+  tab: "request" | "submitted" | "final" | "payment" | "receipt"
+): void {
+  this.activeTab = tab;
+}
 
   // =========================================================
   // EDIT SERVICE REQUEST
@@ -411,6 +413,87 @@ this.invoiceItems = this.buildInvoiceItems(
       this.finalUploading = false;
     }
   }
+
+  
+
+
+async downloadInvoice(payment: any): Promise<void> {
+  const invoiceElement = document.getElementById('invoice-print-area');
+
+  if (!invoiceElement || !payment) {
+    this.toastr.error('Invoice information is not available.');
+    return;
+  }
+
+  if (this.isDownloadingInvoice) {
+    return;
+  }
+
+  this.isDownloadingInvoice = true;
+
+  try {
+    // Wait for invoice content and images to finish loading.
+    await Promise.all(
+      Array.from(invoiceElement.querySelectorAll('img')).map((img) => {
+        if (img.complete) {
+          return Promise.resolve();
+        }
+
+        return new Promise<void>((resolve) => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        });
+      })
+    );
+
+    const invoiceNumber =
+      payment.invoiceNumber ||
+      this.requestData?.documentRequest?.requestCode ||
+      this.documentRequestId ||
+      'Invoice';
+
+    const options = {
+      margin: [8, 8, 8, 8] as [number, number, number, number],
+      filename: `Invoice-${invoiceNumber}.pdf`,
+      image: {
+        type: 'jpeg' as const,
+        quality: 0.98
+      },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: invoiceElement.scrollWidth
+      },
+      jsPDF: {
+        unit: 'mm' as const,
+        format: 'a4',
+        orientation: 'portrait' as const
+      },
+      pagebreak: {
+        mode: ['css', 'legacy'] as ('css' | 'legacy')[]
+      }
+    };
+
+    await html2pdf()
+      .set(options)
+      .from(invoiceElement)
+      .save();
+
+    this.toastr.success('Invoice downloaded successfully.');
+  } catch (error) {
+    console.error('Invoice PDF generation failed:', error);
+    this.toastr.error('Unable to download the invoice.');
+  } finally {
+    this.isDownloadingInvoice = false;
+  }
+}
+
+
+
 
   // =========================================================
   // FINAL DOCUMENT REPLACE
@@ -849,14 +932,14 @@ this.invoiceItems = this.buildInvoiceItems(
     // COMPLETED CHECK
     // =======================================================
 
-  if (
-  this.requestData?.documentRequest?.status === "COMPLETED" ||
-  this.requestData?.documentRequest?.status === "PAYMENT_DUE"
-) {
-  this.toastr.info("This service request has already been completed.");
+    if (
+      this.requestData?.documentRequest?.status === "COMPLETED" ||
+      this.requestData?.documentRequest?.status === "PAYMENT_DUE"
+    ) {
+      this.toastr.info("This service request has already been completed.");
 
-  return;
-}
+      return;
+    }
 
     // =======================================================
     // UPLOAD CHECK
@@ -1018,113 +1101,83 @@ this.invoiceItems = this.buildInvoiceItems(
   // INVOICE ITEMS
   // =========================================================
 
- private buildInvoiceItems(
-  payment: any,
-  services: any[] = []
-): any[] {
-  if (!payment && (!Array.isArray(services) || services.length === 0)) {
-    return [];
+  private buildInvoiceItems(payment: any, services: any[] = []): any[] {
+    if (!payment && (!Array.isArray(services) || services.length === 0)) {
+      return [];
+    }
+
+    // 1. Actual invoice line items
+    // Do NOT use payment.services here because it may contain only
+    // the primary service.
+    const rawItems =
+      payment?.items || payment?.lineItems || payment?.invoiceItems;
+
+    if (Array.isArray(rawItems) && rawItems.length > 0) {
+      return rawItems.map((item: any) => ({
+        description:
+          item.description || item.serviceName || item.name || "Service",
+
+        code: item.serviceCode || item.code || "",
+
+        amount: Number(
+          item.amount ?? item.total ?? item.price ?? item.billingAmount ?? 0,
+        ),
+      }));
+    }
+
+    // 2. Multiple services from Document Request
+    if (Array.isArray(services) && services.length > 0) {
+      return services.map((service: any) => ({
+        description: service.serviceName || service.name || "Service",
+
+        code: service.serviceCode || service.code || "",
+
+        amount: Number(
+          service.billingAmount ?? service.amount ?? service.price ?? 0,
+        ),
+      }));
+    }
+
+    // 3. Payment services fallback
+    if (Array.isArray(payment?.services) && payment.services.length > 0) {
+      return payment.services.map((service: any) => ({
+        description:
+          service.serviceName ||
+          service.description ||
+          service.name ||
+          "Service",
+
+        code: service.serviceCode || service.code || "",
+
+        amount: Number(
+          service.billingAmount ??
+            service.amount ??
+            service.total ??
+            service.price ??
+            0,
+        ),
+      }));
+    }
+
+    // 4. Existing single-service fallback
+    return [
+      {
+        description:
+          this.requestData?.service?.serviceName ||
+          this.requestData?.serviceName ||
+          this.requestData?.documentRequest?.serviceName ||
+          "Service",
+
+        code:
+          this.requestData?.service?.serviceCode ||
+          this.requestData?.serviceCode ||
+          this.requestData?.documentRequest?.serviceCode ||
+          "",
+
+        amount: Number(payment?.subtotal || 0),
+      },
+    ];
   }
-
-  // 1. Actual invoice line items
-  // Do NOT use payment.services here because it may contain only
-  // the primary service.
-  const rawItems =
-    payment?.items ||
-    payment?.lineItems ||
-    payment?.invoiceItems;
-
-  if (Array.isArray(rawItems) && rawItems.length > 0) {
-    return rawItems.map((item: any) => ({
-      description:
-        item.description ||
-        item.serviceName ||
-        item.name ||
-        "Service",
-
-      code:
-        item.serviceCode ||
-        item.code ||
-        "",
-
-      amount: Number(
-        item.amount ??
-        item.total ??
-        item.price ??
-        item.billingAmount ??
-        0
-      ),
-    }));
-  }
-
-  // 2. Multiple services from Document Request
-  if (Array.isArray(services) && services.length > 0) {
-    return services.map((service: any) => ({
-      description:
-        service.serviceName ||
-        service.name ||
-        "Service",
-
-      code:
-        service.serviceCode ||
-        service.code ||
-        "",
-
-      amount: Number(
-        service.billingAmount ??
-        service.amount ??
-        service.price ??
-        0
-      ),
-    }));
-  }
-
-  // 3. Payment services fallback
-  if (
-    Array.isArray(payment?.services) &&
-    payment.services.length > 0
-  ) {
-    return payment.services.map((service: any) => ({
-      description:
-        service.serviceName ||
-        service.description ||
-        service.name ||
-        "Service",
-
-      code:
-        service.serviceCode ||
-        service.code ||
-        "",
-
-      amount: Number(
-        service.billingAmount ??
-        service.amount ??
-        service.total ??
-        service.price ??
-        0
-      ),
-    }));
-  }
-
-  // 4. Existing single-service fallback
-  return [
-    {
-      description:
-        this.requestData?.service?.serviceName ||
-        this.requestData?.serviceName ||
-        this.requestData?.documentRequest?.serviceName ||
-        "Service",
-
-      code:
-        this.requestData?.service?.serviceCode ||
-        this.requestData?.serviceCode ||
-        this.requestData?.documentRequest?.serviceCode ||
-        "",
-
-      amount: Number(payment?.subtotal || 0),
-    },
-  ];
-}
   // =========================================================
   // TAX PERCENTAGE
   // =========================================================
@@ -1174,6 +1227,78 @@ this.invoiceItems = this.buildInvoiceItems(
       null
     );
   }
+  
+isPaymentPaid(payment: any): boolean {
+  return String(payment?.status || '').toLowerCase() === 'paid';
+}
+
+
+
+async downloadReceipt(): Promise<void> {
+  const payment = this.serviceRequestPayment;
+  const receiptElement = document.getElementById('receipt-print-area');
+
+  if (!this.isPaymentPaid(payment)) {
+    this.toastr.warning(
+      'Receipt is available after payment confirmation.'
+    );
+    return;
+  }
+
+  if (!receiptElement) {
+    this.toastr.error('Receipt element not found in the HTML.');
+    return;
+  }
+
+  const reference =
+    payment?.receiptNumber ||
+    payment?.paymentId ||
+    payment?.payment_id ||
+    this.requestData?.documentRequest?.requestCode ||
+    this.documentRequestId ||
+    'Payment-Receipt';
+
+  const options = {
+    margin: [8, 8, 8, 8] as [number, number, number, number],
+    filename: `Receipt-${reference}.pdf`,
+    image: {
+      type: 'jpeg' as const,
+      quality: 0.98
+    },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: receiptElement.scrollWidth
+    },
+    jsPDF: {
+      unit: 'mm' as const,
+      format: 'a4',
+      orientation: 'portrait' as const
+    },
+    pagebreak: {
+      mode: ['css', 'legacy'] as ('css' | 'legacy')[]
+    }
+  };
+
+  try {
+    await html2pdf()
+      .set(options)
+      .from(receiptElement)
+      .save();
+
+    this.toastr.success('Receipt downloaded successfully.');
+  } catch (error) {
+    console.error('Receipt PDF generation failed:', error);
+    this.toastr.error('Unable to download the receipt.');
+  }
+}
+
+
+
   // =========================================================
   // BACK
   // =========================================================

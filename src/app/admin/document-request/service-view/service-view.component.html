@@ -80,7 +80,14 @@
         [class.active]="activeTab === 'payment'"
         (click)="setTab('payment')"
       >
-        Payment
+        Invoice
+      </button>
+      <button
+        type="button"
+        [class.active]="activeTab === 'receipt'"
+        (click)="setTab('receipt')"
+      >
+        Receipt
       </button>
     </div>
 
@@ -315,15 +322,27 @@
         <div class="payment-tab-header">
           <div class="payment-tab-title">
             <div class="payment-tab-icon">
-              <i class="bi bi-receipt"></i>
+              <i class="bi bi-receipt-cutoff"></i>
             </div>
 
-            <div>
-              <h3>Payment Details</h3>
-
-              <p>Invoice and payment information for this service request.</p>
+            <div class="payment-tab-heading">
+              <h3>Invoice Details</h3>
+              <p>
+                View your invoice and payment information for this service
+                request.
+              </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            class="download-invoice-btn"
+            (click)="downloadInvoice(serviceRequestPayment)"
+            [disabled]="!serviceRequestPayment"
+          >
+            <i class="bi bi-download"></i>
+            <span>Download Invoice</span>
+          </button>
         </div>
 
         <!-- =================================================
@@ -396,7 +415,7 @@
 
                 <div>
                   <div class="inv-brand">CA Desk</div>
-                  <span class="inv-brand-sub">Client Portal</span>
+                  <!-- <span class="inv-brand-sub">Client Portal</span> -->
                 </div>
               </div>
 
@@ -542,100 +561,61 @@
 
               <!-- ================= PAYMENT + TOTAL ================= -->
 
-              <div class="inv-bottom">
-                <!-- PAYMENT INFORMATION -->
+              <!-- ================= AMOUNT BREAKDOWN ================= -->
 
-                <div class="inv-payment-info">
-                  <span class="inv-label"> PAYMENT INFORMATION </span>
-
-                  <div class="inv-meta-row">
-                    <span>Status</span>
-
-                    <strong
-                      [class.paid-text]="
-                        serviceRequestPayment.status === 'paid'
-                      "
-                    >
-                      {{ serviceRequestPayment.status | titlecase }}
-                    </strong>
+              <div class="inv-bottom inv-bottom--redesigned">
+                <div class="inv-totals inv-totals--premium">
+                  <!-- Breakdown header -->
+                  <div class="inv-totals-heading">
+                    <div>
+                      <h4>Amount Breakdown</h4>
+                      <p>Summary of your invoice charges</p>
+                    </div>
+                    <i class="bi bi-receipt"></i>
                   </div>
 
-                  <div
-                    class="inv-meta-row"
-                    *ngIf="serviceRequestPayment.transactionId"
-                  >
-                    <span>Transaction ID</span>
-
-                    <strong class="transaction-id">
-                      {{ serviceRequestPayment.transactionId }}
-                    </strong>
-                  </div>
-
-                  <div
-                    class="inv-meta-row"
-                    *ngIf="
-                      serviceRequestPayment.paidAt ||
-                      serviceRequestPayment.paymentDate
-                    "
-                  >
-                    <span>Paid On</span>
-
-                    <strong>
-                      {{
-                        serviceRequestPayment.paidAt ||
-                          serviceRequestPayment.paymentDate
-                          | date: "dd MMM yyyy, hh:mm a"
-                      }}
-                    </strong>
-                  </div>
-                </div>
-
-                <!-- TOTALS -->
-
-                <div class="inv-totals">
-                  <!-- SERVICE COST -->
+                  <!-- Service cost -->
                   <div class="inv-total-row">
                     <span>Service Cost</span>
-
                     <strong>
                       {{
-                        serviceRequestPayment.serviceCost
+                        serviceRequestPayment.serviceCost || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
                   </div>
 
-                  <!-- PLATFORM FEE -->
+                  <!-- Platform fee -->
                   <div class="inv-total-row">
                     <span>Platform Fee</span>
-
                     <strong>
                       {{
-                        serviceRequestPayment.platformFeeAmount
+                        serviceRequestPayment.platformFeeAmount || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
                   </div>
-                  <!-- DISCOUNT -->
-                  <div class="inv-total-row">
-                    <span>Discount</span>
 
+                  <!-- Discount -->
+                  <div class="inv-total-row inv-total-row--discount">
+                    <span>
+                      <i class="bi bi-tag"></i>
+                      Discount
+                    </span>
                     <strong class="discount-amount">
-                      -
-                      {{
-                        serviceRequestPayment.discountAmount
+                      −{{
+                        serviceRequestPayment.discountAmount || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
                   </div>
 
-                  <!-- SUBTOTAL -->
-                  <div class="inv-total-row">
+                  <!-- Subtotal -->
+                  <div class="inv-total-row inv-total-row--subtotal">
                     <span>Subtotal</span>
-
                     <strong>
                       {{
-                        serviceRequestPayment.subtotal
+                        serviceRequestPayment.subtotal || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
@@ -646,10 +626,9 @@
                     <span>
                       CGST ({{ getTaxPercent(serviceRequestPayment, "cgst") }}%)
                     </span>
-
                     <strong>
                       {{
-                        serviceRequestPayment.cgst
+                        serviceRequestPayment.cgst || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
@@ -660,58 +639,88 @@
                     <span>
                       SGST ({{ getTaxPercent(serviceRequestPayment, "sgst") }}%)
                     </span>
-
                     <strong>
                       {{
-                        serviceRequestPayment.sgst
+                        serviceRequestPayment.sgst || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
                   </div>
 
-                  
-<!-- LATE FEE -->
-<div
-  class="inv-total-row"
-  *ngIf="serviceRequestPayment.lateFeeAmount > 0"
->
-  <span>
-    Late Fee
-    <small *ngIf="serviceRequestPayment.lateFeeDescription">
-      ({{ serviceRequestPayment.lateFeeDescription }})
-    </small>
-  </span>
-
-  <strong>
-    {{
-      serviceRequestPayment.lateFeeAmount
-        | currency: "INR" : "symbol" : "1.2-2"
-    }}
-  </strong>
-</div>
-
-<!-- ADDITIONAL CHARGES -->
-<div
-  class="inv-total-row"
-  *ngIf="serviceRequestPayment.otherAmountPaid > 0"
->
-  <span>Additional Charges</span>
-
-  <strong>
-    {{
-      serviceRequestPayment.otherAmountPaid
-        | currency: "INR" : "symbol" : "1.2-2"
-    }}
-  </strong>
-</div>
-
-                  <!-- TOTAL -->
-                  <div class="inv-grand-total">
-                    <span>Total Amount</span>
+                  <!-- Late fee -->
+                  <div
+                    class="inv-total-row inv-total-row--extra"
+                    *ngIf="(serviceRequestPayment?.lateFeeAmount || 0) > 0"
+                  >
+                    <span class="inv-charge-label">
+                      <i class="bi bi-clock-history"></i>
+                      <span>
+                        Late Fee
+                        <small
+                          *ngIf="serviceRequestPayment?.lateFeeDescription"
+                        >
+                          {{ serviceRequestPayment.lateFeeDescription }}
+                        </small>
+                      </span>
+                    </span>
 
                     <strong>
                       {{
-                        serviceRequestPayment.amount
+                        serviceRequestPayment.lateFeeAmount
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+
+                  <!-- Additional charges -->
+                  <div
+                    class="inv-total-row inv-total-row--extra"
+                    *ngIf="(serviceRequestPayment?.otherAmountPaid || 0) > 0"
+                  >
+                    <span class="inv-charge-label">
+                      <i class="bi bi-plus-circle"></i>
+                      <span>Additional Charges</span>
+                    </span>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.otherAmountPaid
+                          | currency: "INR" : "symbol" : "1.2-2"
+                      }}
+                    </strong>
+                  </div>
+
+                  <!-- Tax-inclusive note -->
+                  <div
+                    class="inv-tax-note"
+                    *ngIf="
+                      (serviceRequestPayment?.lateFeeAmount || 0) > 0 ||
+                      (serviceRequestPayment?.otherAmountPaid || 0) > 0
+                    "
+                  >
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>
+                      Late fees and additional charges are inclusive of
+                      applicable taxes and are included in the invoice total.
+                    </span>
+                  </div>
+
+                  <!-- Final amount -->
+                  <div class="inv-grand-total">
+                    <div class="inv-grand-total-label">
+                      <span>
+                        {{
+                          serviceRequestPayment.status === "paid"
+                            ? "Total Paid"
+                            : "Total Due"
+                        }}
+                      </span>
+                      <small>INR · Final amount</small>
+                    </div>
+
+                    <strong>
+                      {{
+                        serviceRequestPayment.amount || 0
                           | currency: "INR" : "symbol" : "1.2-2"
                       }}
                     </strong>
@@ -725,12 +734,285 @@
                 <span>Thank you for choosing CA Desk.</span>
                 <span>Customer Portal</span>
               </div>
+              
             </div>
           </div>
         </div>
       </div>
+
+    </div>
+    <!-- ================= PREMIUM PAYMENT RECEIPT ================= -->
+<div
+  class="section-card payment-section receipt-section"
+  *ngIf="activeTab === 'receipt'"
+>
+  <!-- Receipt heading and download button -->
+  <div class="payment-section-header receipt-toolbar">
+    <div class="payment-title-wrapper">
+      <div class="payment-title-icon receipt-title-icon">
+        <i class="bi bi-receipt-cutoff"></i>
+      </div>
+
+      <div>
+        <h3>Payment Receipt</h3>
+        <p>Your payment confirmation and transaction details.</p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="invoice-action-button invoice-download-button receipt-download-button"
+      (click)="downloadReceipt()"
+      [disabled]="!isPaymentPaid(serviceRequestPayment)"
+    >
+      <i class="bi bi-download"></i>
+      <span>Download Receipt</span>
+    </button>
+  </div>
+
+  <!-- Receipt unavailable -->
+  <div
+    class="state-card"
+    *ngIf="!isPaymentPaid(serviceRequestPayment)"
+  >
+    <div class="state-icon">
+      <i class="bi bi-receipt"></i>
+    </div>
+
+    <h3>Receipt Not Available</h3>
+    <p>
+      Your payment receipt will be available after the payment is confirmed.
+    </p>
+  </div>
+
+  <!-- Printable receipt -->
+  <div
+    class="receipt-wrapper"
+    *ngIf="isPaymentPaid(serviceRequestPayment)"
+  >
+    <div class="receipt-sheet" id="receipt-print-area">
+
+      <!-- Purple receipt header -->
+      <div class="receipt-band">
+        <div class="receipt-brand">
+          <div class="receipt-brand-logo">
+            <i class="bi bi-shield-check"></i>
+          </div>
+
+          <div>
+            <div class="receipt-brand-name">CA Desk</div>
+            <!-- <span class="receipt-brand-subtitle">Client Portal</span> -->
+          </div>
+        </div>
+
+        <div class="receipt-heading">
+          <span>PAYMENT RECEIPT</span>
+          <!-- <strong>
+            {{
+              serviceRequestPayment.receiptNumber ||
+              serviceRequestPayment.paymentId ||
+              serviceRequestPayment.payment_id ||
+              requestData?.documentRequest?.requestCode ||
+              'Payment Confirmation'
+            }}
+          </strong> -->
+        </div>
+      </div>
+
+      <div class="receipt-body">
+
+        <!-- Total amount paid -->
+        <div class="receipt-amount-card">
+          <span class="receipt-label">TOTAL AMOUNT PAID</span>
+
+          <strong class="receipt-amount">
+            {{
+              serviceRequestPayment.amount || 0
+                | currency: 'INR' : 'symbol' : '1.2-2'
+            }}
+          </strong>
+
+          <span class="receipt-amount-note">
+            <i class="bi bi-shield-check"></i>
+            Payment confirmation for your service request
+          </span>
+
+          <!-- <span class="receipt-paid-badge">
+            <i class="bi bi-check-circle-fill"></i>
+            PAID
+          </span> -->
+        </div>
+
+        <!-- Customer and transaction details -->
+        <div class="receipt-info-grid">
+
+          <!-- Customer details -->
+          <div class="receipt-info-card">
+            <div class="receipt-info-heading">
+              <i class="bi bi-person-circle"></i>
+              Customer Details
+            </div>
+
+            <div class="receipt-detail">
+              <span>Customer Name</span>
+              <strong>
+                {{
+                  requestData?.client?.clientName ||
+                  requestData?.clientName ||
+                  'Customer'
+                }}
+              </strong>
+            </div>
+
+            <div
+              class="receipt-detail"
+              *ngIf="requestData?.client?.email || requestData?.email"
+            >
+              <span>Email Address</span>
+              <strong>
+                {{
+                  requestData?.client?.email ||
+                  requestData?.email
+                }}
+              </strong>
+            </div>
+
+            <div
+              class="receipt-detail"
+              *ngIf="requestData?.client?.phone || requestData?.phone"
+            >
+              <span>Phone Number</span>
+              <strong>
+                {{
+                  requestData?.client?.phone ||
+                  requestData?.phone
+                }}
+              </strong>
+            </div>
+          </div>
+
+          <!-- Transaction details -->
+          <div class="receipt-info-card">
+            <div class="receipt-info-heading">
+              <i class="bi bi-file-earmark-text"></i>
+              Transaction Details
+            </div>
+
+            <div class="receipt-detail">
+              <span>Request Number</span>
+              <strong>
+                {{
+                  requestData?.documentRequest?.requestCode ||
+                  requestData?.requestCode ||
+                  '—'
+                }}
+              </strong>
+            </div>
+
+            <div class="receipt-detail">
+              <span>Transaction ID</span>
+              <strong class="receipt-reference">
+                {{
+                  serviceRequestPayment.paymentId ||
+                  serviceRequestPayment.payment_id ||
+                  '—'
+                }}
+              </strong>
+            </div>
+
+            <div class="receipt-detail">
+              <span>Payment Date</span>
+              <strong>
+                {{
+                  getInvoiceDate(serviceRequestPayment)
+                    ? (getInvoiceDate(serviceRequestPayment)
+                      | date: 'dd MMM yyyy, hh:mm a')
+                    : '—'
+                }}
+              </strong>
+            </div>
+
+            <div class="receipt-detail">
+              <span>Payment Status</span>
+              <strong class="receipt-status-text">
+                <i class="bi bi-check-circle-fill"></i>
+                Paid
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service summary -->
+        <div class="receipt-service-summary">
+          <div class="receipt-info-heading">
+            <i class="bi bi-briefcase"></i>
+            Service Summary
+          </div>
+
+          <div class="receipt-detail">
+            <span>Service / Task</span>
+            <strong>
+              {{
+                requestData?.documentRequest?.taskName ||
+                requestData?.taskName ||
+                requestData?.serviceName ||
+                requestData?.documentRequest?.serviceName ||
+                invoiceItems[0]?.description ||
+                'Service Request'
+              }}
+            </strong>
+          </div>
+
+          <div
+            class="receipt-detail"
+            *ngIf="
+              requestData?.documentRequest?.period ||
+              requestData?.period
+            "
+          >
+            <span>Service Period</span>
+            <strong>
+              {{
+                requestData?.documentRequest?.period ||
+                requestData?.period
+              }}
+            </strong>
+          </div>
+
+          <div class="receipt-total-row">
+            <span>Amount Received</span>
+            <strong>
+              {{
+                serviceRequestPayment.amount || 0
+                  | currency: 'INR' : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+        </div>
+
+        <!-- Receipt footer -->
+        <div class="receipt-footer">
+          <div class="receipt-footer-icon">
+            <i class="bi bi-patch-check-fill"></i>
+          </div>
+
+          <div>
+            <strong>Thank you for choosing CA Desk!</strong>
+            <p>
+              This receipt confirms the payment details recorded for
+              this service request. Please retain it for your records.
+            </p>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
+</div>
+  </div>
+  
+
+
 
   <!-- =====================================================
        FINAL DOCUMENT PREVIEW MODAL
