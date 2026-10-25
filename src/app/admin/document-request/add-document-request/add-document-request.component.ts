@@ -222,7 +222,7 @@ export class AddDocumentRequestComponent implements OnInit {
 
       dueDate: [null],
       reminderEnabled: [false],
-reminderDays: [[15, 7, 3, 1, 0, -1]],
+      reminderDays: [[15, 7, 3, 1, 0, -1]],
 
       lastFilingDate: [null],
       lateFeeDescription: [""],
@@ -358,12 +358,12 @@ reminderDays: [[15, 7, 3, 1, 0, -1]],
               : Array.isArray(response?.data)
                 ? response.data[0]?.items || []
                 : [];
-                
+
         // =================================================
         // PATCH FORM
         // =================================================
 
-           let savedReminderDays: number[] = [15, 7, 3, 1, 0, -1];
+        let savedReminderDays: number[] = [15, 7, 3, 1, 0, -1];
 
         if (Array.isArray(request.reminderDays)) {
           savedReminderDays = request.reminderDays.map(Number);
@@ -396,10 +396,10 @@ reminderDays: [[15, 7, 3, 1, 0, -1]],
 
           dueDate: request.dueDate ?? null,
           reminderEnabled:
-  request.reminderEnabled === true ||
-  Number(request.reminderEnabled) === 1,
+            request.reminderEnabled === true ||
+            Number(request.reminderEnabled) === 1,
 
-reminderDays: savedReminderDays,
+          reminderDays: savedReminderDays,
           lastFilingDate: request.lastFilingDate
             ? String(request.lastFilingDate).slice(0, 10)
             : null,
@@ -1697,9 +1697,9 @@ reminderDays: savedReminderDays,
       dueDate: formValue.dueDate || null,
       reminderEnabled: formValue.reminderEnabled === true,
 
-reminderDays: Array.isArray(formValue.reminderDays)
-  ? formValue.reminderDays.map(Number)
-  : [],
+      reminderDays: Array.isArray(formValue.reminderDays)
+        ? formValue.reminderDays.map(Number)
+        : [],
       lastFilingDate: formValue.lastFilingDate || null,
       lateFeeDescription: formValue.lateFeeDescription?.trim() || null,
       lateFeeAmount: Number(formValue.lateFeeAmount || 0),
@@ -2022,9 +2022,7 @@ reminderDays: Array.isArray(formValue.reminderDays)
       ? Array.from(new Set([...selectedDays, day]))
       : selectedDays.filter((value) => value !== day);
 
-    this.documentRequestForm
-      .get("reminderDays")
-      ?.setValue(updatedDays);
+    this.documentRequestForm.get("reminderDays")?.setValue(updatedDays);
 
     this.documentRequestForm.get("reminderDays")?.markAsDirty();
   }
