@@ -127,6 +127,23 @@ generateInvoice(
       }
     );
   }
+  
+  // =====================================================
+  // DOWNLOAD CUSTOMER SERVICE REQUEST ZIP
+  // =====================================================
+
+  downloadCustomerZip(
+    documentRequestId: number | string
+  ): Observable<any> {
+    return this.http.post(
+      `${this.base}/zip/download-url`,
+      { documentRequestId },
+      {
+        headers: this.getHeaders()
+      }
+    );
+  }
+
 getAllServiceRequestPayments(payload: any = {}): Observable<any> {
   return this.http.post(
     `${this.base}/payments`,

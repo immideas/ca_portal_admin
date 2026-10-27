@@ -37,6 +37,14 @@ export class SubmittedDocumentsComponent implements OnInit {
   documentRequest: any = null;
 
   documents: any[] = [];
+  zipUpload: {
+  uploaded: boolean;
+  fileName: string;
+  filePath: string;
+  fileUrl: string;
+} | null = null;
+
+downloadingZip = false;
 
   // =====================================================
   // LOADING
@@ -178,6 +186,10 @@ export class SubmittedDocumentsComponent implements OnInit {
           };
 
           this.documents = Array.isArray(data.documents) ? data.documents : [];
+
+this.zipUpload = data.zipUpload?.uploaded
+  ? data.zipUpload
+  : null;
         },
 
         error: (error: any) => {
@@ -235,6 +247,9 @@ export class SubmittedDocumentsComponent implements OnInit {
         this.documents = Array.isArray(data.documents)
           ? data.documents
           : [];
+          this.zipUpload = data.zipUpload?.uploaded
+  ? data.zipUpload
+  : null;
       },
 
       error: (error: any) => {
@@ -641,6 +656,71 @@ getResubmissionCount(): number {
         },
       });
   }
+  // =====================================================
+// DOWNLOAD CUSTOMER ZIP
+// =====================================================
+
+async downloadZip(): Promise<void> {
+  const url = this.zipUpload?.fileUrl;
+
+  if (!url) {
+    this.toastr.warning(
+      "ZIP file is not available",
+      "Warning"
+    );
+    return;
+  }
+
+  const fileName =
+    this.zipUpload?.fileName || "Customer Documents.zip";
+
+  try {
+    this.downloadingZip = true;
+    this.ngxLoader.start();
+
+    const response = await fetch(url, { mode: "cors" });
+
+    if (!response.ok) {
+      throw new Error(`Download failed: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+
+    if (!blob.size) {
+      throw new Error("Downloaded ZIP file is empty");
+    }
+
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+
+    link.href = blobUrl;
+    link.download = fileName;
+    link.style.display = "none";
+
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
+
+    setTimeout(() => {
+      window.URL.revokeObjectURL(blobUrl);
+    }, 1000);
+
+    this.toastr.success(
+      "ZIP downloaded successfully",
+      "Download"
+    );
+  } catch (error) {
+    console.error("DOWNLOAD ZIP ERROR:", error);
+
+    this.toastr.error(
+      "Unable to download ZIP. Please check the S3 URL and CORS configuration.",
+      "Download Failed"
+    );
+  } finally {
+    this.downloadingZip = false;
+    this.ngxLoader.stop();
+  }
+}
 
   // =====================================================
   // TRACK BY
