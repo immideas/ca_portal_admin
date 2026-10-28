@@ -143,6 +143,50 @@ generateInvoice(
       }
     );
   }
+  
+
+  // =====================================================
+  // SUBMIT CA SERVICE REQUEST DOCUMENTS
+  // =====================================================
+
+  submitCaServiceRequestDocuments(payload: {
+    documentRequestId: number;
+    documents: {
+      documentRequestItemId: number;
+      fileName: string;
+      filePath: string;
+      fileType: string;
+      fileSize: number;
+    }[];
+  }): Observable<any> {
+    return this.http.post(
+      `${this.base}/submitted-documents/submit`,
+      payload,
+      {
+        headers: this.getHeaders()
+      }
+    );
+  }
+  // =====================================================
+// REJECT SUBMITTED CUSTOMER ZIP
+// =====================================================
+
+rejectSubmittedZip(
+  zipId: number | string,
+  rejectionReason: string
+): Observable<any> {
+  return this.http.post(
+    `${this.base}/submitted-document/reject`,
+    {
+      documentType: 'ZIP',
+      zipId,
+      rejectionReason
+    },
+    {
+      headers: this.getHeaders()
+    }
+  );
+}
 
 getAllServiceRequestPayments(payload: any = {}): Observable<any> {
   return this.http.post(

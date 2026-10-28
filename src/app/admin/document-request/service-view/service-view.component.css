@@ -5121,3 +5121,63 @@ color: var(--primary-color, #4f46e5);
     white-space: normal;
   }
 }
+
+/* =========================================================
+   FIX: SERVICE REQUEST TAB TOP SPACING
+   Match Submitted Documents tab
+   ========================================================= */
+
+.service-tab-content {
+  padding-top: 10px !important;
+}
+
+::ng-deep app-add-document-request {
+  display: block !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+::ng-deep app-add-document-request .complaint-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+::ng-deep .service-tab-content > div:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* =========================================================
+   RECEIPT EMPTY STATE — MATCH PAYMENT EMPTY STATE
+   Keep the same width as other service tabs
+   ========================================================= */
+
+.service-tab-content > div > .receipt-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Receipt unavailable message */
+.receipt-empty-state {
+  width: 100%;
+  max-width: 100%;
+  min-height: 280px;
+  margin: 0;
+  padding: 40px 24px;
+  box-sizing: border-box;
+}
+
+/* Keep receipt heading aligned with invoice heading */
+.receipt-section .receipt-toolbar {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Responsive layout */
+@media (max-width: 576px) {
+  .receipt-empty-state {
+    padding: 28px 16px;
+  }
+}

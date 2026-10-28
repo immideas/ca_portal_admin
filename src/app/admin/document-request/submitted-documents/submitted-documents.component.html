@@ -30,8 +30,6 @@
       </div>
     </div>
 
-    <!-- ================= HEADER ACTIONS ================= -->
-
     <div class="header-actions">
       <button type="button" class="btn-cancel" (click)="cancel()">Back</button>
     </div>
@@ -67,8 +65,6 @@
 
       <div class="form-padding-wrap">
         <div class="row mb-3">
-          <!-- REQUEST CODE -->
-
           <div class="col-md-4 form-group">
             <label>Request Code</label>
 
@@ -82,8 +78,6 @@
             </div>
           </div>
 
-          <!-- REQUEST ID -->
-
           <div class="col-md-4 form-group">
             <label>Request ID</label>
 
@@ -96,8 +90,6 @@
               />
             </div>
           </div>
-
-          <!-- STATUS -->
 
           <div class="col-md-4 form-group">
             <label>Request Status</label>
@@ -136,8 +128,6 @@
 
       <div class="form-padding-wrap">
         <div class="document-summary-grid">
-          <!-- TOTAL DOCUMENTS -->
-
           <div class="summary-item">
             <div class="summary-icon">
               <i class="bi bi-files"></i>
@@ -151,8 +141,6 @@
               </strong>
             </div>
           </div>
-
-          <!-- SUBMITTED -->
 
           <div class="summary-item">
             <div class="summary-icon">
@@ -168,8 +156,6 @@
             </div>
           </div>
 
-          <!-- PENDING -->
-
           <div class="summary-item">
             <div class="summary-icon">
               <i class="bi bi-clock"></i>
@@ -183,8 +169,6 @@
               </strong>
             </div>
           </div>
-
-          <!-- RESUBMISSION -->
 
           <div class="summary-item">
             <div class="summary-icon">
@@ -239,13 +223,13 @@
 
         <!-- ================= NO DOCUMENTS ================= -->
 
-     <div
-  class="no-documents-view"
-  *ngIf="!loading && documents.length === 0 && !zipUpload?.uploaded"
->
-  <i class="bi bi-file-earmark-x"></i>
-  <span>No documents have been submitted for this request.</span>
-</div>
+        <div
+          class="no-documents-view"
+          *ngIf="!loading && documents.length === 0 && !zipUpload?.uploaded"
+        >
+          <i class="bi bi-file-earmark-x"></i>
+          <span>No documents have been submitted for this request.</span>
+        </div>
 
         <!-- ================= DOCUMENT GRID ================= -->
 
@@ -257,9 +241,7 @@
             class="submitted-document-item"
             *ngFor="let document of documents; trackBy: trackByDocument"
           >
-            <!-- ================================================= -->
-            <!-- DOCUMENT HEADER -->
-            <!-- ================================================= -->
+            <!-- ================= DOCUMENT HEADER ================= -->
 
             <div class="submitted-document-header">
               <div class="submitted-document-title">
@@ -297,13 +279,9 @@
               </span>
             </div>
 
-            <!-- ================================================= -->
-            <!-- DOCUMENT REVIEW STATUS -->
-            <!-- ================================================= -->
+            <!-- ================= DOCUMENT REVIEW STATUS ================= -->
 
             <div class="document-review-status" *ngIf="isUploaded(document)">
-              <!-- UPLOADED -->
-
               <span
                 class="review-status-badge review-under-review"
                 *ngIf="document.uploadedDocument?.status === 'UPLOADED'"
@@ -311,8 +289,6 @@
                 <i class="bi bi-cloud-check"></i>
                 Uploaded
               </span>
-
-              <!-- RESUBMISSION -->
 
               <span
                 class="review-status-badge review-rejected"
@@ -323,16 +299,13 @@
               </span>
             </div>
 
-            <!-- ================================================= -->
-            <!-- DOCUMENT THUMBNAIL -->
-            <!-- ================================================= -->
+            <!-- ================= DOCUMENT THUMBNAIL ================= -->
 
             <div
               class="submitted-document-preview"
               *ngIf="isUploaded(document)"
             >
-              <!-- ================= IMAGE ================= -->
-
+              <!-- IMAGE -->
               <div
                 class="document-thumbnail image-thumbnail"
                 *ngIf="isImage(document)"
@@ -352,8 +325,7 @@
                 </div>
               </div>
 
-              <!-- ================= PDF ================= -->
-
+              <!-- PDF -->
               <div
                 class="document-thumbnail pdf-thumbnail"
                 *ngIf="isPdf(document)"
@@ -380,8 +352,7 @@
                 </div>
               </div>
 
-              <!-- ================= OTHER FILE ================= -->
-
+              <!-- OTHER FILE -->
               <div
                 class="document-thumbnail file-thumbnail"
                 *ngIf="!isImage(document) && !isPdf(document)"
@@ -409,9 +380,7 @@
               </div>
             </div>
 
-            <!-- ================================================= -->
-            <!-- NOT SUBMITTED -->
-            <!-- ================================================= -->
+            <!-- ================= NOT SUBMITTED ================= -->
 
             <div class="document-not-submitted" *ngIf="!isUploaded(document)">
               <i class="bi bi-hourglass-split"></i>
@@ -419,9 +388,7 @@
               <span> Pending </span>
             </div>
 
-            <!-- ================================================= -->
-            <!-- DOCUMENT DETAILS -->
-            <!-- ================================================= -->
+            <!-- ================= DOCUMENT DETAILS ================= -->
 
             <div
               class="submitted-document-details"
@@ -467,9 +434,7 @@
                 </strong>
               </div>
 
-              <!-- ================================================= -->
               <!-- RESUBMISSION REASON -->
-              <!-- ================================================= -->
 
               <div
                 class="document-rejection-reason"
@@ -490,16 +455,12 @@
               </div>
             </div>
 
-            <!-- ================================================= -->
-            <!-- ACTIONS -->
-            <!-- ================================================= -->
+            <!-- ================= ACTIONS ================= -->
 
             <div
               class="submitted-document-actions"
               *ngIf="isUploaded(document)"
             >
-              <!-- VIEW -->
-
               <button
                 type="button"
                 class="btn-cancel"
@@ -510,8 +471,6 @@
                 View
               </button>
 
-              <!-- DOWNLOAD -->
-
               <button
                 type="button"
                 class="btn-save btn-active"
@@ -521,8 +480,6 @@
 
                 Download
               </button>
-
-              <!-- RESUBMISSION -->
 
               <button
                 type="button"
@@ -535,12 +492,104 @@
                 Resubmission
               </button>
             </div>
+
+            <!-- ===================================================== -->
+            <!-- CA UPLOAD AREA (same uploader as Customer Portal)      -->
+            <!-- Supports images AND PDF, validated by allowed types    -->
+            <!-- ===================================================== -->
+
+            <div
+              class="document-upload-area"
+              *ngIf="!isUploaded(document) || isResubmission(document)"
+              [class.is-busy]="isUploadingDocument(document)"
+            >
+              <!-- Accepted formats and maximum size -->
+              <div class="document-upload-rules">
+                <div class="upload-rule upload-rule--format">
+                  <i class="bi bi-file-earmark"></i>
+
+                  <span class="upload-rule-label"> Accepted formats </span>
+
+                  <strong>
+                    {{ getAllowedFileTypes(document) }}
+                  </strong>
+                </div>
+
+                <div class="upload-rule upload-rule--size">
+                  <i class="bi bi-file-earmark-arrow-up"></i>
+
+                  <span class="upload-rule-label"> Maximum file size </span>
+
+                  <strong>
+                    {{ getMaxFileSize(document) }}
+                  </strong>
+                </div>
+              </div>
+
+              <!-- CA DOCUMENT UPLOADER -->
+              <ng-container
+                *ngFor="let version of [getCaUploaderVersion(document)]"
+              >
+                <lib-image-uploader-lib
+                  [imageUrls]="getCaDocumentImageUrls(document)"
+                  [maxImages]="1"
+                  [aspectRatio]="4 / 3"
+                  [enableFreeCrop]="true"
+                  [layoutMode]="'grid'"
+                  [previewFit]="'contain'"
+                  [allowDrag]="false"
+                  [allowEdit]="true"
+                  [allowReplace]="true"
+                  [allowDelete]="canDeleteCaDocument(document)"
+                  [allowDownload]="true"
+                  (imageUpload)="onCaImageUpload($event, document)"
+                  (imageReplace)="onCaImageUpload($event, document)"
+                  (imageEdit)="onCaImageEdit($event, document)"
+                  (imageDelete)="onCaImageDelete($event, document)"
+                ></lib-image-uploader-lib>
+              </ng-container>
+
+              <!-- Upload spinner -->
+              <div
+                class="document-uploading"
+                *ngIf="isUploadingDocument(document)"
+              >
+                <span class="upload-spinner"></span>
+                <span>Uploading document...</span>
+              </div>
+
+              <!-- Pending upload details -->
+              <div
+                class="ca-pending-upload"
+                *ngIf="getPendingUpload(document) as pending"
+              >
+                <i class="bi bi-cloud-check"></i>
+                <span>{{ pending.fileName }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- ================= SUBMIT ALL DOCUMENTS ================= -->
+
+      <div
+        class="form-padding-wrap ca-submit-all-wrap"
+        *ngIf="hasPendingUploads()"
+      >
+        <button
+          type="button"
+          class="btn-save btn-active"
+          [disabled]="submittingAllDocuments"
+          (click)="submitAllDocuments()"
+        >
+          {{ submittingAllDocuments ? "Submitting..." : "Submit All Documents" }}
+        </button>
+      </div>
     </article>
-       <!-- ===================================================== -->
-    <!-- CUSTOMER ZIP DOWNLOAD CARD -->
+
+    <!-- ===================================================== -->
+    <!-- CUSTOMER ZIP DOWNLOAD CARD (with resubmission)         -->
     <!-- ===================================================== -->
 
     <article
@@ -565,6 +614,26 @@
       </div>
 
       <div class="form-padding-wrap">
+        <!-- ZIP REVIEW STATUS -->
+
+        <div class="document-review-status zip-review-status">
+          <span
+            class="review-status-badge review-under-review"
+            *ngIf="!isZipResubmission()"
+          >
+            <i class="bi bi-cloud-check"></i>
+            Uploaded
+          </span>
+
+          <span
+            class="review-status-badge review-rejected"
+            *ngIf="isZipResubmission()"
+          >
+            <i class="bi bi-arrow-repeat"></i>
+            Resubmission
+          </span>
+        </div>
+
         <div class="zip-download-content">
           <div class="zip-file-information">
             <div class="zip-file-icon">
@@ -596,18 +665,42 @@
                 "
               ></i>
 
-              {{
-                downloadingZip
-                  ? "Preparing Download..."
-                  : "Download ZIP"
-              }}
+              {{ downloadingZip ? "Preparing Download..." : "Download ZIP" }}
             </button>
+
+            <!-- ZIP RESUBMISSION -->
+            <button
+              type="button"
+              class="btn-reject"
+              *ngIf="!isZipResubmission()"
+              (click)="openZipRejectModal()"
+            >
+              <i class="bi bi-arrow-repeat"></i>
+
+              Resubmission
+            </button>
+          </div>
+        </div>
+
+        <!-- ZIP RESUBMISSION REASON -->
+
+        <div
+          class="document-rejection-reason zip-rejection-reason"
+          *ngIf="isZipResubmission() && zipUpload?.rejectionReason"
+        >
+          <div class="rejection-reason-title">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+
+            <span> Resubmission Reason </span>
+          </div>
+
+          <div class="rejection-reason-text">
+            {{ zipUpload?.rejectionReason }}
           </div>
         </div>
       </div>
     </article>
   </div>
-  
 
   <!-- ===================================================== -->
   <!-- DOCUMENT PREVIEW MODAL -->
@@ -619,8 +712,6 @@
     (click)="closeDocumentPreview()"
   >
     <div class="document-preview-modal" (click)="$event.stopPropagation()">
-      <!-- ================= MODAL HEADER ================= -->
-
       <div class="document-preview-modal-header">
         <div class="document-preview-title">
           <div class="document-preview-title-icon">
@@ -657,18 +748,12 @@
         </button>
       </div>
 
-      <!-- ================= MODAL BODY ================= -->
-
       <div class="document-preview-modal-body">
-        <!-- LOADING -->
-
         <div class="document-preview-loading" *ngIf="previewLoading">
           <i class="bi bi-arrow-repeat spin"></i>
 
           <span> Loading document... </span>
         </div>
-
-        <!-- IMAGE -->
 
         <div
           class="document-full-image"
@@ -680,16 +765,12 @@
           />
         </div>
 
-        <!-- PDF -->
-
         <div
           class="document-full-pdf"
           *ngIf="!previewLoading && previewType === 'pdf'"
         >
           <iframe [src]="previewSafeUrl" title="PDF Document Preview"></iframe>
         </div>
-
-        <!-- OTHER FILE -->
 
         <div
           class="document-full-file"
@@ -716,8 +797,6 @@
           </div>
         </div>
       </div>
-
-      <!-- ================= MODAL FOOTER ================= -->
 
       <div class="document-preview-modal-footer">
         <div class="preview-file-info">
@@ -758,19 +837,27 @@
   </div>
 
   <!-- ===================================================== -->
-  <!-- REQUEST RESUBMISSION MODAL -->
+  <!-- REQUEST RESUBMISSION MODAL (document + ZIP)            -->
   <!-- ===================================================== -->
 
   <div class="reject-modal-overlay" *ngIf="showRejectModal">
     <div class="reject-modal">
-      <!-- MODAL HEADER -->
-
       <div class="reject-modal-header">
         <div>
-          <h3>Request Resubmission</h3>
+          <h3>
+            {{
+              rejectTarget === "zip"
+                ? "Request ZIP Resubmission"
+                : "Request Resubmission"
+            }}
+          </h3>
 
           <p>
-            {{ selectedDocument?.documentName || "Document" }}
+            {{
+              rejectTarget === "zip"
+                ? zipUpload?.fileName || "Customer ZIP Upload"
+                : selectedDocument?.documentName || "Document"
+            }}
           </p>
         </div>
 
@@ -783,8 +870,6 @@
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-
-      <!-- MODAL BODY -->
 
       <div class="reject-modal-body">
         <label for="rejectionReason">
@@ -806,8 +891,6 @@
           corrected.
         </small>
       </div>
-
-      <!-- MODAL FOOTER -->
 
       <div class="reject-modal-footer">
         <button type="button" class="btn-cancel" (click)="closeRejectModal()">

@@ -312,9 +312,9 @@ export class ServiceCalendarComponent implements OnInit {
       return 'status-overdue';
     }
 
-    if (dueDate && dueDate > this.today) {
-      return 'status-upcoming';
-    }
+    // if (dueDate && dueDate > this.today) {
+    //   return 'status-upcoming';
+    // }
 
     return 'status-pending';
   }

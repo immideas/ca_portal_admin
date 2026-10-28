@@ -772,19 +772,21 @@
   </div>
 
   <!-- Receipt unavailable -->
-  <div
-    class="state-card"
-    *ngIf="!isPaymentPaid(serviceRequestPayment)"
-  >
-    <div class="state-icon">
-      <i class="bi bi-receipt"></i>
-    </div>
-
-    <h3>Receipt Not Available</h3>
-    <p>
-      Your payment receipt will be available after the payment is confirmed.
-    </p>
+<!-- RECEIPT NOT AVAILABLE -->
+<div
+  class="payment-empty-state receipt-empty-state"
+  *ngIf="!isPaymentPaid(serviceRequestPayment)"
+>
+  <div class="payment-empty-icon">
+    <i class="bi bi-receipt"></i>
   </div>
+
+  <h4>Receipt Not Available</h4>
+
+  <p>
+    Your payment receipt will be available after the payment is confirmed.
+  </p>
+</div>
 
   <!-- Printable receipt -->
   <div

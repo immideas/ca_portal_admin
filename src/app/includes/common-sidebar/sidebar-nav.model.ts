@@ -455,17 +455,13 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
   items: [
     {
       id: "due-date-calendar",
-      label: "Due Date Calendar",
+     label: "My Calendar",
       icon: "bi-calendar3",
-      children: [
-        {
-          label: "My Calendar",
-          icon: "",
-          route: "/my-calendar",
-          permission: "my_calendar",
-          activeRoutes: ["/my-calendar"],
-        },
-      ],
+      route: "/my-calendar",
+      permission: "my_calendar",
+      alwaysVisible: false,
+      exactMatch: true,
+      activeRoutes: ["/my-calendar"],
     },
   ],
 },
