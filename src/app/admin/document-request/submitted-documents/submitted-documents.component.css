@@ -98,7 +98,6 @@
   font-weight: 700;
 }
 
-
 /* =====================================================
    DOCUMENT GRID
    ===================================================== */
@@ -108,7 +107,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
-
 
 /* =====================================================
    DOCUMENT CARD
@@ -129,12 +127,10 @@
 .submitted-document-item:hover {
   border-color: #d5dae3;
 
-  box-shadow:
-    0 6px 18px rgba(30, 41, 59, 0.07);
+  box-shadow: 0 6px 18px rgba(30, 41, 59, 0.07);
 
   transform: translateY(-2px);
 }
-
 
 /* =====================================================
    DOCUMENT HEADER
@@ -214,7 +210,6 @@
   font-weight: 500;
 }
 
-
 /* =====================================================
    REQUIRED / OPTIONAL
    ===================================================== */
@@ -254,7 +249,6 @@
   border-color: #e2e5ea;
   color: #707782;
 }
-
 
 /* =====================================================
    DOCUMENT REVIEW STATUS
@@ -301,7 +295,6 @@
   font-size: 10px;
 }
 
-
 /* UNDER REVIEW */
 
 .review-under-review {
@@ -310,7 +303,6 @@
 
   border: 1px solid #f4d99a;
 }
-
 
 /* APPROVED */
 
@@ -321,7 +313,6 @@
   border: 1px solid #b9dfc1;
 }
 
-
 /* REJECTED */
 
 .review-rejected {
@@ -330,7 +321,6 @@
 
   border: 1px solid #f1b9b6;
 }
-
 
 /* =====================================================
    PREVIEW
@@ -343,12 +333,7 @@
 
   padding: 9px 15px;
 
-  background:
-    linear-gradient(
-      180deg,
-      #f8f9fb 0%,
-      #f3f5f8 100%
-    );
+  background: linear-gradient(180deg, #f8f9fb 0%, #f3f5f8 100%);
 
   display: flex;
 
@@ -390,7 +375,6 @@
 .submitted-document-item:hover .image-preview img {
   transform: scale(1.01);
 }
-
 
 /* =====================================================
    PDF / FILE PREVIEW
@@ -473,7 +457,6 @@
   color: #8a909c;
 }
 
-
 /* =====================================================
    NOT SUBMITTED
    ===================================================== */
@@ -520,7 +503,6 @@
 
   font-size: 21px;
 }
-
 
 /* =====================================================
    DETAILS
@@ -575,7 +557,6 @@
   text-transform: uppercase;
 }
 
-
 /* =====================================================
    REJECTION REASON
    ===================================================== */
@@ -619,7 +600,6 @@
 
   line-height: 1.5;
 }
-
 
 /* =====================================================
    ACTION BUTTONS
@@ -684,7 +664,6 @@
   font-size: 11px;
 }
 
-
 /* =====================================================
    VIEW BUTTON
    ===================================================== */
@@ -704,10 +683,8 @@
 
   color: #1f2937;
 
-  box-shadow:
-    0 2px 6px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
 }
-
 
 /* =====================================================
    DOWNLOAD BUTTON
@@ -728,10 +705,8 @@
 
   color: #1d4ed8;
 
-  box-shadow:
-    0 2px 6px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.12);
 }
-
 
 /* =====================================================
    APPROVE BUTTON
@@ -779,12 +754,10 @@
 
   border-color: #257f3d;
 
-  box-shadow:
-    0 3px 8px rgba(46, 155, 75, 0.18);
+  box-shadow: 0 3px 8px rgba(46, 155, 75, 0.18);
 
   transform: translateY(-1px);
 }
-
 
 /* =====================================================
    REJECT BUTTON
@@ -832,8 +805,7 @@
 
   border-color: #b9231b;
 
-  box-shadow:
-    0 3px 8px rgba(217, 48, 37, 0.18);
+  box-shadow: 0 3px 8px rgba(217, 48, 37, 0.18);
 
   transform: translateY(-1px);
 }
@@ -847,7 +819,6 @@
 
   transform: none;
 }
-
 
 /* =====================================================
    LOADING
@@ -902,7 +873,6 @@
   }
 }
 
-
 /* =====================================================
    EMPTY
    ===================================================== */
@@ -944,7 +914,6 @@
   font-size: 22px;
 }
 
-
 /* =====================================================
    COUNT BADGE
    ===================================================== */
@@ -972,7 +941,6 @@
 
   font-weight: 700;
 }
-
 
 /* =====================================================
    REQUEST STATUS
@@ -1003,7 +971,6 @@
 
   text-transform: uppercase;
 }
-
 
 /* =====================================================
    REJECT MODAL
@@ -1039,12 +1006,10 @@
 
   border: 1px solid #e5e7eb;
 
-  box-shadow:
-    0 18px 45px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
 
   overflow: hidden;
 }
-
 
 /* =====================================================
    MODAL HEADER
@@ -1081,7 +1046,6 @@
 
   color: #777;
 }
-
 
 /* =====================================================
    CLOSE
@@ -1120,7 +1084,6 @@
 
   color: #222;
 }
-
 
 /* =====================================================
    MODAL BODY
@@ -1185,8 +1148,7 @@
 .rejection-reason-input:focus {
   border-color: #2563eb;
 
-  box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .reject-modal-body small {
@@ -1200,7 +1162,6 @@
 
   line-height: 1.5;
 }
-
 
 /* =====================================================
    MODAL FOOTER
@@ -1222,13 +1183,11 @@
   background: #fafbfc;
 }
 
-
 /* =====================================================
    RESPONSIVE
    ===================================================== */
 
 @media (max-width: 900px) {
-
   .submitted-document-grid {
     grid-template-columns: 1fr;
   }
@@ -1236,12 +1195,9 @@
   .document-summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
 }
 
-
 @media (max-width: 768px) {
-
   .submitted-document-actions {
     width: 100%;
 
@@ -1263,12 +1219,9 @@
   .reject-modal-footer button {
     width: 100%;
   }
-
 }
 
-
 @media (max-width: 600px) {
-
   .submitted-document-header {
     align-items: flex-start;
   }
@@ -1300,16 +1253,12 @@
 
     flex: none;
   }
-
 }
 
-
 @media (max-width: 400px) {
-
   .submitted-document-actions {
     grid-template-columns: 1fr;
   }
-
 }
 /* =========================================================
    DOCUMENT THUMBNAIL
@@ -1922,4 +1871,666 @@
   .file-thumbnail-content strong {
     max-width: 150px;
   }
+}
+.zip-icon {
+  color: #7c3aed;
+  background: #f3e8ff;
+}
+
+.zip-thumbnail .file-thumbnail-icon {
+  color: #7c3aed;
+}
+
+.zip-thumbnail .file-thumbnail-content strong {
+  overflow-wrap: anywhere;
+}
+/* ===================================================== */
+/* CUSTOMER ZIP DOWNLOAD CARD */
+/* ===================================================== */
+
+.zip-download-card {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* ZIP card header icon */
+
+.zip-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 10px;
+  font-size: 22px;
+}
+
+/* ZIP card content */
+
+.zip-download-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+}
+
+/* File information */
+
+.zip-file-information {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  flex: 1;
+}
+
+.zip-file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  font-size: 30px;
+}
+
+.zip-file-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.zip-file-details strong {
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.zip-file-details span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.zip-file-details small {
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Download button */
+
+.zip-download-content .submitted-document-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin: 0;
+  gap: 10px;
+}
+
+.zip-download-content .submitted-document-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.zip-download-content .submitted-document-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.zip-download-content .submitted-document-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Download loading animation */
+
+.zip-download-card .spin {
+  display: inline-block;
+  animation: zip-spin 1s linear infinite;
+}
+
+@keyframes zip-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive layout */
+
+@media (max-width: 768px) {
+  .zip-download-content {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .zip-download-content .submitted-document-actions {
+    width: 100%;
+  }
+
+  .zip-download-content .submitted-document-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .zip-file-information {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .zip-file-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 25px;
+  }
+
+  .zip-file-details strong {
+    font-size: 14px;
+  }
+
+  .zip-file-details span {
+    font-size: 12px;
+  }
+
+  .zip-file-details small {
+    font-size: 11px;
+  }
+}
+/* CA document uploader */
+.ca-document-upload {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+/* Image uploader container */
+.ca-document-upload lib-image-uploader-lib {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  min-height: 320px;
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px dashed #d6dae4;
+  border-radius: 8px;
+  background: #fafbfe;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.ca-document-upload lib-image-uploader-lib:hover {
+  border-color: #c7cce0;
+  background: #f8f9fd;
+}
+
+/* Disable interaction while uploading */
+.ca-document-upload.is-busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Center uploader content */
+.ca-document-upload ::ng-deep .row {
+  justify-content: center;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.ca-document-upload ::ng-deep .row > [class*="col-"] {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.ca-document-upload ::ng-deep .upload-slot {
+  min-height: 280px;
+}
+
+/* Upload progress */
+.ca-upload-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #eef0fd;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+/* Pending upload information */
+.ca-pending-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  max-width: 560px;
+  padding: 12px;
+  border: 1px solid #d6dae4;
+  border-radius: 8px;
+  background: #fafbfe;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+.ca-pending-upload i {
+  color: #16a34a;
+  font-size: 18px;
+}
+
+.ca-pending-upload span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.ca-pending-upload small {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ca-document-upload lib-image-uploader-lib {
+    min-height: 260px;
+    padding: 12px;
+  }
+
+  .ca-document-upload ::ng-deep .upload-slot {
+    min-height: 230px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ca-document-upload lib-image-uploader-lib {
+    min-height: 230px;
+    padding: 10px;
+  }
+
+  .ca-pending-upload {
+    padding: 10px;
+  }
+}
+/* ============================================================
+   CA DOCUMENT UPLOADER
+   ============================================================ */
+
+.document-upload-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+/* Image uploader container */
+.document-upload-area lib-image-uploader-lib {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  min-height: 280px;
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px dashed #d6dae4;
+  border-radius: 8px;
+  background: #fafbfe;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.document-upload-area lib-image-uploader-lib:hover {
+  border-color: #c7cce0;
+  background: #f8f9fd;
+}
+
+/* Disable interaction while uploading */
+.document-upload-area.is-busy {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* Expand the single-image uploader slot */
+.document-upload-area ::ng-deep .row {
+  justify-content: center;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.document-upload-area ::ng-deep .row > [class*="col-"] {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.document-upload-area ::ng-deep .upload-slot {
+  min-height: 240px;
+}
+
+/* ============================================================
+   UPLOAD RULES
+   ============================================================ */
+
+.document-upload-rules {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.upload-rule {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 30px;
+  padding: 6px 11px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.upload-rule i {
+  font-size: 14px;
+}
+
+.upload-rule-label {
+  font-weight: 500;
+}
+
+.upload-rule strong {
+  font-weight: 700;
+}
+
+.upload-rule--format {
+  color: #315ea8;
+  background: #eef5ff;
+  border-color: #cfe0ff;
+}
+
+.upload-rule--format i {
+  color: #3b6fd8;
+}
+
+.upload-rule--format strong {
+  color: #1d4f9c;
+}
+
+.upload-rule--size {
+  color: #95630b;
+  background: #fff7e8;
+  border-color: #f5dfb3;
+}
+
+.upload-rule--size i {
+  color: #d28a00;
+}
+
+.upload-rule--size strong {
+  color: #815400;
+}
+
+/* ============================================================
+   UPLOADING SPINNER
+   ============================================================ */
+
+.document-uploading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #eef0fd;
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.upload-spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid #dfe2f8;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: ca-upload-spin 0.7s linear infinite;
+}
+
+@keyframes ca-upload-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   TEMPORARY UPLOAD CONFIRMATION
+   ============================================================ */
+
+.ca-pending-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  max-width: 560px;
+  padding: 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #15803d;
+  text-align: center;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+.ca-pending-upload > i {
+  font-size: 20px;
+}
+
+.ca-pending-upload > span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ca-pending-upload small {
+  color: #4b7c5c;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .document-upload-rules {
+    justify-content: flex-start;
+  }
+
+  .document-upload-area lib-image-uploader-lib {
+    min-height: 240px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-rule {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .document-upload-area lib-image-uploader-lib {
+    min-height: 220px;
+    padding: 10px;
+  }
+}
+/* ==========================================================================
+   ADD THIS BLOCK AT THE VERY BOTTOM of your existing
+   submitted-documents.component.css
+   (no existing rule is changed or removed)
+   ========================================================================== */
+
+/* ============================================================
+   SUBMIT ALL DOCUMENTS (CA)
+   ============================================================ */
+
+.ca-submit-all-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 0;
+  padding-bottom: 18px;
+}
+
+.ca-submit-all-wrap .btn-save {
+  min-width: 190px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 18px;
+  border: 1px solid #cfe0fb;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s ease, box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.ca-submit-all-wrap .btn-save:hover:not(:disabled) {
+  background: #dbeafe;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.14);
+  transform: translateY(-1px);
+}
+
+.ca-submit-all-wrap .btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   CA UPLOADER (images + PDF) - keeps the pending file visible
+   ============================================================ */
+
+.document-upload-area {
+  margin: 0 15px 15px;
+  width: auto;
+}
+
+.document-upload-area .document-upload-rules {
+  justify-content: flex-start;
+}
+
+/* ============================================================
+   ZIP RESUBMISSION
+   ============================================================ */
+
+.zip-review-status {
+  padding: 0 0 12px;
+  border-bottom: 0;
+  min-height: 0;
+  background: transparent;
+}
+
+.zip-download-card .review-status-badge {
+  font-size: 10px;
+}
+
+/* Download + Resubmission buttons side by side */
+.zip-download-content .submitted-document-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  border-top: 0;
+  background: transparent;
+}
+
+.zip-download-content .submitted-document-actions .btn-reject {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* Resubmission reason inside the ZIP card */
+.zip-rejection-reason {
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .zip-download-content .submitted-document-actions {
+    justify-content: stretch;
+  }
+
+  .zip-download-content .submitted-document-actions .btn-reject {
+    width: 100%;
+  }
+
+  .ca-submit-all-wrap {
+    justify-content: stretch;
+  }
+
+  .ca-submit-all-wrap .btn-save {
+    width: 100%;
+  }
+}
+/* Hide the uploader's loading animation */
+.document-upload-area ::ng-deep .spinner,
+.document-upload-area ::ng-deep .spinner-border,
+.document-upload-area ::ng-deep .loading-spinner {
+  display: none !important;
 }

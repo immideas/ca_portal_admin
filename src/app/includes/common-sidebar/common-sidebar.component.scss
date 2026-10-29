@@ -1457,3 +1457,84 @@
   border-bottom:
     1px solid var(--sb-border);
 }
+
+.cs-brand-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  white-space: nowrap;
+}
+
+.tax-text {
+  color: #2563EB;
+}
+
+.tidy-text {
+  color: #10B981;
+}
+
+/* Taxtidy wordmark */
+.common-sidebar .cs-brand {
+  height: 48px;
+  min-height: 48px;
+}
+
+.common-sidebar .cs-brand-link {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+  padding: 0 12px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.common-sidebar .cs-brand-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.common-sidebar .cs-brand-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.common-sidebar .cs-brand-text {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.6px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.common-sidebar .tax-text {
+  color: #2563EB;
+}
+
+.common-sidebar .tidy-text {
+  color: #10B981;
+}
+
+/* Collapsed sidebar: show icon only */
+.common-sidebar.collapsed .cs-brand-link {
+  justify-content: center;
+  padding: 0;
+}
+
+.common-sidebar.collapsed .cs-brand-text {
+  display: none;
+}

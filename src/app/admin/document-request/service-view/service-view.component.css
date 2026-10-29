@@ -5037,3 +5037,147 @@ color: var(--primary-color, #4f46e5);
     width: 100%;
   }
 }
+
+/* Customer ZIP download section */
+.customer-zip-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* Section heading */
+.customer-zip-actions h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Download button: reuse your existing tab-edit-btn class */
+.customer-zip-actions .tab-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.customer-zip-actions .tab-edit-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+.customer-zip-actions .tab-edit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.customer-zip-actions .tab-edit-btn:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+/* Submitted documents area */
+.service-tab-content .customer-zip-actions + app-submitted-documents {
+  display: block;
+}
+
+/* Responsive layout */
+@media (max-width: 600px) {
+  .customer-zip-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .customer-zip-actions h3 {
+    font-size: 16px;
+  }
+
+  .customer-zip-actions .tab-edit-btn {
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+/* =========================================================
+   FIX: SERVICE REQUEST TAB TOP SPACING
+   Match Submitted Documents tab
+   ========================================================= */
+
+.service-tab-content {
+  padding-top: 10px !important;
+}
+
+::ng-deep app-add-document-request {
+  display: block !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+::ng-deep app-add-document-request .complaint-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+::ng-deep .service-tab-content > div:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* =========================================================
+   RECEIPT EMPTY STATE — MATCH PAYMENT EMPTY STATE
+   Keep the same width as other service tabs
+   ========================================================= */
+
+.service-tab-content > div > .receipt-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Receipt unavailable message */
+.receipt-empty-state {
+  width: 100%;
+  max-width: 100%;
+  min-height: 280px;
+  margin: 0;
+  padding: 40px 24px;
+  box-sizing: border-box;
+}
+
+/* Keep receipt heading aligned with invoice heading */
+.receipt-section .receipt-toolbar {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Responsive layout */
+@media (max-width: 576px) {
+  .receipt-empty-state {
+    padding: 28px 16px;
+  }
+}

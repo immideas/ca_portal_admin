@@ -6,7 +6,7 @@
   --c-completed: #1e9e57;   /* green */
   --c-payment: #8bd3a3;     /* light green */
   --c-pending: #f0b400;     /* yellow */
-  --c-upcoming: #f7e48a;    /* light yellow */
+  /* --c-upcoming: #f7e48a; */
   --c-overdue: #e04b4b;     /* red */
   --c-cancelled: #98a2b3;   /* grey */
 
@@ -96,7 +96,7 @@
 .legend-dot.completed { background: var(--c-completed); }
 .legend-dot.payment-due { background: var(--c-payment); }
 .legend-dot.pending { background: var(--c-pending); }
-.legend-dot.upcoming { background: var(--c-upcoming); }
+/* .legend-dot.upcoming { background: var(--c-upcoming); } */
 .legend-dot.overdue { background: var(--c-overdue); }
 
 /* LAYOUT: flexible calendar + fixed-width details panel */
@@ -294,7 +294,7 @@
 .event-dot.status-completed { background: var(--c-completed); }
 .event-dot.status-payment-due { background: var(--c-payment); }
 .event-dot.status-pending { background: var(--c-pending); }
-.event-dot.status-upcoming { background: var(--c-upcoming); }
+/* .event-dot.status-upcoming { background: var(--c-upcoming); } */
 .event-dot.status-overdue { background: var(--c-overdue); }
 .event-dot.status-cancelled { background: var(--c-cancelled); }
 

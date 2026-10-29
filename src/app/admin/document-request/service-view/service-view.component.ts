@@ -111,6 +111,8 @@ activeTab: "request" | "submitted" | "final" | "payment" | "receipt" =
   previewFinalType: "image" | "pdf" | "file" | "" = "";
 
   previewFinalLoading = false;
+  downloadingZip = false;
+  
 
   // =========================================================
   // CONSTRUCTOR
@@ -415,7 +417,38 @@ setTab(
   }
 
   
+async downloadCustomerZip(): Promise<void> {
+  if (!this.documentRequestId || this.downloadingZip) {
+    return;
+  }
 
+  this.downloadingZip = true;
+
+  try {
+    const response: any = await this.documentRequestService
+       .downloadCustomerZip(this.documentRequestId)
+      .toPromise();
+
+    const downloadUrl = response?.data?.downloadUrl;
+
+    if (!response?.success || !downloadUrl) {
+      this.toastr.error(
+        response?.message || "Customer ZIP is not available."
+      );
+      return;
+    }
+
+    window.open(downloadUrl, "_blank", "noopener");
+  } catch (error: any) {
+    console.error("Customer ZIP download failed:", error);
+
+    this.toastr.error(
+      error?.error?.message || "Unable to download customer ZIP."
+    );
+  } finally {
+    this.downloadingZip = false;
+  }
+}
 
 async downloadInvoice(payment: any): Promise<void> {
   const invoiceElement = document.getElementById('invoice-print-area');

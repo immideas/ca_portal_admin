@@ -1916,7 +1916,35 @@ export class AddDocumentRequestComponent implements OnInit {
 
     return Math.max(serviceCost - discountAmount, 0);
   }
+downloadCustomerZip(): void {
+  if (!this.documentRequestId) {
+    this.toastr.error("Document request ID not found.", "Error");
+    return;
+  }
 
+  this.documentRequestService.downloadCustomerZip(this.documentRequestId).subscribe({
+    next: (response: any) => {
+      const downloadUrl = response?.data?.downloadUrl;
+
+      if (!response?.success || !downloadUrl) {
+        this.toastr.error(
+          response?.message || "ZIP download URL not found.",
+          "Error"
+        );
+        return;
+      }
+
+      window.open(downloadUrl, "_blank");
+    },
+    error: (error: any) => {
+      console.error("ZIP download failed:", error);
+      this.toastr.error(
+        error?.error?.message || "Failed to download customer ZIP.",
+        "Error"
+      );
+    }
+  });
+}
   // =====================================================
   // CANCEL
   // =====================================================

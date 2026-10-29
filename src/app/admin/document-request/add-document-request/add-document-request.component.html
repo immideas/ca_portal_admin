@@ -50,6 +50,15 @@
     <!-- ================= HEADER ACTIONS ================= -->
 
     <div class="header-actions">
+        <button
+    *ngIf="isViewMode && documentRequestId"
+    type="button"
+    class="btn-save btn-active"
+    (click)="downloadCustomerZip()"
+  >
+    <i class="bi bi-file-earmark-zip"></i>
+    <span>Download Customer ZIP</span>
+  </button>
       <ng-container *ngIf="isViewMode; else saveMode">
         <button
           type="button"
@@ -642,30 +651,28 @@
           </div>
         </div>
 
-        
-<!-- OTHER AMOUNT PAID -->
-<div class="row mb-3">
-  <div class="col-md-12 form-group">
-    <label for="otherAmountPaid">Other Amount Paid (₹)</label>
+        <!-- OTHER AMOUNT PAID -->
+        <div class="row mb-3">
+          <div class="col-md-12 form-group">
+            <label for="otherAmountPaid">Other Amount Paid (₹)</label>
 
-    <div
-      class="field-wrap"
-      style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
-    >
-      <input
-        type="number"
-        id="otherAmountPaid"
-        formControlName="otherAmountPaid"
-        class="form-controler"
-        placeholder="Enter other amount paid"
-        min="0"
-        step="0.01"
-        [disabled]="isViewMode"
-      />
-    </div>
-  </div>
-</div>
-
+            <div
+              class="field-wrap"
+              style="--field-icon: url(&quot;assets/img/category-sub.svg&quot;)"
+            >
+              <input
+                type="number"
+                id="otherAmountPaid"
+                formControlName="otherAmountPaid"
+                class="form-controler"
+                placeholder="Enter other amount paid"
+                min="0"
+                step="0.01"
+                [disabled]="isViewMode"
+              />
+            </div>
+          </div>
+        </div>
 
         <!-- SECOND ROW: FULL-WIDTH DUE DATE -->
         <!-- <div class="row mb-3">
@@ -779,84 +786,84 @@
       </div>
     </article>
 
-<!-- ===================================================== -->
-<!-- DOCUMENT REMINDERS -->
-<!-- ===================================================== -->
+    <!-- ===================================================== -->
+    <!-- DOCUMENT REMINDERS -->
+    <!-- ===================================================== -->
 
+    <!-- DOCUMENT REMINDERS -->
+    <article class="card complaint-card mb-4 reminder-card">
+      <div class="section-title">
+        <div class="item-icon reminder-icon">
+          <i class="bi bi-bell"></i>
+        </div>
 
-<!-- DOCUMENT REMINDERS -->
-<article class="card complaint-card mb-4 reminder-card">
-  <div class="section-title">
-    <div class="item-icon reminder-icon">
-      <i class="bi bi-bell"></i>
-    </div>
-
-    <div class="header-content">
-      <span class="header-text">Document Reminders</span>
-      <span class="header-subtext">
-        Configure automatic reminders for pending documents.
-      </span>
-    </div>
-  </div>
-
-  <div class="reminder-body">
-    <!-- Enable reminders -->
-    <div class="reminder-setting">
-      <div class="reminder-setting-info">
-        <span class="reminder-setting-title">Automatic reminders</span>
-        <span class="reminder-setting-description">
-          Notify clients before or after the due date.
-        </span>
+        <div class="header-content">
+          <span class="header-text">Document Reminders</span>
+          <span class="header-subtext">
+            Configure automatic reminders for pending documents.
+          </span>
+        </div>
       </div>
 
-      <label class="recurring-switch">
-        <input
-          type="checkbox"
-          formControlName="reminderEnabled"
-          [disabled]="isViewMode"
-        />
-        <span class="recurring-slider"></span>
-      </label>
-    </div>
+      <div class="reminder-body">
+        <!-- Enable reminders -->
+        <div class="reminder-setting">
+          <div class="reminder-setting-info">
+            <span class="reminder-setting-title">Automatic reminders</span>
+            <span class="reminder-setting-description">
+              Notify clients before or after the due date.
+            </span>
+          </div>
 
-    <!-- Reminder options -->
-    <div
-      class="reminder-options"
-      *ngIf="documentRequestForm.get('reminderEnabled')?.value"
-    >
-      <div class="reminder-options-heading">
-        <span>Reminder schedule</span>
-        <!-- <span class="reminder-options-hint">Select one or more</span> -->
-      </div>
+          <label class="recurring-switch">
+            <input
+              type="checkbox"
+              formControlName="reminderEnabled"
+              [disabled]="isViewMode"
+            />
+            <span class="recurring-slider"></span>
+          </label>
+        </div>
 
-      <div class="reminder-chips">
-        <label
-          *ngFor="let day of reminderDayOptions"
-          class="reminder-chip"
-          [class.selected]="isReminderDaySelected(day.value)"
-          [class.disabled]="isViewMode"
+        <!-- Reminder options -->
+        <div
+          class="reminder-options"
+          *ngIf="documentRequestForm.get('reminderEnabled')?.value"
         >
-          <input
-            type="checkbox"
-            [checked]="isReminderDaySelected(day.value)"
-            [disabled]="isViewMode"
-            (change)="toggleReminderDay(day.value, $event)"
-          />
+          <div class="reminder-options-heading">
+            <span>Reminder schedule</span>
+            <!-- <span class="reminder-options-hint">Select one or more</span> -->
+          </div>
 
-          <i
-            class="bi"
-            [ngClass]="isReminderDaySelected(day.value)
-              ? 'bi-check-circle-fill'
-              : 'bi-circle'"
-          ></i>
+          <div class="reminder-chips">
+            <label
+              *ngFor="let day of reminderDayOptions"
+              class="reminder-chip"
+              [class.selected]="isReminderDaySelected(day.value)"
+              [class.disabled]="isViewMode"
+            >
+              <input
+                type="checkbox"
+                [checked]="isReminderDaySelected(day.value)"
+                [disabled]="isViewMode"
+                (change)="toggleReminderDay(day.value, $event)"
+              />
 
-          <span>{{ day.label }}</span>
-        </label>
+              <i
+                class="bi"
+                [ngClass]="
+                  isReminderDaySelected(day.value)
+                    ? 'bi-check-circle-fill'
+                    : 'bi-circle'
+                "
+              ></i>
+
+              <span>{{ day.label }}</span>
+            </label>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</article>
-
+    </article>
 
     <!-- ===================================================== -->
     <!-- PRICING & DISCOUNT -->

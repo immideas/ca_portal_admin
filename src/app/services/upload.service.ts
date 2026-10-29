@@ -35,6 +35,9 @@ export class UploadService {
   [UploadType.DOCUMENT_PREVIEW]: 'documents/previews',
     [UploadType.SERVICE_REQUEST_FINAL_DOCUMENT]:
     'service-request-final-documents',
+
+  [UploadType.SERVICE_REQUEST_DOCUMENT]:
+    'service-request-documents',
   };
 
   private getFolder(type: UploadType): string {
