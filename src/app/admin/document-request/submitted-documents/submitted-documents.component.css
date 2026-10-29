@@ -2528,3 +2528,9 @@
     width: 100%;
   }
 }
+/* Hide the uploader's loading animation */
+.document-upload-area ::ng-deep .spinner,
+.document-upload-area ::ng-deep .spinner-border,
+.document-upload-area ::ng-deep .loading-spinner {
+  display: none !important;
+}

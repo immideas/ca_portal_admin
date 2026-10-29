@@ -1297,3 +1297,10 @@
   background: rgba(79, 70, 229, 0.05);
   border-radius: 10px;
 }
+
+/* Resubmission Required - Red/Orange */
+.status-resubmission-required {
+  color: #c2410c;
+  background: #ffedd5;
+  border: 1px solid #fdba74;
+}
