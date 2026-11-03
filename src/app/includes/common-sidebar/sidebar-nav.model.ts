@@ -194,61 +194,61 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
             route: "/manage-email-templates",
             activeRoutes: ["/manage-email-templates"],
           },
-          {
-            label: "WhatsApp Template",
-            icon: "",
-            route: "/manage-whatsapp-templates",
-            activeRoutes: ["/manage-whatsapp-templates"],
-          },
-          {
-            label: "SMS Template",
-            icon: "",
-            route: "/manage-sms-templates",
-            activeRoutes: ["/manage-sms-templates"],
-          },
+          // {
+          //   label: "WhatsApp Template",
+          //   icon: "",
+          //   route: "/manage-whatsapp-templates",
+          //   activeRoutes: ["/manage-whatsapp-templates"],
+          // },
+          // {
+          //   label: "SMS Template",
+          //   icon: "",
+          //   route: "/manage-sms-templates",
+          //   activeRoutes: ["/manage-sms-templates"],
+          // },
         ],
       },
     ],
   },
-  {
-    items: [
-      {
-        id: "monitoring",
-        label: "Monitoring",
-        icon: "bi-clock-history",
-        children: [
-          {
-            label: "User Session History",
-            icon: "",
-            route: "/user-sessions",
-          },
-          {
-            label: "User Activity History",
-            icon: "",
-            route: "/activity-details",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    items: [
-      {
-        id: "reports-analysis",
-        label: "Reports & Analysis",
-        icon: "bi-bar-chart-line",
+  // {
+  //   items: [
+  //     {
+  //       id: "monitoring",
+  //       label: "Monitoring",
+  //       icon: "bi-clock-history",
+  //       children: [
+  //         {
+  //           label: "User Session History",
+  //           icon: "",
+  //           route: "/user-sessions",
+  //         },
+  //         {
+  //           label: "User Activity History",
+  //           icon: "",
+  //           route: "/activity-details",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   items: [
+  //     {
+  //       id: "reports-analysis",
+  //       label: "Reports & Analysis",
+  //       icon: "bi-bar-chart-line",
 
-        children: [
-          {
-            label: "Dashboard Reports",
-            icon: "",
-            route: "/super-reports",
-            activeRoutes: ["/super-reports"],
-          },
-        ],
-      },
-    ],
-  },
+  //       children: [
+  //         {
+  //           label: "Dashboard Reports",
+  //           icon: "",
+  //           route: "/super-reports",
+  //           activeRoutes: ["/super-reports"],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   {
     items: [
       {
@@ -261,15 +261,32 @@ export const SUPER_ADMIN_NAV: SidebarNavSection[] = [
             icon: "",
             route: "/manage-permissions",
           },
-          {
-            label: "Password Reset Requests",
-            icon: "",
-            route: "/password-reset-requests",
-          },
+          // {
+          //   label: "Password Reset Requests",
+          //   icon: "",
+          //   route: "/password-reset-requests",
+          // },
         ],
       },
     ],
   },
+  // ================= PORTAL MANAGEMENT =================
+{
+  items: [
+    {
+      id: "manage-portals",
+      label: "Manage Portals",
+      icon: "bi-globe",
+      route: "/manage-portals",
+      activeRoutes: [
+        "/manage-portals",
+        "/add-portal",
+        "/edit-portal",
+        "/view-portal",
+      ],
+    },
+  ],
+},
 
   {
     label: "Account",
@@ -521,29 +538,29 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
   ]
 },
 
-  {
-    items: [
-      {
-        id: "monitoring",
-        label: "Monitoring",
-        icon: "bi-clock-history",
-        children: [
-          {
-            label: "User Session History",
-            icon: "",
-            route: "/user-sessions",
-            permission: "manage_user_history",
-          },
-          {
-            label: "User Activity History",
-            icon: "",
-            route: "/activity-details",
-            permission: "manage_activity_details",
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   items: [
+  //     {
+  //       id: "monitoring",
+  //       label: "Monitoring",
+  //       icon: "bi-clock-history",
+  //       children: [
+  //         {
+  //           label: "User Session History",
+  //           icon: "",
+  //           route: "/user-sessions",
+  //           permission: "manage_user_history",
+  //         },
+  //         {
+  //           label: "User Activity History",
+  //           icon: "",
+  //           route: "/activity-details",
+  //           permission: "manage_activity_details",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
 
   {
     items: [
@@ -566,20 +583,20 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
             permission: "manage_email_template",
             activeRoutes: ["/manage-email-templates"],
           },
-          {
-            label: "WhatsApp Template",
-            icon: "",
-            route: "/manage-whatsapp-templates",
-            permission: "manage_whatsapp_template",
-            activeRoutes: ["/manage-whatsapp-templates"],
-          },
-          {
-            label: "SMS Template",
-            icon: "",
-            route: "/manage-sms-templates",
-            permission: "manage_sms_template",
-            activeRoutes: ["/manage-sms-templates"],
-          },
+          // {
+          //   label: "WhatsApp Template",
+          //   icon: "",
+          //   route: "/manage-whatsapp-templates",
+          //   permission: "manage_whatsapp_template",
+          //   activeRoutes: ["/manage-whatsapp-templates"],
+          // },
+          // {
+          //   label: "SMS Template",
+          //   icon: "",
+          //   route: "/manage-sms-templates",
+          //   permission: "manage_sms_template",
+          //   activeRoutes: ["/manage-sms-templates"],
+          // },
         ],
       },
     ],
@@ -628,26 +645,26 @@ export const DEFAULT_SUB_ADMIN_NAV: SidebarNavSection[] = [
     }
   ]
 },
-  {
-    items: [
-      {
-        id: "reports-analysis",
-        label: "Reports & Analysis",
-        icon: "bi-bar-chart-line",
+  // {
+  //   items: [
+  //     {
+  //       id: "reports-analysis",
+  //       label: "Reports & Analysis",
+  //       icon: "bi-bar-chart-line",
 
-        children: [
-          {
-            label: "Dashboard Reports",
-            icon: "",
-            route: "/reports",
-            permission: "dashboard_reports",
+  //       children: [
+  //         {
+  //           label: "Dashboard Reports",
+  //           icon: "",
+  //           route: "/reports",
+  //           permission: "dashboard_reports",
 
-            activeRoutes: ["/reports"],
-          },
-        ],
-      },
-    ],
-  },
+  //           activeRoutes: ["/reports"],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
   {
     label: "Account",
     items: [

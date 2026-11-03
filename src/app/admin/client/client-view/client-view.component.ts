@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AddClientComponent } from '../add-client/add-client.component';
 import { ClientKycComponent } from '../client-kyc/client-kyc.component';
 import { AddClientServicesComponent } from '../add-client-services/add-client-services.component';
+import { ClientCredentialVaultComponent } from '../client-credential-vault/client-credential-vault.component';
 
 @Component({
   selector: 'app-client-view',
@@ -13,7 +14,8 @@ import { AddClientServicesComponent } from '../add-client-services/add-client-se
     CommonModule,
     AddClientComponent,
     ClientKycComponent,
-    AddClientServicesComponent
+    AddClientServicesComponent,
+      ClientCredentialVaultComponent
   ],
   templateUrl: './client-view.component.html',
   styleUrl: './client-view.component.css'
@@ -21,8 +23,7 @@ import { AddClientServicesComponent } from '../add-client-services/add-client-se
 export class ClientViewComponent implements OnInit {
 
   clientId!: number;
-
-  activeTab: 'basic' | 'kyc' | 'services' = 'basic';
+activeTab: 'basic' | 'kyc' | 'services' | 'credentials' = 'basic';
 
   constructor(
     private route: ActivatedRoute,
@@ -39,9 +40,9 @@ export class ClientViewComponent implements OnInit {
 
   }
 
-  setTab(tab: 'basic' | 'kyc' | 'services'): void {
-    this.activeTab = tab;
-  }
+ setTab(tab: 'basic' | 'kyc' | 'services' | 'credentials'): void {
+  this.activeTab = tab;
+}
 
   goBack(): void {
     this.router.navigate(['/clients']);

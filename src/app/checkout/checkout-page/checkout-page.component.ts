@@ -219,7 +219,7 @@ private createOrderPayment(): void {
         order_id: order.id,
         amount: order.amount,
         currency: order.currency,
-        name: 'Resolvenest',
+        name: 'Taxtidy',
         description: this.selectedPlan.plan_name,
 
         handler: (response: any) => {
@@ -270,7 +270,7 @@ private createOrderPayment(): void {
           subscription_id: response.subscription_id,
 
           amount: response.amount,
-          name: 'Resolvenest',
+          name: 'Taxtidy',
           description: this.selectedPlan.plan_name,
           handler: (response: any) => {
 
