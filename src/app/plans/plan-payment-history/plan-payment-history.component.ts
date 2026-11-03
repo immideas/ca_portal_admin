@@ -290,7 +290,7 @@ export class PlanPaymentHistoryComponent implements OnInit {
   downloadInvoice(record: any) {
     try {
       const doc = new jsPDF();
-      const companyName = 'Resolvenest';
+      const companyName = 'Taxtidy';
       const left = 14;
       let y = 20;
 

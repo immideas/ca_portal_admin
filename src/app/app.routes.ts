@@ -139,6 +139,10 @@ import { AddThemeComponent } from "./super-admin/ThemeConfiguration/add-theme/ad
 // ================= CHANGE USER THEME =================
 import { ChangeUserThemeComponent } from "./super-admin/ThemeConfiguration/change-user-theme/change-user-theme.component";
 import { ServiceCalendarComponent } from "./admin/service-calendar/service-calendar.component";
+// ================= PORTAL MANAGEMENT =================
+import { ManagePortalComponent } from "./super-admin/portal-management/manage-portal/manage-portal.component";
+import { AddPortalComponent } from "./super-admin/portal-management/add-portal/add-portal.component";
+
 export const routes: Routes = [
   { path: "login", component: LoginComponent, canActivate: [LoginAuthGuard] },
   { path: "password-reset", component: RequestPasswordResetComponent }, // public — no guard
@@ -636,11 +640,11 @@ export const routes: Routes = [
         canActivate: [SuperAdminAuthGuard],
       },
       // ---- My Calendar ----
-{
-  path: "my-calendar",
-  component: ServiceCalendarComponent,
-  canActivate: [AdminAuthGuard, paymentStatusGuard],
-},
+      {
+        path: "my-calendar",
+        component: ServiceCalendarComponent,
+        canActivate: [AdminAuthGuard, paymentStatusGuard],
+      },
       // ---- Document Request Management ----
 
       {
@@ -1063,6 +1067,28 @@ export const routes: Routes = [
           SubAdminPermissionGuard,
         ],
         data: { permission: "manage_customize_theme" },
+      },
+      // ---- Portal Management (Super Admin Only) ----
+      {
+        path: "manage-portals",
+        component: ManagePortalComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+      {
+        path: "add-portal",
+        component: AddPortalComponent,
+        canDeactivate: [CanDeactivateGuard],
+        canActivate: [SuperAdminAuthGuard],
+      },
+      {
+        path: "edit-portal/:id",
+        component: AddPortalComponent,
+        canActivate: [SuperAdminAuthGuard],
+      },
+      {
+        path: "view-portal/:id",
+        component: AddPortalComponent,
+        canActivate: [SuperAdminAuthGuard],
       },
 
       // ---- Reports & Analysis (already single-permission, unchanged) ----

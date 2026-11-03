@@ -672,65 +672,67 @@ this.zipUpload = data.zipUpload?.uploaded
   // =====================================================
   // REJECT DOCUMENT / ZIP
   // =====================================================
+rejectDocument(): void {
+  const reason = this.rejectionReason.trim();
 
-  rejectDocument(): void {
-    const reason = this.rejectionReason.trim();
-
-    if (!reason) {
-      this.toastr.warning("Please enter resubmission reason", "Required");
-
-      return;
-    }
-
-    // ---------------- ZIP RESUBMISSION ----------------
-    if (this.rejectTarget === "zip") {
-      this.rejectZip(reason);
-      return;
-    }
-
-    // ---------------- DOCUMENT RESUBMISSION ----------------
-    const documentId = this.selectedDocument?.uploadedDocument?.id;
-
-    if (!documentId) {
-      this.toastr.error("Submitted document ID is missing", "Error");
-
-      return;
-    }
-
-    this.documentRequestService
-      .rejectSubmittedDocument(documentId, reason)
-      .subscribe({
-        next: (response: any) => {
-          if (!response?.success) {
-            this.toastr.error(
-              response?.message || "Failed to reject document",
-              "Error",
-            );
-
-            return;
-          }
-
-          this.toastr.success(
-            "Document resubmission requested successfully",
-            "Success",
-          );
-
-          this.closeRejectModal();
-
-          this.reloadDocuments();
-        },
-
-        error: (error: any) => {
-          console.error("REJECT DOCUMENT ERROR:", error);
-
-          this.toastr.error(
-            error?.error?.message || "Failed to reject document",
-            "Error",
-          );
-        },
-      });
+  if (!reason) {
+    this.toastr.warning("Please enter resubmission reason", "Required");
+    return;
   }
 
+  // ---------------- ZIP RESUBMISSION ----------------
+  if (this.rejectTarget === "zip") {
+    this.rejectZip(reason);
+    return;
+  }
+
+  // ---------------- DOCUMENT RESUBMISSION ----------------
+  const documentId = this.selectedDocument?.uploadedDocument?.id;
+
+  if (!documentId) {
+    this.toastr.error("Submitted document ID is missing", "Error");
+    return;
+  }
+
+  this.documentRequestService
+    .rejectSubmittedDocument(documentId, reason)
+    .subscribe({
+      next: (response: any) => {
+        if (!response?.success) {
+          this.toastr.error(
+            response?.message || "Failed to reject document",
+            "Error",
+          );
+          return;
+        }
+
+        // Show resubmission reason immediately in CA Portal
+        if (this.selectedDocument?.uploadedDocument) {
+          this.selectedDocument.uploadedDocument.rejectionReason = reason;
+          this.selectedDocument.uploadedDocument.status =
+            "RESUBMISSION_REQUIRED";
+        }
+
+        this.toastr.success(
+          "Document resubmission requested successfully",
+          "Success",
+        );
+
+        this.closeRejectModal();
+
+        this.reloadDocuments();
+      },
+
+      error: (error: any) => {
+        console.error("REJECT DOCUMENT ERROR:", error);
+
+        this.toastr.error(
+          error?.error?.message || "Failed to reject document",
+          "Error",
+        );
+      },
+    });
+}
 
 private rejectZip(reason: string): void {
   const zipId = Number(this.zipUpload?.id);

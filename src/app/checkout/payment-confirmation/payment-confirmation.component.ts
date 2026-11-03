@@ -266,7 +266,7 @@ goToDashboard(): void {
 
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
-    doc.text('Resolvenest', left, y);
+    doc.text('Taxtidy', left, y);
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');

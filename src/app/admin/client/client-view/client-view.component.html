@@ -79,6 +79,13 @@
       >
         Services
       </button>
+      <button
+  type="button"
+  [class.active]="activeTab === 'credentials'"
+  (click)="setTab('credentials')"
+>
+  Credential Vault
+</button>
 
     </div>
 
@@ -88,6 +95,7 @@
     <button
       type="button"
       class="tab-edit-btn"
+        *ngIf="activeTab !== 'credentials'"
       (click)="
         activeTab === 'basic'
           ? editBasicDetails()
@@ -162,6 +170,19 @@
       </app-add-client-services>
 
     </div>
+    <!-- =====================================================
+     CREDENTIAL VAULT
+     ===================================================== -->
+
+<div *ngIf="activeTab === 'credentials'">
+
+  <app-client-credential-vault
+    [clientIdInput]="clientId"
+    [isViewMode]="false"
+    [embedded]="true">
+  </app-client-credential-vault>
+
+</div>
 
   </div>
 

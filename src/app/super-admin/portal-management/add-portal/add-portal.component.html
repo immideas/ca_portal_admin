@@ -1,0 +1,343 @@
+<main id="main" class="complaint-wrapper">
+
+  <ngx-ui-loader></ngx-ui-loader>
+
+  <!-- Header -->
+  <header class="top-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-btn"
+        (click)="cancel()"
+        aria-label="Go back"
+      >
+        <img src="assets/img/back-icon.svg" alt="back" />
+      </button>
+
+      <div class="divider"></div>
+
+      <div class="title-box">
+
+        <div class="title-icon">
+          <img src="assets/img/Plus.svg" alt="add" />
+        </div>
+
+        <div class="title-text">
+          <h4>
+            {{
+              isViewMode
+                ? 'View Portal'
+                : isEditMode
+                  ? 'Edit Portal'
+                  : 'Add Portal'
+            }}
+          </h4>
+
+          <p>Portal details</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+
+      <ng-container *ngIf="isViewMode; else editOrSaveMode">
+
+        <button
+          type="button"
+          class="btn-save btn-active"
+          (click)="enableEditMode()"
+        >
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit</span>
+        </button>
+
+      </ng-container>
+
+      <ng-template #editOrSaveMode>
+
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="cancel()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          form="portalForm"
+          class="btn-save"
+          [ngClass]="{
+            'btn-active': portalForm.valid
+          }"
+        >
+          <img
+            class="save-icon"
+            src="assets/img/Group-Save.svg"
+            alt="save"
+          />
+
+          <span>
+            {{ isEditMode ? 'Update' : 'Save' }}
+          </span>
+        </button>
+
+      </ng-template>
+
+    </div>
+
+  </header>
+
+  <!-- Main Card -->
+  <article class="card complaint-card">
+
+    <!-- Section Header -->
+    <div class="section-title">
+
+      <div class="item-icon">
+        <img src="assets/img/Information.svg" alt="info" />
+      </div>
+
+      <div class="header-content">
+        <span class="header-text">
+          Portal Details
+        </span>
+      </div>
+
+      <div class="required-group">
+        <span class="badge-required">
+          Required
+          <img
+            src="assets/img/star.svg"
+            class="required-icon"
+            alt="required-star"
+          />
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Error -->
+    <div
+      *ngIf="errorMessage"
+      class="alert alert-danger mx-4 mt-3"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <!-- Form -->
+    <form
+      [formGroup]="portalForm"
+      id="portalForm"
+      (ngSubmit)="savePortal()"
+      class="form-padding-wrap"
+    >
+
+      <!-- PORTAL NAME + PORTAL URL -->
+      <div class="row mb-3">
+
+        <!-- Portal Name -->
+        <div class="col-md-6 form-group">
+
+          <label for="portalName">
+            Portal Name
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+            <input
+              id="portalName"
+              type="text"
+              formControlName="name"
+              class="form-controler"
+              maxlength="150"
+              placeholder="Enter portal name"
+              [readonly]="isViewMode"
+            />
+          </div>
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              portalForm.get('name')?.invalid &&
+              portalForm.get('name')?.touched
+            "
+          >
+
+            <div
+              *ngIf="portalForm.get('name')?.errors?.['required']"
+            >
+              Portal name is required.
+            </div>
+
+            <div
+              *ngIf="portalForm.get('name')?.errors?.['minlength']"
+            >
+              Portal name must be at least 2 characters long.
+            </div>
+
+            <div
+              *ngIf="portalForm.get('name')?.errors?.['maxlength']"
+            >
+              Portal name cannot exceed 150 characters.
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Portal URL -->
+        <div class="col-md-6 form-group">
+
+          <label for="portalUrl">
+            Portal URL
+            <img
+              src="assets/img/star.svg"
+              class="required-icon"
+              alt="required"
+            />
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+            <input
+              id="portalUrl"
+              type="url"
+              formControlName="url"
+              class="form-controler"
+              maxlength="500"
+              placeholder="https://example.com"
+              [readonly]="isViewMode"
+            />
+          </div>
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              portalForm.get('url')?.invalid &&
+              portalForm.get('url')?.touched
+            "
+          >
+
+            <div
+              *ngIf="portalForm.get('url')?.errors?.['required']"
+            >
+              Portal URL is required.
+            </div>
+
+            <div
+              *ngIf="
+                portalForm.get('url')?.errors?.['invalidPortalUrl']
+              "
+            >
+              Enter a valid URL starting with http:// or https://.
+            </div>
+
+            <div
+              *ngIf="portalForm.get('url')?.errors?.['maxlength']"
+            >
+              Portal URL cannot exceed 500 characters.
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="row mb-3">
+
+        <div class="col-md-12 form-group">
+
+          <label for="portalDescription">
+            Description
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+            <textarea
+              id="portalDescription"
+              formControlName="description"
+              class="form-controler"
+              rows="4"
+              maxlength="500"
+              placeholder="Enter portal description"
+              [readonly]="isViewMode"
+            ></textarea>
+          </div>
+
+          <!-- Validation -->
+          <div
+            class="text-danger mt-1"
+            style="font-size: 11px"
+            *ngIf="
+              portalForm.get('description')?.invalid &&
+              portalForm.get('description')?.touched
+            "
+          >
+            <div
+              *ngIf="
+                portalForm.get('description')?.errors?.['maxlength']
+              "
+            >
+              Description cannot exceed 500 characters.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- STATUS -->
+      <!-- <div class="row mb-3">
+
+        <div class="col-md-6 form-group">
+
+          <label for="portalStatus">
+            Status
+          </label>
+
+          <div
+            class="field-wrap"
+            style="--field-icon: url('assets/img/category-sub.svg')"
+          >
+            <select
+              id="portalStatus"
+              formControlName="status"
+              class="form-controler"
+            >
+              <option [ngValue]="1">Active</option>
+              <option [ngValue]="0">Inactive</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div> -->
+
+    </form>
+
+  </article>
+
+</main>

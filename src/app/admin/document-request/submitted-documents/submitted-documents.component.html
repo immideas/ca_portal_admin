@@ -434,25 +434,22 @@
                 </strong>
               </div>
 
-              <!-- RESUBMISSION REASON -->
+         
 
-              <div
-                class="document-rejection-reason"
-                *ngIf="
-                  isResubmission(document) &&
-                  document.uploadedDocument?.rejectionReason
-                "
-              >
-                <div class="rejection-reason-title">
-                  <i class="bi bi-exclamation-triangle-fill"></i>
+           <!-- RESUBMISSION REASON -->
+<div
+  class="document-rejection-reason"
+  *ngIf="document.uploadedDocument?.rejectionReason"
+>
+  <div class="rejection-reason-title">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span>Resubmission Reason</span>
+  </div>
 
-                  <span> Resubmission Reason </span>
-                </div>
-
-                <div class="rejection-reason-text">
-                  {{ document.uploadedDocument?.rejectionReason }}
-                </div>
-              </div>
+  <div class="rejection-reason-text">
+    {{ document.uploadedDocument?.rejectionReason }}
+  </div>
+</div>
             </div>
 
             <!-- ================= ACTIONS ================= -->
